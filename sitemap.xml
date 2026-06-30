@@ -43,6 +43,27 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/br-utils/"/>
     </url>
     <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/flags-storage/</loc>
+        <lastmod>2026-06-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/flags-storage/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/flags-storage/"/>
+    </url>
+    <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/jobs/</loc>
+        <lastmod>2026-06-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/jobs/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/jobs/"/>
+    </url>
+    <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/realtime/</loc>
+        <lastmod>2026-06-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/realtime/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/realtime/"/>
+    </url>
+    <url>
         <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/en/</loc>
         <lastmod>2026-06-30</lastmod>
         <changefreq>daily</changefreq>
@@ -83,5 +104,26 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/br-utils/"/>
         <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/br-utils/"/>
+    </url>
+    <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/flags-storage/</loc>
+        <lastmod>2026-06-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/flags-storage/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/flags-storage/"/>
+    </url>
+    <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/jobs/</loc>
+        <lastmod>2026-06-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/jobs/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/jobs/"/>
+    </url>
+    <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/realtime/</loc>
+        <lastmod>2026-06-30</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/realtime/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/realtime/"/>
     </url>
 </urlset>

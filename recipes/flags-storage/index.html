@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="pt" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -10,35 +10,35 @@
       
       
       
-        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/br-utils/">
+        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/flags-storage/">
       
       
-        <link rel="prev" href="../auth/">
+        <link rel="prev" href="../jobs/">
       
       
-        <link rel="next" href="../realtime/">
+        <link rel="next" href="../../changelog/">
       
       
         
-          <link rel="alternate" href="../../../recipes/br-utils/" hreflang="pt">
+          <link rel="alternate" href="./" hreflang="pt">
         
-          <link rel="alternate" href="./" hreflang="en">
+          <link rel="alternate" href="../../en/recipes/flags-storage/" hreflang="en">
         
       
       
-      <link rel="icon" href="../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>BR utilities - tempest-express-sdk</title>
+        <title>Feature flags e storage - tempest-express-sdk</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -57,7 +57,7 @@
       
     
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -82,8 +82,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#br-utilities" class="md-skip">
-          Skip to content
+        <a href="#feature-flags-e-storage" class="md-skip">
+          Ir para o conteúdo
         </a>
       
     </div>
@@ -97,8 +97,8 @@
   
 
 <header class="md-header md-header--shadow" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../" title="tempest-express-sdk" class="md-header__button md-logo" aria-label="tempest-express-sdk" data-md-component="logo">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="../.." title="tempest-express-sdk" class="md-header__button md-logo" aria-label="tempest-express-sdk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              BR utilities
+              Feature flags e storage
             
           </span>
         </div>
@@ -168,20 +168,20 @@
       <div class="md-header__option">
   <div class="md-select">
     
-    <button class="md-header__button md-icon" aria-label="Select language">
+    <button class="md-header__button md-icon" aria-label="Selecione o idioma">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
     </button>
     <div class="md-select__inner">
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../../recipes/br-utils/" hreflang="pt" class="md-select__link">
+            <a href="./" hreflang="pt" class="md-select__link">
               Português (BR)
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="./" hreflang="en" class="md-select__link">
+            <a href="../../en/recipes/flags-storage/" hreflang="en" class="md-select__link">
               English (US)
             </a>
           </li>
@@ -202,16 +202,16 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="Search">
+      <nav class="md-search__options" aria-label="Pesquisar">
         
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
@@ -224,7 +224,7 @@
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            Initializing search
+            Inicializando a pesquisa
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -236,7 +236,7 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/mauriciobenjamin700/tempest-express-sdk" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/mauriciobenjamin700/tempest-express-sdk" title="Ir ao repositório" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
@@ -270,9 +270,9 @@
 
 
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+<nav class="md-nav md-nav--primary" aria-label="Navegação" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../" title="tempest-express-sdk" class="md-nav__button md-logo" aria-label="tempest-express-sdk" data-md-component="logo">
+    <a href="../.." title="tempest-express-sdk" class="md-nav__button md-logo" aria-label="tempest-express-sdk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -282,7 +282,7 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/mauriciobenjamin700/tempest-express-sdk" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/mauriciobenjamin700/tempest-express-sdk" title="Ir ao repositório" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
@@ -302,14 +302,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Home
+    Início
   
 
     
@@ -336,7 +336,7 @@
   <span class="md-ellipsis">
     
   
-    Installation
+    Instalação
   
 
     
@@ -408,7 +408,7 @@
   <span class="md-ellipsis">
     
   
-    Recipes
+    Receitas
   
 
     
@@ -424,7 +424,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Recipes
+    Receitas
   
 
           </label>
@@ -444,7 +444,91 @@
   <span class="md-ellipsis">
     
   
-    Authentication (JWT)
+    Autenticação (JWT)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../br-utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilidades BR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../realtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tempo real (WebSocket + SSE)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jobs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache, fila e tarefas
   
 
     
@@ -481,7 +565,7 @@
   <span class="md-ellipsis">
     
   
-    BR utilities
+    Feature flags e storage
   
 
     
@@ -499,7 +583,7 @@
   <span class="md-ellipsis">
     
   
-    BR utilities
+    Feature flags e storage
   
 
     
@@ -511,7 +595,7 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
   
   
   
@@ -520,15 +604,15 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      Índice
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#validation-and-normalization" class="md-nav__link">
+  <a href="#feature-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validation and normalization
+        Feature flags
       
     </span>
   </a>
@@ -536,10 +620,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#zod-fields" class="md-nav__link">
+  <a href="#storage-uploads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Zod fields
+        Storage / uploads
       
     </span>
   </a>
@@ -547,21 +631,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#states-and-cities" class="md-nav__link">
+  <a href="#recapitulando" class="md-nav__link">
     <span class="md-ellipsis">
       
-        States and cities
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recap
+        Recapitulando
       
     </span>
   </a>
@@ -572,90 +645,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../realtime/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Real-time (WebSocket + SSE)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../jobs/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache, queue and tasks
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../flags-storage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Feature flags and storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -708,7 +697,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
   
   
   
@@ -717,15 +706,15 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      Índice
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#validation-and-normalization" class="md-nav__link">
+  <a href="#feature-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validation and normalization
+        Feature flags
       
     </span>
   </a>
@@ -733,10 +722,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#zod-fields" class="md-nav__link">
+  <a href="#storage-uploads" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Zod fields
+        Storage / uploads
       
     </span>
   </a>
@@ -744,21 +733,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#states-and-cities" class="md-nav__link">
+  <a href="#recapitulando" class="md-nav__link">
     <span class="md-ellipsis">
       
-        States and cities
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recap
+        Recapitulando
       
     </span>
   </a>
@@ -785,54 +763,59 @@
   
 
 
-<h1 id="br-utilities">BR utilities<a class="headerlink" href="#br-utilities" title="Permanent link">&para;</a></h1>
-<p>Ready-made helpers for the identity/contact fields most common in Brazilian
-APIs: CPF, CNPJ, CEP, phone and UF/cities.</p>
-<h2 id="validation-and-normalization">Validation and normalization<a class="headerlink" href="#validation-and-normalization" title="Permanent link">&para;</a></h2>
+<h1 id="feature-flags-e-storage">Feature flags e storage<a class="headerlink" href="#feature-flags-e-storage" title="Permanent link">&para;</a></h1>
+<h2 id="feature-flags">Feature flags<a class="headerlink" href="#feature-flags" title="Permanent link">&para;</a></h2>
+<p>Backends componíveis: memória (overrides/testes), env (<code>FLAG_&lt;NOME&gt;</code>) e
+composite (primeiro que decide vence).</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nx">isValidCpf</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nx">isValidCnpj</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nx">normalizeCpf</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nx">onlyDigits</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nx">isValidCpf</span><span class="p">(</span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// true (format + check digits)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nx">isValidCpf</span><span class="p">(</span><span class="s2">&quot;111.111.111-11&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// false (repeated sequence)</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nx">normalizeCpf</span><span class="p">(</span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;52998224725&quot;</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nx">onlyDigits</span><span class="p">(</span><span class="s2">&quot;(11) 99999-8888&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;11999998888&quot;</span>
-</code></pre></div>
-<p>Available: <code>isValidCpf</code>, <code>isValidCnpj</code>, <code>isValidCpfCnpj</code>, <code>isValidCep</code>,
-<code>isValidPhoneBr</code>, plus the matching <code>normalize*</code> (which throw on invalid input).</p>
-<h2 id="zod-fields">Zod fields<a class="headerlink" href="#zod-fields" title="Permanent link">&para;</a></h2>
-<p>Each document has a Zod field that validates <strong>and</strong> normalizes to digits:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">cpfField</span><span class="p">,</span><span class="w"> </span><span class="nx">phoneBrField</span><span class="p">,</span><span class="w"> </span><span class="nx">ufField</span><span class="p">,</span><span class="w"> </span><span class="nx">z</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">customerSchema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">z</span><span class="p">.</span><span class="nx">object</span><span class="p">({</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">cpf</span><span class="o">:</span><span class="w"> </span><span class="kt">cpfField</span><span class="p">,</span><span class="w"> </span><span class="c1">// &quot;529.982.247-25&quot; → &quot;52998224725&quot;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nx">phone</span><span class="o">:</span><span class="w"> </span><span class="kt">phoneBrField</span><span class="p">,</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nx">uf</span><span class="o">:</span><span class="w"> </span><span class="kt">ufField</span><span class="p">,</span><span class="w"> </span><span class="c1">// &quot;sp&quot; → &quot;SP&quot;</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">});</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nx">customerSchema</span><span class="p">.</span><span class="nx">parse</span><span class="p">({</span><span class="w"> </span><span class="nx">cpf</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">phone</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;(11) 99999-8888&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">uf</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;sp&quot;</span><span class="w"> </span><span class="p">});</span>
-</code></pre></div>
-<p>An invalid value throws <code>ZodError</code>, which the error handler turns into <strong>422</strong>.</p>
-<h2 id="states-and-cities">States and cities<a class="headerlink" href="#states-and-cities" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">listStates</span><span class="p">,</span><span class="w"> </span><span class="nx">getState</span><span class="p">,</span><span class="w"> </span><span class="nx">isValidCity</span><span class="p">,</span><span class="w"> </span><span class="nx">statesByRegion</span><span class="p">,</span><span class="w"> </span><span class="nx">Region</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nx">listStates</span><span class="p">().</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="c1">// 27</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nx">getState</span><span class="p">(</span><span class="s2">&quot;SP&quot;</span><span class="p">)</span><span class="o">?</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;São Paulo&quot;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nx">isValidCity</span><span class="p">(</span><span class="s2">&quot;sao paulo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SP&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// true (accent/case-insensitive)</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nx">statesByRegion</span><span class="p">(</span><span class="nx">Region</span><span class="p">.</span><span class="nx">SOUTH</span><span class="p">).</span><span class="nx">map</span><span class="p">((</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">uf</span><span class="p">);</span><span class="w"> </span><span class="c1">// [&quot;PR&quot;, &quot;RS&quot;, &quot;SC&quot;]</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nx">CompositeFeatureFlagBackend</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nx">EnvFeatureFlagBackend</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nx">FeatureFlags</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nx">MemoryFeatureFlagBackend</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nx">makeFlagGuard</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kd">const</span><span class="w"> </span><span class="nx">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">FeatureFlags</span><span class="p">(</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="ow">new</span><span class="w"> </span><span class="nx">CompositeFeatureFlagBackend</span><span class="p">([</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryFeatureFlagBackend</span><span class="p">({</span><span class="w"> </span><span class="s2">&quot;new-ui&quot;</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}),</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">EnvFeatureFlagBackend</span><span class="p">(),</span><span class="w"> </span><span class="c1">// lê FLAG_NEW_UI, FLAG_BETA, …</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="p">]),</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">);</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="k">await</span><span class="w"> </span><span class="nx">flags</span><span class="p">.</span><span class="nx">isEnabled</span><span class="p">(</span><span class="s2">&quot;new-ui&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// true</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="c1">// Esconde uma rota (404) quando a flag está desligada:</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;/api/beta&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">makeFlagGuard</span><span class="p">(</span><span class="nx">flags</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;beta&quot;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="nx">_req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">({</span><span class="w"> </span><span class="nx">ok</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="w"> </span><span class="p">}));</span>
 </code></pre></div>
 <div class="admonition note">
-<p class="admonition-title">Offline dataset</p>
-<p>The package bundles all 27 states and ~5.6k municipalities — no network
-calls. City comparisons ignore accents and case.</p>
+<p class="admonition-title">Convenção de env</p>
+<p>A flag <code>new-ui</code> mapeia para <code>FLAG_NEW_UI</code>. Valores <code>1/true/on/yes/enabled</code>
+(case-insensitive) contam como ligado.</p>
 </div>
-<h2 id="recap">Recap<a class="headerlink" href="#recap" title="Permanent link">&para;</a></h2>
-<p>Validators + Zod fields cover CPF/CNPJ/CEP/phone; the UF/cities dataset is
-offline. Everything integrates with the canonical error envelope via
-<code>ZodError</code> → 422.</p>
+<h2 id="storage-uploads">Storage / uploads<a class="headerlink" href="#storage-uploads" title="Permanent link">&para;</a></h2>
+<p><code>UploadStorage</code> é a interface; <code>LocalUploadStorage</code> grava no sistema de arquivos.
+Para S3/MinIO, implemente a mesma interface sobre o seu cliente.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">LocalUploadStorage</span><span class="p">,</span><span class="w"> </span><span class="nx">buildContentDisposition</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">storage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">LocalUploadStorage</span><span class="p">({</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">root</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;./var/uploads&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nx">baseUrl</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://cdn.example.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">});</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">storage</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="s2">&quot;avatars/123.png&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="ow">new</span><span class="w"> </span><span class="nb">Uint8Array</span><span class="p">(</span><span class="nx">bytes</span><span class="p">),</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">contentType</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;image/png&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">);</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="nx">result</span><span class="p">.</span><span class="nx">url</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;https://cdn.example.com/avatars/123.png&quot;</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="c1">// Download com nome de arquivo (acentos seguros via RFC 5987):</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="nx">res</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="s2">&quot;Content-Disposition&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">buildContentDisposition</span><span class="p">(</span><span class="s2">&quot;relatório.pdf&quot;</span><span class="p">));</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">storage</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="s2">&quot;docs/relatorio.pdf&quot;</span><span class="p">));</span>
+</code></pre></div>
+<h2 id="recapitulando">Recapitulando<a class="headerlink" href="#recapitulando" title="Permanent link">&para;</a></h2>
+<p>Flags com backends trocáveis + guarda de rota; storage com interface única
+(local agora, S3/MinIO implementando o mesmo contrato).</p>
 
 
 
@@ -856,7 +839,7 @@ offline. Everything integrates with the canonical error envelope via
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
-  Back to top
+  Voltar ao topo
 </button>
         
       </main>
@@ -888,10 +871,10 @@ offline. Everything integrates with the canonical error envelope via
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tracking", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate", "search.suggest", "search.highlight"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tracking", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

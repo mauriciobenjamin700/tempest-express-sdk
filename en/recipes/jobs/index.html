@@ -10,17 +10,17 @@
       
       
       
-        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/br-utils/">
+        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/jobs/">
       
       
-        <link rel="prev" href="../auth/">
+        <link rel="prev" href="../realtime/">
       
       
-        <link rel="next" href="../realtime/">
+        <link rel="next" href="../flags-storage/">
       
       
         
-          <link rel="alternate" href="../../../recipes/br-utils/" hreflang="pt">
+          <link rel="alternate" href="../../../recipes/jobs/" hreflang="pt">
         
           <link rel="alternate" href="./" hreflang="en">
         
@@ -31,7 +31,7 @@
     
     
       
-        <title>BR utilities - tempest-express-sdk</title>
+        <title>Cache, queue and tasks - tempest-express-sdk</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#br-utilities" class="md-skip">
+        <a href="#cache-queue-and-tasks" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              BR utilities
+              Cache, queue and tasks
             
           </span>
         </div>
@@ -175,7 +175,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../../recipes/br-utils/" hreflang="pt" class="md-select__link">
+            <a href="../../../recipes/jobs/" hreflang="pt" class="md-select__link">
               Português (BR)
             </a>
           </li>
@@ -462,37 +462,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    BR utilities
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../br-utils/" class="md-nav__link">
         
   
   
@@ -508,70 +481,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#validation-and-normalization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Validation and normalization
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#zod-fields" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Zod fields
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#states-and-cities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        States and cities
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recap
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -609,10 +518,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../jobs/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache, queue and tasks
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -628,6 +564,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#queue-broker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Queue (broker)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#background-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Background tasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recap
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -722,10 +722,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#validation-and-normalization" class="md-nav__link">
+  <a href="#cache" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validation and normalization
+        Cache
       
     </span>
   </a>
@@ -733,10 +733,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#zod-fields" class="md-nav__link">
+  <a href="#queue-broker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Zod fields
+        Queue (broker)
       
     </span>
   </a>
@@ -744,10 +744,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#states-and-cities" class="md-nav__link">
+  <a href="#background-tasks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        States and cities
+        Background tasks
       
     </span>
   </a>
@@ -785,54 +785,68 @@
   
 
 
-<h1 id="br-utilities">BR utilities<a class="headerlink" href="#br-utilities" title="Permanent link">&para;</a></h1>
-<p>Ready-made helpers for the identity/contact fields most common in Brazilian
-APIs: CPF, CNPJ, CEP, phone and UF/cities.</p>
-<h2 id="validation-and-normalization">Validation and normalization<a class="headerlink" href="#validation-and-normalization" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nx">isValidCpf</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nx">isValidCnpj</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nx">normalizeCpf</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nx">onlyDigits</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nx">isValidCpf</span><span class="p">(</span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// true (format + check digits)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nx">isValidCpf</span><span class="p">(</span><span class="s2">&quot;111.111.111-11&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// false (repeated sequence)</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nx">normalizeCpf</span><span class="p">(</span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;52998224725&quot;</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nx">onlyDigits</span><span class="p">(</span><span class="s2">&quot;(11) 99999-8888&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;11999998888&quot;</span>
+<h1 id="cache-queue-and-tasks">Cache, queue and tasks<a class="headerlink" href="#cache-queue-and-tasks" title="Permanent link">&para;</a></h1>
+<h2 id="cache">Cache<a class="headerlink" href="#cache" title="Permanent link">&para;</a></h2>
+<p><code>MemoryCacheManager</code> (in-process) or <code>RedisCacheManager</code> (injected node-redis
+client). The <code>cached</code> helper does read-through memoization.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MemoryCacheManager</span><span class="p">,</span><span class="w"> </span><span class="nx">cached</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">MemoryCacheManager</span><span class="p">();</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">getUser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">cached</span><span class="p">(</span><span class="nx">fetchUserFromDb</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nx">manager</span><span class="o">:</span><span class="w"> </span><span class="kt">cache</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="sb">`user:</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nx">ttlSeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">60</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">});</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="k">await</span><span class="w"> </span><span class="nx">getUser</span><span class="p">(</span><span class="s2">&quot;123&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// miss → runs fetchUserFromDb and stores</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="k">await</span><span class="w"> </span><span class="nx">getUser</span><span class="p">(</span><span class="s2">&quot;123&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// hit → served from cache</span>
 </code></pre></div>
-<p>Available: <code>isValidCpf</code>, <code>isValidCnpj</code>, <code>isValidCpfCnpj</code>, <code>isValidCep</code>,
-<code>isValidPhoneBr</code>, plus the matching <code>normalize*</code> (which throw on invalid input).</p>
-<h2 id="zod-fields">Zod fields<a class="headerlink" href="#zod-fields" title="Permanent link">&para;</a></h2>
-<p>Each document has a Zod field that validates <strong>and</strong> normalizes to digits:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">cpfField</span><span class="p">,</span><span class="w"> </span><span class="nx">phoneBrField</span><span class="p">,</span><span class="w"> </span><span class="nx">ufField</span><span class="p">,</span><span class="w"> </span><span class="nx">z</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">customerSchema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">z</span><span class="p">.</span><span class="nx">object</span><span class="p">({</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">cpf</span><span class="o">:</span><span class="w"> </span><span class="kt">cpfField</span><span class="p">,</span><span class="w"> </span><span class="c1">// &quot;529.982.247-25&quot; → &quot;52998224725&quot;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nx">phone</span><span class="o">:</span><span class="w"> </span><span class="kt">phoneBrField</span><span class="p">,</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nx">uf</span><span class="o">:</span><span class="w"> </span><span class="kt">ufField</span><span class="p">,</span><span class="w"> </span><span class="c1">// &quot;sp&quot; → &quot;SP&quot;</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">});</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nx">customerSchema</span><span class="p">.</span><span class="nx">parse</span><span class="p">({</span><span class="w"> </span><span class="nx">cpf</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">phone</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;(11) 99999-8888&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">uf</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;sp&quot;</span><span class="w"> </span><span class="p">});</span>
+<p>For Redis, pass a connected client:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">RedisCacheManager</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;redis&quot;</span><span class="p">;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createClient</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;redis://localhost&quot;</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kd">const</span><span class="w"> </span><span class="nx">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">RedisCacheManager</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;myapp:&quot;</span><span class="p">);</span>
 </code></pre></div>
-<p>An invalid value throws <code>ZodError</code>, which the error handler turns into <strong>422</strong>.</p>
-<h2 id="states-and-cities">States and cities<a class="headerlink" href="#states-and-cities" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">listStates</span><span class="p">,</span><span class="w"> </span><span class="nx">getState</span><span class="p">,</span><span class="w"> </span><span class="nx">isValidCity</span><span class="p">,</span><span class="w"> </span><span class="nx">statesByRegion</span><span class="p">,</span><span class="w"> </span><span class="nx">Region</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nx">listStates</span><span class="p">().</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="c1">// 27</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nx">getState</span><span class="p">(</span><span class="s2">&quot;SP&quot;</span><span class="p">)</span><span class="o">?</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;São Paulo&quot;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nx">isValidCity</span><span class="p">(</span><span class="s2">&quot;sao paulo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SP&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// true (accent/case-insensitive)</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nx">statesByRegion</span><span class="p">(</span><span class="nx">Region</span><span class="p">.</span><span class="nx">SOUTH</span><span class="p">).</span><span class="nx">map</span><span class="p">((</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">uf</span><span class="p">);</span><span class="w"> </span><span class="c1">// [&quot;PR&quot;, &quot;RS&quot;, &quot;SC&quot;]</span>
+<h2 id="queue-broker">Queue (broker)<a class="headerlink" href="#queue-broker" title="Permanent link">&para;</a></h2>
+<p><code>MemoryBroker</code> for dev/tests; <code>RabbitBroker</code> for production (the <code>amqplib</code> peer).</p>
+<div class="admonition info">
+<p class="admonition-title">Optional peer</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>npm<span class="w"> </span>install<span class="w"> </span>amqplib
 </code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Offline dataset</p>
-<p>The package bundles all 27 states and ~5.6k municipalities — no network
-calls. City comparisons ignore accents and case.</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">RabbitBroker</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">broker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">RabbitBroker</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;amqp://localhost&quot;</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">unsub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">broker</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s2">&quot;emails&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;send email&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">msg</span><span class="p">);</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">});</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="k">await</span><span class="w"> </span><span class="nx">broker</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s2">&quot;emails&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;ana@example.com&quot;</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+<h2 id="background-tasks">Background tasks<a class="headerlink" href="#background-tasks" title="Permanent link">&para;</a></h2>
+<p><code>TaskManager</code> registers handlers by name and processes whatever is enqueued.
+It rides on any <code>BrokerManager</code> (defaults to <code>MemoryBroker</code>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">RabbitBroker</span><span class="p">,</span><span class="w"> </span><span class="nx">TaskManager</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">tasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TaskManager</span><span class="p">({</span><span class="w"> </span><span class="nx">broker</span><span class="o">:</span><span class="w"> </span><span class="kt">new</span><span class="w"> </span><span class="nx">RabbitBroker</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;amqp://localhost&quot;</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nx">tasks</span><span class="p">.</span><span class="nx">register</span><span class="o">&lt;</span><span class="p">{</span><span class="w"> </span><span class="nx">userId</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}</span><span class="o">&gt;</span><span class="p">(</span><span class="s2">&quot;welcome-email&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">sendWelcome</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">userId</span><span class="p">);</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">});</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="k">await</span><span class="w"> </span><span class="nx">tasks</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span><span class="w">              </span><span class="c1">// start the worker (consumes the queue)</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="k">await</span><span class="w"> </span><span class="nx">tasks</span><span class="p">.</span><span class="nx">enqueue</span><span class="p">(</span><span class="s2">&quot;welcome-email&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">userId</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;123&quot;</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Same process or dedicated worker</p>
+<p>Use <code>MemoryBroker</code> to run everything in one process (dev); point a
+<code>RabbitBroker</code> and run <code>tasks.start()</code> in a separate worker process in production.</p>
 </div>
 <h2 id="recap">Recap<a class="headerlink" href="#recap" title="Permanent link">&para;</a></h2>
-<p>Validators + Zod fields cover CPF/CNPJ/CEP/phone; the UF/cities dataset is
-offline. Everything integrates with the canonical error envelope via
-<code>ZodError</code> → 422.</p>
+<p>Read-through cache (memory/redis), message broker (memory/rabbit) and a task
+queue that reuses the broker — all behind the same swappable interface.</p>
 
 
 
