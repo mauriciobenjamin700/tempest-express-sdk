@@ -31,6 +31,11 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) |
 | **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers |
 | **services / controllers** | `BaseService`, `BaseController` over a typed repository |
+| **utils** | CPF/CNPJ/CEP/phone/UF + cities, `PasswordUtils`, `JWTUtils`, opaque tokens, `AttemptThrottle` |
+| **auth** | `UserAuthService`, JWT middleware + role guards, `makeAuthRouter` |
+| **cache / queue / tasks** | `CacheManager` (+`cached`), `BrokerManager` (memory/RabbitMQ), `TaskManager` |
+| **sse / websockets** | `SSEBroker`/`sseResponse`, transport-agnostic `WebSocketHub` + `attachWebSocketHub` |
+| **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage` |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
 
 ## Quick start
@@ -81,12 +86,12 @@ health, CLI `new`.
 
 Also ported: BR utils (CPF/CNPJ/CEP/phone/UF + cities), `PasswordUtils`,
 `JWTUtils`, opaque tokens, `AttemptThrottle`, the `auth` module (signup/login/
-refresh + JWT guards), CLI `generate`/`secret`/`docker-compose`, and the
-bilingual MkDocs docs site.
+refresh + JWT guards), cache, sessions, queue (RabbitMQ), background tasks, SSE,
+WebSockets, feature flags, object storage, CLI `generate`/`secret`/`docker-compose`,
+and the bilingual MkDocs docs site.
 
-Not yet ported from `tempest-fastapi-sdk`: sessions, cache (Redis), queue
-(RabbitMQ), tasks, webpush, websockets, feature flags, object storage, metrics,
-admin, SSE, and the MFA / email / password-reset flows.
+Not yet ported from `tempest-fastapi-sdk`: webpush, metrics, admin, and the
+MFA / email / password-reset flows.
 
 ## License
 

@@ -1,0 +1,67 @@
+# Real-time (WebSocket + SSE)
+
+Two ways to push data to clients in real time: **WebSocket** (bidirectional) and
+**SSE** (one-way, over HTTP).
+
+## WebSocket
+
+`WebSocketHub` is transport-agnostic; `attachWebSocketHub` wires it to the HTTP
+server using the optional `ws` peer.
+
+!!! info "Optional peer"
+    ```bash
+    npm install ws
+    ```
+
+```ts
+import { WebSocketHub, attachWebSocketHub, createApp, runServer } from "tempest-express-sdk";
+
+const hub = new WebSocketHub({ maxPerUser: 5 });
+const app = await createApp();
+const server = await runServer(app, { port: 8000 });
+
+await attachWebSocketHub(server, hub, {
+  path: "/ws",
+  // Authenticate at the handshake (e.g. ?token=…). Return null to reject (1008).
+  authenticate: (info) => (info.url.includes("token=") ? "user-1" : null),
+  onMessage: (conn, raw) => {
+    if (raw === "subscribe:news") hub.subscribe(conn.id, "news");
+  },
+});
+
+// Anywhere in the app:
+hub.sendTo("user-1", { type: "notification", data: { unread: 3 } });
+hub.broadcast({ type: "news", data: { id: 1 } }, "news"); // only topic subscribers
+```
+
+`hub` offers `sendTo(userId, envelope)`, `broadcast(envelope, topic?)`,
+`subscribe`/`unsubscribe`, `onlineUsers()`, `connectionCount()`.
+
+## SSE
+
+No extra dependencies. `SSEBroker` fans events out per channel; `sseResponse`
+streams them into an Express response.
+
+```ts
+import { SSEBroker, sseResponse } from "tempest-express-sdk";
+
+const broker = new SSEBroker();
+
+app.get("/api/feed", (req, res) => {
+  const stream = broker.register("feed");
+  req.on("close", () => broker.unregister("feed", stream));
+  void sseResponse(req, res, stream);
+});
+
+// Publish to every subscriber of the channel:
+broker.publish("feed", { price: 42 }, "tick");
+```
+
+!!! tip "Heartbeat"
+    `EventStream` sends a periodic `: ping` comment (15s by default) to keep the
+    connection alive. Configure with `new SSEBroker({ heartbeatSeconds })`.
+
+## Recap
+
+WebSocket for bidirectional with topics and per-user delivery; SSE for simple
+one-way push over HTTP, dependency-free.

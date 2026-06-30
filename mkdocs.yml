@@ -75,6 +75,9 @@ plugins:
             Receitas: Recipes
             "Autenticação (JWT)": "Authentication (JWT)"
             "Utilidades BR": "BR utilities"
+            "Tempo real (WebSocket + SSE)": "Real-time (WebSocket + SSE)"
+            "Cache, fila e tarefas": "Cache, queue and tasks"
+            "Feature flags e storage": "Feature flags and storage"
             Changelog: Changelog
 
 nav:
@@ -84,4 +87,7 @@ nav:
   - Receitas:
       - "Autenticação (JWT)": recipes/auth.md
       - "Utilidades BR": recipes/br-utils.md
+      - "Tempo real (WebSocket + SSE)": recipes/realtime.md
+      - "Cache, fila e tarefas": recipes/jobs.md
+      - "Feature flags e storage": recipes/flags-storage.md
   - Changelog: changelog.md

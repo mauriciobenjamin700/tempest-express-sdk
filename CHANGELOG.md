@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.2.0] — 2026-06-29
 
 ### Added
 
@@ -17,6 +17,14 @@ to [SemVer](https://semver.org/).
 - **websockets**: transport-agnostic `WebSocketHub` (per-user delivery, topics,
   broadcast, per-user cap), `WSEnvelope`, and `attachWebSocketHub` over the
   optional `ws` peer.
+- **queue**: `BrokerManager` interface, `MemoryBroker` and `RabbitBroker`
+  (optional `amqplib` peer).
+- **tasks**: `TaskManager` — register/enqueue/worker background jobs riding on
+  any `BrokerManager`.
+- **flags**: `FeatureFlags` with `Memory`/`Env`/`Composite` backends, `coerceFlag`
+  and the `makeFlagGuard` route guard.
+- **storage**: `UploadStorage` interface, `LocalUploadStorage` (filesystem) and
+  `buildContentDisposition`.
 
 ## [0.1.0] — 2026-06-29
 

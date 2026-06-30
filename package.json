@@ -1,6 +1,6 @@
 {
   "name": "tempest-express-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared Express/Zod/tempest-db-js building blocks: base schemas, repository, exceptions, pagination, settings and native Swagger + Redoc — the conventions used across Tempest projects, ported from tempest-fastapi-sdk.",
   "type": "module",
   "license": "MIT",
@@ -35,7 +35,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -58,12 +60,16 @@
     "zod": "^3.24.1"
   },
   "peerDependencies": {
+    "amqplib": "^0.10.0",
     "bcryptjs": "^2.4.3 || ^3.0.0",
     "jsonwebtoken": "^9.0.0",
     "tempest-db-js": ">=0.1.0",
     "ws": "^8.0.0"
   },
   "peerDependenciesMeta": {
+    "amqplib": {
+      "optional": true
+    },
     "bcryptjs": {
       "optional": true
     },
@@ -76,12 +82,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",
+    "@types/amqplib": "^0.10.5",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.0",
     "@types/swagger-ui-dist": "^3.30.6",
     "@types/ws": "^8.5.12",
+    "amqplib": "^0.10.4",
     "bcryptjs": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
     "tempest-db-js": "^0.1.0",
