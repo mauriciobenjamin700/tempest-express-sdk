@@ -1,0 +1,87 @@
+site_name: tempest-express-sdk
+site_description: Blocos compartilhados Express + Zod + tempest-db-js — porte Node.js do tempest-fastapi-sdk.
+site_url: https://mauriciobenjamin700.github.io/tempest-express-sdk/
+repo_url: https://github.com/mauriciobenjamin700/tempest-express-sdk
+repo_name: mauriciobenjamin700/tempest-express-sdk
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Alternar para o modo claro
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Alternar para o modo escuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Alternar para o modo automático
+  features:
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+    - search.suggest
+    - search.highlight
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  # PT-BR é o default; traduções vivem em `<nome>.en.md` e caem para o PT
+  # quando ausentes. Seletor de idioma no header.
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: pt
+          name: Português (BR)
+          default: true
+          build: true
+        - locale: en
+          name: English (US)
+          build: true
+          site_name: tempest-express-sdk
+          nav_translations:
+            Início: Home
+            Instalação: Installation
+            Tutorial: Tutorial
+            Receitas: Recipes
+            "Autenticação (JWT)": "Authentication (JWT)"
+            "Utilidades BR": "BR utilities"
+            Changelog: Changelog
+
+nav:
+  - Início: index.md
+  - Instalação: installation.md
+  - Tutorial: tutorial.md
+  - Receitas:
+      - "Autenticação (JWT)": recipes/auth.md
+      - "Utilidades BR": recipes/br-utils.md
+  - Changelog: changelog.md

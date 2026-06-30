@@ -1,0 +1,93 @@
+# tempest-express-sdk
+
+> Shared **Express + Zod + tempest-db-js** building blocks — a Node.js/TypeScript
+> port of the conventions in [`tempest-fastapi-sdk`](https://pypi.org/project/tempest-fastapi-sdk/).
+
+📖 **Documentation:** [Português (BR)](https://mauriciobenjamin700.github.io/tempest-express-sdk/) · [English (US)](https://mauriciobenjamin700.github.io/tempest-express-sdk/en/)
+
+Strict TypeScript, `@`-alias imports (no `.js` suffixes), native **Swagger UI +
+Redoc** generated straight from your Zod schemas, and a layered
+router → controller → service → repository → model stack built on
+[`tempest-db-js`](https://www.npmjs.com/package/tempest-db-js).
+
+> ⚠️ **Status: pre-alpha (v0.1.0).** Foundation layer is built and tested; many
+> `tempest-fastapi-sdk` feature modules are not yet ported (see Roadmap).
+
+## Install
+
+```bash
+npm install tempest-express-sdk tempest-db-js express zod
+```
+
+`tempest-db-js` is a required peer dependency.
+
+## What's inside
+
+| Area | Exports |
+| --- | --- |
+| **core** | `JSONLogger`, `configureLogging`, request-id context (`getRequestId`, `runWithRequestContext`), `defineEnum` |
+| **exceptions** | `AppException` + `ConflictException` / `NotFoundException` / `UnauthorizedException` / `ForbiddenException` / `ValidationException` / `TooManyRequestsException` / `InvalidTokenException` / `ExpiredTokenException`, `MessageCatalog` (i18n) |
+| **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor pagination, `encodeCursor` / `decodeCursor` |
+| **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) |
+| **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers |
+| **services / controllers** | `BaseService`, `BaseController` over a typed repository |
+| **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
+
+## Quick start
+
+```ts
+import { createApp, createOpenApiRegistry, runServer, z } from "tempest-express-sdk";
+
+const registry = createOpenApiRegistry();
+const Item = registry.register("Item", z.object({ id: z.string().uuid(), name: z.string() }));
+
+const app = await createApp({
+  corsOrigins: "*",
+  openapi: { registry, info: { title: "My API", version: "1.0.0" } },
+  configure: (app) => {
+    app.get("/api/items", (_req, res) => res.json([]));
+  },
+});
+
+await runServer(app, { host: "127.0.0.1", port: 8000 });
+// Swagger UI → /docs   ·   Redoc → /redoc   ·   spec → /openapi.json   ·   health → /health
+```
+
+## CLI
+
+```bash
+npx tempest-express new my-service   # scaffold a runnable layered service
+cd my-service && npm install && npm run dev
+```
+
+The generated project is a complete vertical slice (model → repository → service
+→ controller → router → app) pre-wired with `createApp`, Swagger/Redoc and Zod.
+
+## Develop
+
+```bash
+npm install
+npm run test:types   # tsc --noEmit
+npm test             # vitest
+npm run build        # tsup → dual ESM + CJS + .d.ts (+ CLI bin)
+npm run lint         # biome
+```
+
+## Roadmap
+
+Ported: core, exceptions (+ i18n), schemas, pagination, settings, `BaseModel`,
+`BaseRepository`/`BaseService`/`BaseController`, `createApp` + Swagger/Redoc,
+health, CLI `new`.
+
+Also ported: BR utils (CPF/CNPJ/CEP/phone/UF + cities), `PasswordUtils`,
+`JWTUtils`, opaque tokens, `AttemptThrottle`, the `auth` module (signup/login/
+refresh + JWT guards), CLI `generate`/`secret`/`docker-compose`, and the
+bilingual MkDocs docs site.
+
+Not yet ported from `tempest-fastapi-sdk`: sessions, cache (Redis), queue
+(RabbitMQ), tasks, webpush, websockets, feature flags, object storage, metrics,
+admin, SSE, and the MFA / email / password-reset flows.
+
+## License
+
+MIT

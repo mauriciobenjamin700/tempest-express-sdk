@@ -1,0 +1,94 @@
+{
+  "name": "tempest-express-sdk",
+  "version": "0.1.0",
+  "description": "Shared Express/Zod/tempest-db-js building blocks: base schemas, repository, exceptions, pagination, settings and native Swagger + Redoc — the conventions used across Tempest projects, ported from tempest-fastapi-sdk.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Mauricio Benjamin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mauriciobenjamin700/tempest-express-sdk.git"
+  },
+  "homepage": "https://mauriciobenjamin700.github.io/tempest-express-sdk/",
+  "bugs": "https://github.com/mauriciobenjamin700/tempest-express-sdk/issues",
+  "keywords": [
+    "express",
+    "zod",
+    "openapi",
+    "swagger",
+    "redoc",
+    "repository",
+    "pagination",
+    "typescript",
+    "sdk"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "tempest-express": "dist/cli.cjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:types": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "docs:serve": "mkdocs serve",
+    "docs:build": "mkdocs build --strict"
+  },
+  "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.0",
+    "express": "^5.1.0",
+    "swagger-ui-dist": "^5.18.2",
+    "zod": "^3.24.1"
+  },
+  "peerDependencies": {
+    "bcryptjs": "^2.4.3 || ^3.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "tempest-db-js": ">=0.1.0",
+    "ws": "^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "bcryptjs": {
+      "optional": true
+    },
+    "jsonwebtoken": {
+      "optional": true
+    },
+    "ws": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.10.0",
+    "@types/swagger-ui-dist": "^3.30.6",
+    "@types/ws": "^8.5.12",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "tempest-db-js": "^0.1.0",
+    "tsup": "^8.3.0",
+    "ws": "^8.18.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.9"
+  }
+}
