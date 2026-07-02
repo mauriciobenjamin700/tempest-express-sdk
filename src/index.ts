@@ -24,6 +24,8 @@ export * from "@/queue";
 export * from "@/tasks";
 export * from "@/flags";
 export * from "@/storage";
+export * from "@/webpush";
+export * from "@/integrations";
 export * from "@/auth";
 export * from "@/api";
 export { VERSION } from "@/version";
