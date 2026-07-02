@@ -10,17 +10,17 @@
       
       
       
-        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/realtime/">
+        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/admin/">
       
       
-        <link rel="prev" href="../br-utils/">
+        <link rel="prev" href="../whatsapp/">
       
       
-        <link rel="next" href="../jobs/">
+        <link rel="next" href="../../roadmap/">
       
       
         
-          <link rel="alternate" href="../../../recipes/realtime/" hreflang="pt">
+          <link rel="alternate" href="../../../recipes/admin/" hreflang="pt">
         
           <link rel="alternate" href="./" hreflang="en">
         
@@ -31,7 +31,7 @@
     
     
       
-        <title>Real-time (WebSocket + SSE) - tempest-express-sdk</title>
+        <title>Admin (JSON API) - tempest-express-sdk</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#real-time-websocket-sse" class="md-skip">
+        <a href="#admin-json-api" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Real-time (WebSocket + SSE)
+              Admin (JSON API)
             
           </span>
         </div>
@@ -175,7 +175,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../../recipes/realtime/" hreflang="pt" class="md-select__link">
+            <a href="../../../recipes/admin/" hreflang="pt" class="md-select__link">
               Português (BR)
             </a>
           </li>
@@ -490,37 +490,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Real-time (WebSocket + SSE)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../realtime/" class="md-nav__link">
         
   
   
@@ -536,59 +509,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#websocket" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        WebSocket
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sse" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SSE
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recap
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -710,10 +630,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../admin/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin (JSON API)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -729,6 +676,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#register-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Register resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mount-the-router-protected" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mount the router (protected)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recap
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -822,10 +833,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#websocket" class="md-nav__link">
+  <a href="#register-resources" class="md-nav__link">
     <span class="md-ellipsis">
       
-        WebSocket
+        Register resources
       
     </span>
   </a>
@@ -833,10 +844,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sse" class="md-nav__link">
+  <a href="#mount-the-router-protected" class="md-nav__link">
     <span class="md-ellipsis">
       
-        SSE
+        Mount the router (protected)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpoints
       
     </span>
   </a>
@@ -874,62 +896,116 @@
   
 
 
-<h1 id="real-time-websocket-sse">Real-time (WebSocket + SSE)<a class="headerlink" href="#real-time-websocket-sse" title="Permanent link">&para;</a></h1>
-<p>Two ways to push data to clients in real time: <strong>WebSocket</strong> (bidirectional) and
-<strong>SSE</strong> (one-way, over HTTP).</p>
-<h2 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Permanent link">&para;</a></h2>
-<p><code>WebSocketHub</code> is transport-agnostic; <code>attachWebSocketHub</code> wires it to the HTTP
-server using the optional <code>ws</code> peer.</p>
-<div class="admonition info">
-<p class="admonition-title">Optional peer</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>npm<span class="w"> </span>install<span class="w"> </span>ws
+<h1 id="admin-json-api">Admin (JSON API)<a class="headerlink" href="#admin-json-api" title="Permanent link">&para;</a></h1>
+<p>The <code>admin</code> module exposes a <strong>JSON admin</strong> with auto-derived CRUD per resource
+and field introspection — a frontend (React, etc.) consumes and renders it.
+Unlike the FastAPI SDK's server-rendered admin, the UI stays decoupled here.</p>
+<h2 id="register-resources">Register resources<a class="headerlink" href="#register-resources" title="Permanent link">&para;</a></h2>
+<p>An <code>AdminResource</code> is callback-based — wire it to a <code>BaseService</code>, a
+<code>tempest-db-js</code> repository, or any store.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AdminSite</span><span class="p">,</span><span class="w"> </span><span class="nx">createApp</span><span class="p">,</span><span class="w"> </span><span class="nx">makeAdminRouter</span><span class="p">,</span><span class="w"> </span><span class="nx">z</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">AdminSite</span><span class="p">(</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">);</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nx">site</span><span class="p">.</span><span class="nx">register</span><span class="p">({</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;users&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nx">fields</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">readOnly</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;email&quot;</span><span class="p">,</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">required</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="nx">createSchema</span><span class="o">:</span><span class="w"> </span><span class="kt">z.object</span><span class="p">({</span><span class="w"> </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">z.string</span><span class="p">().</span><span class="nx">email</span><span class="p">()</span><span class="w"> </span><span class="p">}),</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nx">updateSchema</span><span class="o">:</span><span class="w"> </span><span class="kt">z.object</span><span class="p">({</span><span class="w"> </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">z.string</span><span class="p">().</span><span class="nx">email</span><span class="p">()</span><span class="w"> </span><span class="p">}),</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">list</span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="p">,</span><span class="w"> </span><span class="nx">pageSize</span><span class="p">,</span><span class="w"> </span><span class="nx">filters</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">userService</span><span class="p">.</span><span class="nx">paginate</span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="p">,</span><span class="w"> </span><span class="nx">pageSize</span><span class="p">,</span><span class="w"> </span><span class="nx">filters</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">data</span><span class="p">;</span><span class="w"> </span><span class="c1">// { items, total, page, pageSize, pages }</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">get</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">userService</span><span class="p">.</span><span class="nx">getByIdOrNull</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">create</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">userService</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">data</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">update</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">userService</span><span class="p">.</span><span class="nx">updateById</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">remove</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">userService</span><span class="p">.</span><span class="nx">deleteById</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="p">});</span>
 </code></pre></div>
-</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">WebSocketHub</span><span class="p">,</span><span class="w"> </span><span class="nx">attachWebSocketHub</span><span class="p">,</span><span class="w"> </span><span class="nx">createApp</span><span class="p">,</span><span class="w"> </span><span class="nx">runServer</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<h2 id="mount-the-router-protected">Mount the router (protected)<a class="headerlink" href="#mount-the-router-protected" title="Permanent link">&para;</a></h2>
+<p>Pass a <code>guard</code> — reuse the JWT middleware + <code>requireRoles("admin")</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">makeJwtAuthMiddleware</span><span class="p">,</span><span class="w"> </span><span class="nx">requireRoles</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">hub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">WebSocketHub</span><span class="p">({</span><span class="w"> </span><span class="nx">maxPerUser</span><span class="o">:</span><span class="w"> </span><span class="kt">5</span><span class="w"> </span><span class="p">});</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">createApp</span><span class="p">();</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">runServer</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">port</span><span class="o">:</span><span class="w"> </span><span class="kt">8000</span><span class="w"> </span><span class="p">});</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">await</span><span class="w"> </span><span class="nx">attachWebSocketHub</span><span class="p">(</span><span class="nx">server</span><span class="p">,</span><span class="w"> </span><span class="nx">hub</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;/ws&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="c1">// Authenticate at the handshake (e.g. ?token=…). Return null to reject (1008).</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="nx">authenticate</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">info</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="nx">info</span><span class="p">.</span><span class="nx">url</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="s2">&quot;token=&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">&quot;user-1&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">),</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nx">onMessage</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">conn</span><span class="p">,</span><span class="w"> </span><span class="nx">raw</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">raw</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;subscribe:news&quot;</span><span class="p">)</span><span class="w"> </span><span class="nx">hub</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">conn</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;news&quot;</span><span class="p">);</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">});</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="c1">// Anywhere in the app:</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="nx">hub</span><span class="p">.</span><span class="nx">sendTo</span><span class="p">(</span><span class="s2">&quot;user-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;notification&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">unread</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="nx">hub</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">({</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;news&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;news&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// only topic subscribers</span>
-</code></pre></div>
-<p><code>hub</code> offers <code>sendTo(userId, envelope)</code>, <code>broadcast(envelope, topic?)</code>,
-<code>subscribe</code>/<code>unsubscribe</code>, <code>onlineUsers()</code>, <code>connectionCount()</code>.</p>
-<h2 id="sse">SSE<a class="headerlink" href="#sse" title="Permanent link">&para;</a></h2>
-<p>No extra dependencies. <code>SSEBroker</code> fans events out per channel; <code>sseResponse</code>
-streams them into an Express response.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">SSEBroker</span><span class="p">,</span><span class="w"> </span><span class="nx">sseResponse</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">broker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">SSEBroker</span><span class="p">();</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;/api/feed&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">broker</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s2">&quot;feed&quot;</span><span class="p">);</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nx">req</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;close&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">broker</span><span class="p">.</span><span class="nx">unregister</span><span class="p">(</span><span class="s2">&quot;feed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">stream</span><span class="p">));</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="ow">void</span><span class="w"> </span><span class="nx">sseResponse</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">,</span><span class="w"> </span><span class="nx">stream</span><span class="p">);</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">});</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1">// Publish to every subscriber of the channel:</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="nx">broker</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s2">&quot;feed&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">price</span><span class="o">:</span><span class="w"> </span><span class="kt">42</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tick&quot;</span><span class="p">);</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">createApp</span><span class="p">({</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">configure</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nx">a</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">      </span><span class="nx">makeAdminRouter</span><span class="p">(</span><span class="nx">site</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">        </span><span class="nx">prefix</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;/admin&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="nx">guard</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="nx">makeJwtAuthMiddleware</span><span class="p">(</span><span class="nx">jwt</span><span class="p">),</span><span class="w"> </span><span class="nx">requireRoles</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">)]</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">never</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">      </span><span class="p">}),</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="p">);</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">});</span>
 </code></pre></div>
 <div class="admonition tip">
-<p class="admonition-title">Heartbeat</p>
-<p><code>EventStream</code> sends a periodic <code>: ping</code> comment (15s by default) to keep the
-connection alive. Configure with <code>new SSEBroker({ heartbeatSeconds })</code>.</p>
+<p class="admonition-title">Single guard</p>
+<p><code>guard</code> accepts one middleware. To chain auth + role, compose them into a
+middleware that runs one after the other, or use an <code>express.Router()</code> with
+both <code>use()</code> calls before mounting the admin.</p>
 </div>
+<h2 id="endpoints">Endpoints<a class="headerlink" href="#endpoints" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Route</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin</code></td>
+<td>Brand + resource list</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/:resource/_meta</code></td>
+<td>Fields + supported operations</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/:resource</code></td>
+<td>Paginated list (<code>?page=&amp;pageSize=</code> + filters)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/:resource/:id</code></td>
+<td>Detail (404 when absent)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/:resource</code></td>
+<td>Create (validates <code>createSchema</code>)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/admin/:resource/:id</code></td>
+<td>Update (validates <code>updateSchema</code>)</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/admin/:resource/:id</code></td>
+<td>Delete (204)</td>
+</tr>
+</tbody>
+</table>
+<p>A missing write op on the resource → <strong>405</strong>; unknown resource → <strong>404</strong>;
+invalid payload → <strong>422</strong>.</p>
 <h2 id="recap">Recap<a class="headerlink" href="#recap" title="Permanent link">&para;</a></h2>
-<p>WebSocket for bidirectional with topics and per-user delivery; SSE for simple
-one-way push over HTTP, dependency-free.</p>
+<p>Register resources (callbacks over your services), mount a guarded router, and
+any frontend renders the admin from the <code>_meta</code> introspection.</p>
 
 
 

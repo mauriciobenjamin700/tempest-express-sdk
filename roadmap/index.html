@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/roadmap/">
       
       
-        <link rel="prev" href="../recipes/whatsapp/">
+        <link rel="prev" href="../recipes/admin/">
       
       
         <link rel="next" href="../changelog/">
@@ -624,6 +624,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/admin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin (API JSON)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -891,6 +919,9 @@
 <li><strong>0.4.0</strong> — <code>integrations/</code>: contrato <code>MessagingProvider</code> + <code>WhatsAppProvider</code>
   (cliente tipado do <code>zap-api</code>, REST + <code>/ws</code>) + <code>makeWhatsAppWebhookRouter</code>.
   Veja a receita <a href="../recipes/whatsapp/">Integrações: WhatsApp</a>.</li>
+<li><strong>0.5.0</strong> — <code>admin/</code>: admin JSON (<code>AdminSite</code> + <code>makeAdminRouter</code>) com CRUD
+  auto-derivado, introspecção <code>_meta</code>, validação Zod e guard plugável.
+  Veja a receita <a href="../recipes/admin/">Admin (API JSON)</a>.</li>
 </ul>
 <h2 id="planejado">Planejado<a class="headerlink" href="#planejado" title="Permanent link">&para;</a></h2>
 <h3 id="mais-canais-sob-messagingprovider">Mais canais sob <code>MessagingProvider</code><a class="headerlink" href="#mais-canais-sob-messagingprovider" title="Permanent link">&para;</a></h3>
@@ -899,7 +930,6 @@ o mesmo contrato (<code>sendText</code>, <code>sendMedia</code>, <code>onMessage
 (ex.: Twilio), Telegram e provedores de email transacional.</p>
 <h3 id="outros-candidatos">Outros candidatos<a class="headerlink" href="#outros-candidatos" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>admin</strong> — UI de admin gerada a partir dos models.</li>
 <li><strong>fluxos de auth</strong> — enrollment de MFA, ativação por email, reset de senha.</li>
 <li><strong>stores Redis</strong> — <code>SessionStore</code> e transporte de <code>SSEBroker</code> em Redis para
   deploys multi-réplica.</li>

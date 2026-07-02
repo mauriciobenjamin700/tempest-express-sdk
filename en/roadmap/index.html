@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/roadmap/">
       
       
-        <link rel="prev" href="../recipes/whatsapp/">
+        <link rel="prev" href="../recipes/admin/">
       
       
         <link rel="next" href="../changelog/">
@@ -624,6 +624,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/admin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin (JSON API)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -891,6 +919,9 @@
 <li><strong>0.4.0</strong> — <code>integrations/</code>: <code>MessagingProvider</code> contract + <code>WhatsAppProvider</code>
   (typed <code>zap-api</code> client, REST + <code>/ws</code>) + <code>makeWhatsAppWebhookRouter</code>.
   See the <a href="../recipes/whatsapp/">Integrations: WhatsApp</a> recipe.</li>
+<li><strong>0.5.0</strong> — <code>admin/</code>: JSON admin (<code>AdminSite</code> + <code>makeAdminRouter</code>) with
+  auto-derived CRUD, <code>_meta</code> introspection, Zod validation and a pluggable guard.
+  See the <a href="../recipes/admin/">Admin (JSON API)</a> recipe.</li>
 </ul>
 <h2 id="planned">Planned<a class="headerlink" href="#planned" title="Permanent link">&para;</a></h2>
 <h3 id="more-channels-under-messagingprovider">More channels under <code>MessagingProvider</code><a class="headerlink" href="#more-channels-under-messagingprovider" title="Permanent link">&para;</a></h3>
@@ -899,7 +930,6 @@ the same contract (<code>sendText</code>, <code>sendMedia</code>, <code>onMessag
 (e.g. Twilio), Telegram, and transactional email providers.</p>
 <h3 id="other-candidates">Other candidates<a class="headerlink" href="#other-candidates" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>admin</strong> — auto-generated admin UI over models.</li>
 <li><strong>auth flows</strong> — MFA enrollment, email activation, password reset.</li>
 <li><strong>Redis stores</strong> — first-party Redis <code>SessionStore</code> and a Redis <code>SSEBroker</code>
   transport for multi-replica deployments.</li>

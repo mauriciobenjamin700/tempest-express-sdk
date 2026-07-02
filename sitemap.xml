@@ -36,6 +36,13 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/tutorial/"/>
     </url>
     <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/admin/</loc>
+        <lastmod>2026-07-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/admin/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/admin/"/>
+    </url>
+    <url>
         <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/auth/</loc>
         <lastmod>2026-07-02</lastmod>
         <changefreq>daily</changefreq>
@@ -118,6 +125,13 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/tutorial/"/>
         <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/tutorial/"/>
+    </url>
+    <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/admin/</loc>
+        <lastmod>2026-07-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/admin/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/admin/"/>
     </url>
     <url>
         <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/auth/</loc>
