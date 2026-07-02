@@ -519,6 +519,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#flows-mfa-activation-and-password-reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flows: MFA, activation and password reset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#recap" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -872,6 +883,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#flows-mfa-activation-and-password-reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flows: MFA, activation and password reset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#recap" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -988,9 +1010,74 @@ decoupled from the ORM via a <code>UserStore</code> interface.</p>
 <p>Use <code>makeJwtAuthMiddleware(jwt, { required: false })</code> to populate <code>req.auth</code>
 when a token is present, without rejecting anonymous callers.</p>
 </div>
+<h2 id="flows-mfa-activation-and-password-reset">Flows: MFA, activation and password reset<a class="headerlink" href="#flows-mfa-activation-and-password-reset" title="Permanent link">&para;</a></h2>
+<p>Pass optional services to <code>makeAuthRouter</code> to mount the flows. Each uses a
+<strong>dedicated store</strong> (implement only the ones you use).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nx">ActivationService</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nx">MfaService</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nx">PasswordResetService</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nx">TOTPHelper</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nx">makeAuthRouter</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="nx">a</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="nx">makeAuthRouter</span><span class="p">({</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="nx">service</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="nx">jwt</span><span class="p">,</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="nx">activation</span><span class="o">:</span><span class="w"> </span><span class="kt">new</span><span class="w"> </span><span class="nx">ActivationService</span><span class="p">({</span><span class="w"> </span><span class="nx">store</span><span class="w"> </span><span class="p">}),</span><span class="w">               </span><span class="c1">// POST /auth/activate</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="nx">passwordReset</span><span class="o">:</span><span class="w"> </span><span class="kt">new</span><span class="w"> </span><span class="nx">PasswordResetService</span><span class="p">({</span><span class="w"> </span><span class="nx">store</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="p">}),</span><span class="w"> </span><span class="c1">// /auth/password-reset/*</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">    </span><span class="nx">mfa</span><span class="o">:</span><span class="w"> </span><span class="kt">new</span><span class="w"> </span><span class="nx">MfaService</span><span class="p">({</span><span class="w"> </span><span class="nx">store</span><span class="p">,</span><span class="w"> </span><span class="nx">totp</span><span class="o">:</span><span class="w"> </span><span class="kt">new</span><span class="w"> </span><span class="nx">TOTPHelper</span><span class="p">({</span><span class="w"> </span><span class="nx">issuer</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;My App&quot;</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">}),</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">  </span><span class="p">}),</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="p">);</span>
+</code></pre></div>
+<p>Mounted routes:</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /auth/activate</code></td>
+<td><code>{ token }</code> → activate the account</td>
+</tr>
+<tr>
+<td><code>POST /auth/password-reset/request</code></td>
+<td><code>{ email }</code> → always <strong>202</strong> (no enumeration)</td>
+</tr>
+<tr>
+<td><code>POST /auth/password-reset/confirm</code></td>
+<td><code>{ token, password }</code> → set the new password</td>
+</tr>
+<tr>
+<td><code>POST /auth/mfa/enroll</code></td>
+<td>guarded (JWT) → <code>{ secret, otpauthUri }</code> (QR)</td>
+</tr>
+<tr>
+<td><code>POST /auth/mfa/confirm</code></td>
+<td><code>{ code }</code> → enable MFA</td>
+</tr>
+<tr>
+<td><code>POST /auth/mfa/disable</code></td>
+<td><code>{ code }</code> → disable MFA</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Opaque tokens</strong>: activation/reset store only the <strong>SHA-256 hash</strong>; the
+  plaintext travels in the emailed link. Invalid/expired token → <strong>401</strong>.</li>
+<li><strong>MFA</strong>: native <code>TOTPHelper</code> (RFC 6238). <code>enroll</code> generates the secret + QR
+  URI; <code>confirm</code> verifies a code and turns MFA on; a wrong code → <strong>422</strong>.</li>
+<li><strong>Anti-enumeration</strong>: <code>password-reset/request</code> always returns 202; the <code>token</code>
+  is echoed only in dev setups (in production the service emails it).</li>
+</ul>
 <h2 id="recap">Recap<a class="headerlink" href="#recap" title="Permanent link">&para;</a></h2>
 <p><code>UserStore</code> decouples auth from your database; <code>UserAuthService</code> handles hashing
-and tokens; the middleware guards routes by role. Everything shows up in
+and tokens; the middleware guards routes by role; the MFA/activation/reset
+services mount the full flows over dedicated stores. Everything shows up in
 Swagger/Redoc.</p>
 
 

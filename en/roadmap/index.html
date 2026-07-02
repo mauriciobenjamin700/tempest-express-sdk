@@ -953,6 +953,9 @@
 <li><strong>0.6.0</strong> — <code>integrations/</code>: <code>TelegramProvider</code> (Bot API, send + polling) and
   <code>TwilioSmsProvider</code> (SMS) + <code>makeTwilioWebhookRouter</code> (signature-validated).
   See the <a href="../recipes/sms-telegram/">SMS and Telegram</a> recipe.</li>
+<li><strong>0.7.0</strong> — auth flows: <code>MfaService</code> (TOTP), <code>ActivationService</code> (email) and
+  <code>PasswordResetService</code>, wired into <code>makeAuthRouter</code>. See
+  <a href="../recipes/auth/">Authentication (JWT)</a>.</li>
 </ul>
 <h2 id="planned">Planned<a class="headerlink" href="#planned" title="Permanent link">&para;</a></h2>
 <h3 id="more-channels-under-messagingprovider">More channels under <code>MessagingProvider</code><a class="headerlink" href="#more-channels-under-messagingprovider" title="Permanent link">&para;</a></h3>
@@ -961,7 +964,6 @@ candidates reuse it too: additional SMS vendors and a transactional-email
 provider exposed as a <code>MessagingProvider</code>.</p>
 <h3 id="other-candidates">Other candidates<a class="headerlink" href="#other-candidates" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>auth flows</strong> — MFA enrollment, email activation, password reset.</li>
 <li><strong>Redis stores</strong> — first-party Redis <code>SessionStore</code> and a Redis <code>SSEBroker</code>
   transport for multi-replica deployments.</li>
 <li><strong>metrics</strong> — optional GPU metrics and a <code>/metrics</code> Prometheus router.</li>
