@@ -12,6 +12,9 @@
 - **0.4.0** — `integrations/`: contrato `MessagingProvider` + `WhatsAppProvider`
   (cliente tipado do `zap-api`, REST + `/ws`) + `makeWhatsAppWebhookRouter`.
   Veja a receita [Integrações: WhatsApp](recipes/whatsapp.md).
+- **0.5.0** — `admin/`: admin JSON (`AdminSite` + `makeAdminRouter`) com CRUD
+  auto-derivado, introspecção `_meta`, validação Zod e guard plugável.
+  Veja a receita [Admin (API JSON)](recipes/admin.md).
 
 ## Planejado
 
@@ -23,7 +26,6 @@ o mesmo contrato (`sendText`, `sendMedia`, `onMessage`, `status`): SMS
 
 ### Outros candidatos
 
-- **admin** — UI de admin gerada a partir dos models.
 - **fluxos de auth** — enrollment de MFA, ativação por email, reset de senha.
 - **stores Redis** — `SessionStore` e transporte de `SSEBroker` em Redis para
   deploys multi-réplica.

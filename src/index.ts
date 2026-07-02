@@ -26,6 +26,7 @@ export * from "@/flags";
 export * from "@/storage";
 export * from "@/webpush";
 export * from "@/integrations";
+export * from "@/admin";
 export * from "@/auth";
 export * from "@/api";
 export { VERSION } from "@/version";

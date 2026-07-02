@@ -80,6 +80,7 @@ plugins:
             "Feature flags e storage": "Feature flags and storage"
             "MFA, HTTP client, Web Push e mais": "MFA, HTTP client, Web Push and more"
             "Integrações: WhatsApp (zap-api)": "Integrations: WhatsApp (zap-api)"
+            "Admin (API JSON)": "Admin (JSON API)"
             Roadmap: Roadmap
             Changelog: Changelog
 
@@ -95,5 +96,6 @@ nav:
       - "Feature flags e storage": recipes/flags-storage.md
       - "MFA, HTTP client, Web Push e mais": recipes/server-utils.md
       - "Integrações: WhatsApp (zap-api)": recipes/whatsapp.md
+      - "Admin (API JSON)": recipes/admin.md
   - Roadmap: roadmap.md
   - Changelog: changelog.md

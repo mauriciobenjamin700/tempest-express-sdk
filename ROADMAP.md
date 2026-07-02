@@ -11,6 +11,8 @@
   (retry + circuit breaker), system metrics (+ Prometheus), Web Push, email.
 - **0.4.0** — `integrations/`: `MessagingProvider` contract + `WhatsAppProvider`
   (typed `zap-api` client, REST + `/ws`) + `makeWhatsAppWebhookRouter`.
+- **0.5.0** — `admin/`: JSON admin API (`AdminSite` + `makeAdminRouter`) with
+  auto-derived CRUD, `_meta` introspection, Zod validation and a pluggable guard.
 
 ## Planned
 
@@ -22,7 +24,6 @@ the same contract (`sendText`, `sendMedia`, `onMessage`, `status`): SMS
 
 ### Other candidates
 
-- **admin** — an auto-generated admin UI over models (mirrors `admin/`).
 - **auth flows** — MFA enrollment endpoints, email activation, password reset
   (the service-level flows still pending from `tempest-fastapi-sdk`).
 - **cache/session Redis stores** — first-party Redis-backed `SessionStore` and

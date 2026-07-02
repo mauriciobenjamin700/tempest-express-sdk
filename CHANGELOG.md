@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.5.0] — 2026-07-02
+
+### Added
+
+- **admin**: a JSON admin API — `AdminSite` resource registry + `makeAdminRouter`
+  with auto-derived CRUD (`list`/`get`/`create`/`update`/`remove`), `_meta` field
+  introspection, Zod validation and a pluggable `guard` for auth. Callback-based
+  resources wire to any service/store; the UI stays decoupled.
+
 ## [0.4.0] — 2026-07-02
 
 ### Added

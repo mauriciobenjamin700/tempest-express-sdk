@@ -39,6 +39,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **webpush / email** | `WebPushDispatcher` (VAPID), `EmailUtils` (SMTP) |
 | **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus), `getClientIp` |
 | **integrations** | `MessagingProvider` contract, `WhatsAppProvider` (zap-api client), `makeWhatsAppWebhookRouter` |
+| **admin** | `AdminSite` + `makeAdminRouter` — JSON admin with auto-derived CRUD + introspection |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
 
 ## Quick start
@@ -98,8 +99,8 @@ Also shipped: the `integrations/` module — a typed WhatsApp client over
 `MessagingProvider` contract.
 
 Planned (see [ROADMAP.md](./ROADMAP.md)): more `MessagingProvider` channels
-(SMS/Telegram), an admin UI, MFA-enrollment/email-activation/password-reset
-flows, and Redis-backed session/SSE stores.
+(SMS/Telegram), MFA-enrollment/email-activation/password-reset flows, and
+Redis-backed session/SSE stores.
 
 ## License
 
