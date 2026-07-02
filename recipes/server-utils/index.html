@@ -10,19 +10,19 @@
       
       
       
-        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/br-utils/">
+        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/server-utils/">
       
       
-        <link rel="prev" href="../auth/">
+        <link rel="prev" href="../flags-storage/">
       
       
-        <link rel="next" href="../realtime/">
+        <link rel="next" href="../../roadmap/">
       
       
         
           <link rel="alternate" href="./" hreflang="pt">
         
-          <link rel="alternate" href="../../en/recipes/br-utils/" hreflang="en">
+          <link rel="alternate" href="../../en/recipes/server-utils/" hreflang="en">
         
       
       
@@ -31,7 +31,7 @@
     
     
       
-        <title>Utilidades BR - tempest-express-sdk</title>
+        <title>MFA, HTTP client, Web Push e mais - tempest-express-sdk</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#utilidades-br" class="md-skip">
+        <a href="#mfa-http-client-web-push-e-mais" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Utilidades BR
+              MFA, HTTP client, Web Push e mais
             
           </span>
         </div>
@@ -181,7 +181,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../../en/recipes/br-utils/" hreflang="en" class="md-select__link">
+            <a href="../../en/recipes/server-utils/" hreflang="en" class="md-select__link">
               English (US)
             </a>
           </li>
@@ -462,37 +462,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utilidades BR
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../br-utils/" class="md-nav__link">
         
   
   
@@ -508,70 +481,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Índice">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Índice
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#validacao-e-normalizacao" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Validação e normalização
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#campos-zod" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Campos Zod
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#estados-e-cidades" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Estados e cidades
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recapitulando" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recapitulando
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -665,10 +574,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../server-utils/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MFA, HTTP client, Web Push e mais
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -684,6 +620,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mfa-totp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MFA (TOTP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http-client-resiliente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP client resiliente
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#web-push-vapid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web Push (VAPID)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Email
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metricas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métricas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#client-ip-confiavel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client IP confiável
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recapitulando" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recapitulando
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -777,10 +810,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#validacao-e-normalizacao" class="md-nav__link">
+  <a href="#mfa-totp" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validação e normalização
+        MFA (TOTP)
       
     </span>
   </a>
@@ -788,10 +821,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#campos-zod" class="md-nav__link">
+  <a href="#http-client-resiliente" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Campos Zod
+        HTTP client resiliente
       
     </span>
   </a>
@@ -799,10 +832,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#estados-e-cidades" class="md-nav__link">
+  <a href="#web-push-vapid" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Estados e cidades
+        Web Push (VAPID)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Email
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metricas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métricas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#client-ip-confiavel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client IP confiável
       
     </span>
   </a>
@@ -840,54 +906,85 @@
   
 
 
-<h1 id="utilidades-br">Utilidades BR<a class="headerlink" href="#utilidades-br" title="Permanent link">&para;</a></h1>
-<p>Helpers prontos para os campos de identidade e contato mais comuns em APIs
-brasileiras: CPF, CNPJ, CEP, telefone e UF/cidades.</p>
-<h2 id="validacao-e-normalizacao">Validação e normalização<a class="headerlink" href="#validacao-e-normalizacao" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nx">isValidCpf</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nx">isValidCnpj</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nx">normalizeCpf</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nx">onlyDigits</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nx">isValidCpf</span><span class="p">(</span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// true (formato + dígitos verificadores)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nx">isValidCpf</span><span class="p">(</span><span class="s2">&quot;111.111.111-11&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// false (sequência repetida)</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nx">normalizeCpf</span><span class="p">(</span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;52998224725&quot;</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nx">onlyDigits</span><span class="p">(</span><span class="s2">&quot;(11) 99999-8888&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;11999998888&quot;</span>
+<h1 id="mfa-http-client-web-push-e-mais">MFA, HTTP client, Web Push e mais<a class="headerlink" href="#mfa-http-client-web-push-e-mais" title="Permanent link">&para;</a></h1>
+<p>Utilidades de servidor prontas para produção.</p>
+<h2 id="mfa-totp">MFA (TOTP)<a class="headerlink" href="#mfa-totp" title="Permanent link">&para;</a></h2>
+<p><code>TOTPHelper</code> é nativo (<code>node:crypto</code>, RFC 6238) — sem dependência externa.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">TOTPHelper</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">totp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TOTPHelper</span><span class="p">({</span><span class="w"> </span><span class="nx">issuer</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Minha App&quot;</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">totp</span><span class="p">.</span><span class="nx">generateSecret</span><span class="p">();</span><span class="w">                     </span><span class="c1">// persista no usuário</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">totp</span><span class="p">.</span><span class="nx">provisioningUri</span><span class="p">(</span><span class="nx">secret</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ana@example.com&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// renderize como QR</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nx">totp</span><span class="p">.</span><span class="nx">verify</span><span class="p">(</span><span class="nx">secret</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;123456&quot;</span><span class="p">);</span><span class="w">                            </span><span class="c1">// true / false (janela ±1)</span>
 </code></pre></div>
-<p>Disponíveis: <code>isValidCpf</code>, <code>isValidCnpj</code>, <code>isValidCpfCnpj</code>, <code>isValidCep</code>,
-<code>isValidPhoneBr</code>, mais os <code>normalize*</code> correspondentes (que lançam em entrada
-inválida).</p>
-<h2 id="campos-zod">Campos Zod<a class="headerlink" href="#campos-zod" title="Permanent link">&para;</a></h2>
-<p>Cada documento tem um campo Zod que valida <strong>e</strong> normaliza para dígitos:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">cpfField</span><span class="p">,</span><span class="w"> </span><span class="nx">phoneBrField</span><span class="p">,</span><span class="w"> </span><span class="nx">ufField</span><span class="p">,</span><span class="w"> </span><span class="nx">z</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<h2 id="http-client-resiliente">HTTP client resiliente<a class="headerlink" href="#http-client-resiliente" title="Permanent link">&para;</a></h2>
+<p><code>HTTPClient</code> embrulha o <code>fetch</code> nativo com retry (backoff) + circuit breaker por
+host.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">HTTPClient</span><span class="p">,</span><span class="w"> </span><span class="nx">RetryPolicy</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">customerSchema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">z</span><span class="p">.</span><span class="nx">object</span><span class="p">({</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">cpf</span><span class="o">:</span><span class="w"> </span><span class="kt">cpfField</span><span class="p">,</span><span class="w"> </span><span class="c1">// &quot;529.982.247-25&quot; → &quot;52998224725&quot;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nx">phone</span><span class="o">:</span><span class="w"> </span><span class="kt">phoneBrField</span><span class="p">,</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nx">uf</span><span class="o">:</span><span class="w"> </span><span class="kt">ufField</span><span class="p">,</span><span class="w"> </span><span class="c1">// &quot;sp&quot; → &quot;SP&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">http</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">HTTPClient</span><span class="p">({</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">baseUrl</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://api.exemplo.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nx">retryPolicy</span><span class="o">:</span><span class="w"> </span><span class="kt">new</span><span class="w"> </span><span class="nx">RetryPolicy</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="mf">200</span><span class="p">),</span><span class="w">   </span><span class="c1">// 3 tentativas, backoff base 200ms</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nx">breakerThreshold</span><span class="o">:</span><span class="w"> </span><span class="kt">5</span><span class="p">,</span><span class="w">                     </span><span class="c1">// abre após 5 falhas seguidas</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">});</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nx">customerSchema</span><span class="p">.</span><span class="nx">parse</span><span class="p">({</span><span class="w"> </span><span class="nx">cpf</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;529.982.247-25&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">phone</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;(11) 99999-8888&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">uf</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;sp&quot;</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;/status&quot;</span><span class="p">);</span>
 </code></pre></div>
-<p>Um valor inválido lança <code>ZodError</code>, que o handler de erro transforma em <strong>422</strong>.</p>
-<h2 id="estados-e-cidades">Estados e cidades<a class="headerlink" href="#estados-e-cidades" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">listStates</span><span class="p">,</span><span class="w"> </span><span class="nx">getState</span><span class="p">,</span><span class="w"> </span><span class="nx">isValidCity</span><span class="p">,</span><span class="w"> </span><span class="nx">statesByRegion</span><span class="p">,</span><span class="w"> </span><span class="nx">Region</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nx">listStates</span><span class="p">().</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="c1">// 27</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nx">getState</span><span class="p">(</span><span class="s2">&quot;SP&quot;</span><span class="p">)</span><span class="o">?</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;São Paulo&quot;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nx">isValidCity</span><span class="p">(</span><span class="s2">&quot;são paulo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;SP&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// true (ignora acento e caixa)</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nx">statesByRegion</span><span class="p">(</span><span class="nx">Region</span><span class="p">.</span><span class="nx">SOUTH</span><span class="p">).</span><span class="nx">map</span><span class="p">((</span><span class="nx">s</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">uf</span><span class="p">);</span><span class="w"> </span><span class="c1">// [&quot;PR&quot;, &quot;RS&quot;, &quot;SC&quot;]</span>
+<h2 id="web-push-vapid">Web Push (VAPID)<a class="headerlink" href="#web-push-vapid" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Peer opcional</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>npm<span class="w"> </span>install<span class="w"> </span>web-push
 </code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Dataset offline</p>
-<p>O pacote embute todos os 27 estados e ~5,6 mil municípios — sem chamadas de
-rede. As comparações de cidade ignoram acento e caixa.</p>
 </div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">WebPushDispatcher</span><span class="p">,</span><span class="w"> </span><span class="nx">WebPushGoneError</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">push</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">WebPushDispatcher</span><span class="p">({</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nx">subject</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;mailto:admin@exemplo.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nx">publicKey</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.VAPID_PUBLIC</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nx">privateKey</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.VAPID_PRIVATE</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">});</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">push</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">subscription</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Olá&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Nova mensagem&quot;</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">WebPushGoneError</span><span class="p">)</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">removeSubscription</span><span class="p">(</span><span class="nx">subscription</span><span class="p">);</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="email">Email<a class="headerlink" href="#email" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Peer opcional</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>npm<span class="w"> </span>install<span class="w"> </span>nodemailer
+</code></pre></div>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">EmailUtils</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">EmailUtils</span><span class="p">({</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nx">host</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;smtp.exemplo.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nx">user</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;no-reply@exemplo.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.SMTP_PASS</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="kr">from</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;no-reply@exemplo.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">});</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">await</span><span class="w"> </span><span class="nx">email</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span><span class="w"> </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;ana@example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">subject</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Bem-vinda&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">html</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;&lt;b&gt;Oi&lt;/b&gt;&quot;</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+<h2 id="metricas">Métricas<a class="headerlink" href="#metricas" title="Permanent link">&para;</a></h2>
+<p><code>MetricsUtils</code> lê CPU/memória/uptime do <code>node:os</code>/<code>process</code>, com exporter
+Prometheus.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MetricsUtils</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;/metrics&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">_req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nx">res</span><span class="p">.</span><span class="kr">type</span><span class="p">(</span><span class="s2">&quot;text/plain&quot;</span><span class="p">).</span><span class="nx">send</span><span class="p">(</span><span class="nx">MetricsUtils</span><span class="p">.</span><span class="nx">toPrometheus</span><span class="p">());</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">});</span>
+</code></pre></div>
+<h2 id="client-ip-confiavel">Client IP confiável<a class="headerlink" href="#client-ip-confiavel" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getClientIp</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1">// Atrás de proxy: confie APENAS no header que a edge define (nunca X-Forwarded-For cru).</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">ip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">getClientIp</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">trustedHeader</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;x-real-ip&quot;</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
 <h2 id="recapitulando">Recapitulando<a class="headerlink" href="#recapitulando" title="Permanent link">&para;</a></h2>
-<p>Validadores + campos Zod cobrem CPF/CNPJ/CEP/telefone; o dataset de UF/cidades é
-offline. Tudo se integra ao envelope de erro padrão via <code>ZodError</code> → 422.</p>
+<p>MFA nativo, HTTP client resiliente, Web Push/email (peers opcionais), métricas
+Prometheus e resolução de IP segura — as peças de servidor que faltavam.</p>
 
 
 
