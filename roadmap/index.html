@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/roadmap/">
       
       
-        <link rel="prev" href="../recipes/server-utils/">
+        <link rel="prev" href="../recipes/whatsapp/">
       
       
         <link rel="next" href="../changelog/">
@@ -596,6 +596,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/whatsapp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrações: WhatsApp (zap-api)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -693,10 +721,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#integrations-modulo-dedicado-a-integracoes" class="md-nav__link">
+  <a href="#mais-canais-sob-messagingprovider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        integrations/ — módulo dedicado a integrações
+        Mais canais sob MessagingProvider
       
     </span>
   </a>
@@ -804,10 +832,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#integrations-modulo-dedicado-a-integracoes" class="md-nav__link">
+  <a href="#mais-canais-sob-messagingprovider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        integrations/ — módulo dedicado a integrações
+        Mais canais sob MessagingProvider
       
     </span>
   </a>
@@ -860,34 +888,15 @@
   background, feature flags, storage.</li>
 <li><strong>0.3.0</strong> — client-IP, TOTP (MFA), HTTP client resiliente (retry + circuit
   breaker), métricas de sistema (+ Prometheus), Web Push, email.</li>
+<li><strong>0.4.0</strong> — <code>integrations/</code>: contrato <code>MessagingProvider</code> + <code>WhatsAppProvider</code>
+  (cliente tipado do <code>zap-api</code>, REST + <code>/ws</code>) + <code>makeWhatsAppWebhookRouter</code>.
+  Veja a receita <a href="../recipes/whatsapp/">Integrações: WhatsApp</a>.</li>
 </ul>
 <h2 id="planejado">Planejado<a class="headerlink" href="#planejado" title="Permanent link">&para;</a></h2>
-<h3 id="integrations-modulo-dedicado-a-integracoes"><code>integrations/</code> — módulo dedicado a integrações<a class="headerlink" href="#integrations-modulo-dedicado-a-integracoes" title="Permanent link">&para;</a></h3>
-<p>Uma camada de abstração <strong>bem documentada e fácil de usar</strong> sobre os serviços
-externos que rodamos, para que todo consumidor do SDK receba um cliente tipado
-em vez de montar chamadas HTTP/WS na mão. Baseado no serviço
-<a href="https://github.com/mauriciobenjamin700"><code>zap-api</code></a> (Express + Baileys: REST para
-enviar, <code>/ws</code> pub/sub para receber, fan-out por webhook).</p>
-<p>Objetivos:</p>
-<ul>
-<li><strong>Interface de provider</strong> — contrato <code>MessagingProvider</code>
-  (<code>sendText</code>, <code>sendMedia</code>, <code>onMessage</code>, <code>status</code>), para que WhatsApp, SMS e
-  futuros canais tenham o mesmo formato e sejam trocáveis em testes.</li>
-<li><strong><code>WhatsAppProvider</code></strong> — cliente de uma instância <code>zap-api</code>:</li>
-<li>REST: iniciar/inspecionar sessão (QR), <code>sendText</code>/<code>sendMedia</code>, histórico.</li>
-<li>Tempo real: assinar mensagens recebidas pelo <code>/ws</code> do <code>zap-api</code>, expostas
-    pelo próprio <code>WebSocketHub</code>/<code>SSEBroker</code> do SDK (um único stream de eventos).</li>
-<li>Auth: header de API key + verificação opcional de assinatura de webhook
-    (reusando os helpers de token opaco / HMAC do SDK).</li>
-<li><strong>Receiver de webhook</strong> — <code>makeWhatsAppWebhookRouter</code> que valida a assinatura
-  e normaliza o payload para um <code>InboundMessage</code> tipado.</li>
-<li><strong>Sem dependência pesada</strong> — HTTP pelo <code>HTTPClient</code> embutido, WS pela peer
-  opcional <code>ws</code>; o provider é criado com base URL + API key.</li>
-<li><strong>Docs</strong> — receita completa em estilo tutorial (PT-BR + EN), no mesmo padrão
-  FastAPI/tiangolo do resto do site.</li>
-</ul>
-<p>Canais futuros sob o mesmo contrato <code>MessagingProvider</code>: SMS (ex.: Twilio),
-Telegram e provedores de email transacional.</p>
+<h3 id="mais-canais-sob-messagingprovider">Mais canais sob <code>MessagingProvider</code><a class="headerlink" href="#mais-canais-sob-messagingprovider" title="Permanent link">&para;</a></h3>
+<p>O módulo <code>integrations/</code> chegou na 0.4.0 com WhatsApp. Os próximos canais reusam
+o mesmo contrato (<code>sendText</code>, <code>sendMedia</code>, <code>onMessage</code>, <code>status</code>): SMS
+(ex.: Twilio), Telegram e provedores de email transacional.</p>
 <h3 id="outros-candidatos">Outros candidatos<a class="headerlink" href="#outros-candidatos" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>admin</strong> — UI de admin gerada a partir dos models.</li>

@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/roadmap/">
       
       
-        <link rel="prev" href="../recipes/server-utils/">
+        <link rel="prev" href="../recipes/whatsapp/">
       
       
         <link rel="next" href="../changelog/">
@@ -596,6 +596,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/whatsapp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations: WhatsApp (zap-api)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -693,10 +721,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#integrations-a-dedicated-integrations-module" class="md-nav__link">
+  <a href="#more-channels-under-messagingprovider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        integrations/ — a dedicated integrations module
+        More channels under MessagingProvider
       
     </span>
   </a>
@@ -804,10 +832,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#integrations-a-dedicated-integrations-module" class="md-nav__link">
+  <a href="#more-channels-under-messagingprovider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        integrations/ — a dedicated integrations module
+        More channels under MessagingProvider
       
     </span>
   </a>
@@ -860,34 +888,15 @@
   tasks, feature flags, object storage.</li>
 <li><strong>0.3.0</strong> — client-IP resolution, TOTP (MFA), resilient HTTP client
   (retry + circuit breaker), system metrics (+ Prometheus), Web Push, email.</li>
+<li><strong>0.4.0</strong> — <code>integrations/</code>: <code>MessagingProvider</code> contract + <code>WhatsAppProvider</code>
+  (typed <code>zap-api</code> client, REST + <code>/ws</code>) + <code>makeWhatsAppWebhookRouter</code>.
+  See the <a href="../recipes/whatsapp/">Integrations: WhatsApp</a> recipe.</li>
 </ul>
 <h2 id="planned">Planned<a class="headerlink" href="#planned" title="Permanent link">&para;</a></h2>
-<h3 id="integrations-a-dedicated-integrations-module"><code>integrations/</code> — a dedicated integrations module<a class="headerlink" href="#integrations-a-dedicated-integrations-module" title="Permanent link">&para;</a></h3>
-<p>A first-class, <strong>well-documented and easy-to-use</strong> abstraction over the external
-services we run, so every SDK consumer gets a typed client instead of
-hand-rolling HTTP/WS calls. Modeled on the existing
-<a href="https://github.com/mauriciobenjamin700"><code>zap-api</code></a> service (Express + Baileys:
-REST to send, <code>/ws</code> pub/sub to receive, webhook fan-out).</p>
-<p>Goals:</p>
-<ul>
-<li><strong>Provider interface</strong> — a <code>MessagingProvider</code> contract
-  (<code>sendText</code>, <code>sendMedia</code>, <code>onMessage</code>, <code>status</code>) so WhatsApp, SMS and future
-  channels share one shape and are swappable in tests.</li>
-<li><strong><code>WhatsAppProvider</code></strong> — a client for a running <code>zap-api</code> instance:</li>
-<li>REST: start/inspect the session (QR), <code>sendText</code>/<code>sendMedia</code>, history.</li>
-<li>Realtime: subscribe to inbound messages over <code>zap-api</code>'s <code>/ws</code>, surfaced
-    through the SDK's own <code>WebSocketHub</code>/<code>SSEBroker</code> (one event stream).</li>
-<li>Auth: API-key header + optional webhook-signature verification (reusing the
-    SDK's opaque-token / HMAC helpers).</li>
-<li><strong>Webhook receiver</strong> — <code>makeWhatsAppWebhookRouter</code> that validates the inbound
-  signature and normalizes payloads to a typed <code>InboundMessage</code>.</li>
-<li><strong>Zero hard dependency</strong> — HTTP over the built-in <code>HTTPClient</code>, WS over the
-  optional <code>ws</code> peer; the provider is built from a base URL + API key.</li>
-<li><strong>Docs</strong> — a full tutorial-style recipe (PT-BR + EN), same FastAPI/tiangolo
-  pattern as the rest of the site.</li>
-</ul>
-<p>Later channels under the same <code>MessagingProvider</code> contract: SMS (e.g. Twilio),
-Telegram, and transactional email providers.</p>
+<h3 id="more-channels-under-messagingprovider">More channels under <code>MessagingProvider</code><a class="headerlink" href="#more-channels-under-messagingprovider" title="Permanent link">&para;</a></h3>
+<p>The <code>integrations/</code> module shipped in 0.4.0 with WhatsApp. Next channels reuse
+the same contract (<code>sendText</code>, <code>sendMedia</code>, <code>onMessage</code>, <code>status</code>): SMS
+(e.g. Twilio), Telegram, and transactional email providers.</p>
 <h3 id="other-candidates">Other candidates<a class="headerlink" href="#other-candidates" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>admin</strong> — auto-generated admin UI over models.</li>
