@@ -91,7 +91,51 @@ app.get("/api/admin", auth, requireRoles("admin"), (req, res) => {
     Use `makeJwtAuthMiddleware(jwt, { required: false })` para popular `req.auth`
     quando houver token, sem rejeitar anônimos.
 
+## Fluxos: MFA, ativação e reset de senha
+
+Passe serviços opcionais ao `makeAuthRouter` para montar os fluxos. Cada um usa
+um **store dedicado** (implemente só os que usar).
+
+```ts
+import {
+  ActivationService,
+  MfaService,
+  PasswordResetService,
+  TOTPHelper,
+  makeAuthRouter,
+} from "tempest-express-sdk";
+
+a.use(
+  makeAuthRouter({
+    service,
+    jwt,
+    activation: new ActivationService({ store }),               // POST /auth/activate
+    passwordReset: new PasswordResetService({ store, password }), // /auth/password-reset/*
+    mfa: new MfaService({ store, totp: new TOTPHelper({ issuer: "Minha App" }) }),
+  }),
+);
+```
+
+Rotas montadas:
+
+| Rota | Descrição |
+|---|---|
+| `POST /auth/activate` | `{ token }` → ativa a conta |
+| `POST /auth/password-reset/request` | `{ email }` → **202** sempre (não vaza existência) |
+| `POST /auth/password-reset/confirm` | `{ token, password }` → redefine a senha |
+| `POST /auth/mfa/enroll` | guardada (JWT) → `{ secret, otpauthUri }` (QR) |
+| `POST /auth/mfa/confirm` | `{ code }` → ativa o MFA |
+| `POST /auth/mfa/disable` | `{ code }` → desativa o MFA |
+
+- **Tokens opacos**: ativação/reset guardam só o **hash SHA-256**; o plaintext
+  vai no link por email. Token inválido/expirado → **401**.
+- **MFA**: `TOTPHelper` nativo (RFC 6238). `enroll` gera o segredo e a URI de QR;
+  `confirm` verifica um código e liga o MFA; código errado → **422**.
+- **Anti-enumeração**: `password-reset/request` sempre responde 202; o `token` só
+  volta no corpo em setup dev (em produção, o serviço envia por email).
+
 ## Recapitulando
 
 `UserStore` desacopla a auth do banco; `UserAuthService` cuida de hashing e
-tokens; o middleware protege rotas por role. Tudo aparece no Swagger/Redoc.
+tokens; o middleware protege rotas por role; os serviços de MFA/ativação/reset
+montam os fluxos completos sobre stores dedicados. Tudo aparece no Swagger/Redoc.

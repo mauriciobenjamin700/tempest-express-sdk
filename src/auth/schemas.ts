@@ -71,9 +71,44 @@ export const authResponseSchema = z
   })
   .openapi("AuthResponse");
 
+/** MFA enrollment response (`POST /auth/mfa/enroll`). */
+export const mfaEnrollResponseSchema = z
+  .object({
+    secret: z.string().openapi({ description: "Base32 TOTP secret (manual entry)." }),
+    otpauthUri: z.string().openapi({ description: "otpauth:// URI to render as QR." }),
+  })
+  .openapi("MfaEnrollResponse");
+
+/** A 6-digit MFA code body (`POST /auth/mfa/confirm|disable`). */
+export const mfaCodeSchema = z
+  .object({ code: z.string().min(1).openapi({ description: "Authenticator code." }) })
+  .openapi("MfaCode");
+
+/** Activation body (`POST /auth/activate`). */
+export const activationSchema = z
+  .object({ token: z.string().min(1).openapi({ description: "Activation token." }) })
+  .openapi("Activation");
+
+/** Password-reset request body (`POST /auth/password-reset/request`). */
+export const passwordResetRequestSchema = z
+  .object({ email: z.string().email().openapi({ description: "Account email." }) })
+  .openapi("PasswordResetRequest");
+
+/** Password-reset confirm body (`POST /auth/password-reset/confirm`). */
+export const passwordResetConfirmSchema = z
+  .object({
+    token: z.string().min(1).openapi({ description: "Reset token." }),
+    password: z.string().min(1).openapi({ description: "New plaintext password." }),
+  })
+  .openapi("PasswordResetConfirm");
+
 export type SignupInput = z.infer<typeof signupSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RefreshInput = z.infer<typeof refreshSchema>;
 export type TokenPair = z.infer<typeof tokenPairSchema>;
 export type UserPublic = z.infer<typeof userPublicSchema>;
 export type AuthResponse = z.infer<typeof authResponseSchema>;
+export type MfaCodeInput = z.infer<typeof mfaCodeSchema>;
+export type ActivationInput = z.infer<typeof activationSchema>;
+export type PasswordResetRequestInput = z.infer<typeof passwordResetRequestSchema>;
+export type PasswordResetConfirmInput = z.infer<typeof passwordResetConfirmSchema>;

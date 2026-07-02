@@ -91,8 +91,52 @@ app.get("/api/admin", auth, requireRoles("admin"), (req, res) => {
     Use `makeJwtAuthMiddleware(jwt, { required: false })` to populate `req.auth`
     when a token is present, without rejecting anonymous callers.
 
+## Flows: MFA, activation and password reset
+
+Pass optional services to `makeAuthRouter` to mount the flows. Each uses a
+**dedicated store** (implement only the ones you use).
+
+```ts
+import {
+  ActivationService,
+  MfaService,
+  PasswordResetService,
+  TOTPHelper,
+  makeAuthRouter,
+} from "tempest-express-sdk";
+
+a.use(
+  makeAuthRouter({
+    service,
+    jwt,
+    activation: new ActivationService({ store }),               // POST /auth/activate
+    passwordReset: new PasswordResetService({ store, password }), // /auth/password-reset/*
+    mfa: new MfaService({ store, totp: new TOTPHelper({ issuer: "My App" }) }),
+  }),
+);
+```
+
+Mounted routes:
+
+| Route | Description |
+|---|---|
+| `POST /auth/activate` | `{ token }` → activate the account |
+| `POST /auth/password-reset/request` | `{ email }` → always **202** (no enumeration) |
+| `POST /auth/password-reset/confirm` | `{ token, password }` → set the new password |
+| `POST /auth/mfa/enroll` | guarded (JWT) → `{ secret, otpauthUri }` (QR) |
+| `POST /auth/mfa/confirm` | `{ code }` → enable MFA |
+| `POST /auth/mfa/disable` | `{ code }` → disable MFA |
+
+- **Opaque tokens**: activation/reset store only the **SHA-256 hash**; the
+  plaintext travels in the emailed link. Invalid/expired token → **401**.
+- **MFA**: native `TOTPHelper` (RFC 6238). `enroll` generates the secret + QR
+  URI; `confirm` verifies a code and turns MFA on; a wrong code → **422**.
+- **Anti-enumeration**: `password-reset/request` always returns 202; the `token`
+  is echoed only in dev setups (in production the service emails it).
+
 ## Recap
 
 `UserStore` decouples auth from your database; `UserAuthService` handles hashing
-and tokens; the middleware guards routes by role. Everything shows up in
+and tokens; the middleware guards routes by role; the MFA/activation/reset
+services mount the full flows over dedicated stores. Everything shows up in
 Swagger/Redoc.

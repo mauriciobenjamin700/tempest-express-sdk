@@ -1,17 +1,26 @@
 /** Authentication: schemas, service, JWT middleware/guards, router. */
 
 export {
+  type ActivationInput,
+  activationSchema,
   type AuthResponse,
-  type LoginInput,
-  type RefreshInput,
-  type SignupInput,
-  type TokenPair,
-  type UserPublic,
   authResponseSchema,
+  type LoginInput,
   loginSchema,
+  type MfaCodeInput,
+  mfaCodeSchema,
+  mfaEnrollResponseSchema,
+  type PasswordResetConfirmInput,
+  passwordResetConfirmSchema,
+  type PasswordResetRequestInput,
+  passwordResetRequestSchema,
+  type RefreshInput,
   refreshSchema,
+  type SignupInput,
   signupSchema,
+  type TokenPair,
   tokenPairSchema,
+  type UserPublic,
   userPublicSchema,
 } from "@/auth/schemas";
 export {
@@ -20,6 +29,22 @@ export {
   type UserStore,
   UserAuthService,
 } from "@/auth/service";
+export {
+  type MfaEnrollment,
+  MfaService,
+  type MfaServiceOptions,
+  type MfaStore,
+} from "@/auth/mfa";
+export {
+  ActivationService,
+  type ActivationServiceOptions,
+  type ActivationStore,
+} from "@/auth/activation";
+export {
+  PasswordResetService,
+  type PasswordResetServiceOptions,
+  type PasswordResetStore,
+} from "@/auth/passwordReset";
 export {
   type JwtAuthOptions,
   bearerToken,

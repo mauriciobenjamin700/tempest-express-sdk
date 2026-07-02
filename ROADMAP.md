@@ -15,6 +15,8 @@
   auto-derived CRUD, `_meta` introspection, Zod validation and a pluggable guard.
 - **0.6.0** — `integrations/`: `TelegramProvider` (Bot API, send + polling) and
   `TwilioSmsProvider` (SMS) + `makeTwilioWebhookRouter` (signature-validated).
+- **0.7.0** — auth flows: `MfaService` (TOTP), `ActivationService` (email) and
+  `PasswordResetService`, wired into `makeAuthRouter`.
 
 ## Planned
 
@@ -26,8 +28,6 @@ providers exposed as a `MessagingProvider`.
 
 ### Other candidates
 
-- **auth flows** — MFA enrollment endpoints, email activation, password reset
-  (the service-level flows still pending from `tempest-fastapi-sdk`).
 - **cache/session Redis stores** — first-party Redis-backed `SessionStore` and
   a Redis `SSEBroker` transport for multi-replica deployments.
 - **metrics** — optional GPU metrics and a `/metrics` Prometheus router.

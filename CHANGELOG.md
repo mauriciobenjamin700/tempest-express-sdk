@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.7.0] — 2026-07-02
+
+### Added
+
+- **auth flows**: `MfaService` (TOTP enroll/confirm/verify/disable),
+  `ActivationService` (email activation) and `PasswordResetService` (reset with
+  anti-enumeration), each over a dedicated store port. `makeAuthRouter` now
+  mounts `POST /auth/activate`, `/auth/password-reset/{request,confirm}` and
+  guarded `/auth/mfa/{enroll,confirm,disable}` when the services are provided.
+
 ## [0.6.0] — 2026-07-02
 
 ### Added

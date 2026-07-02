@@ -18,6 +18,9 @@
 - **0.6.0** — `integrations/`: `TelegramProvider` (Bot API, envio + polling) e
   `TwilioSmsProvider` (SMS) + `makeTwilioWebhookRouter` (assinatura validada).
   Veja a receita [SMS e Telegram](recipes/sms-telegram.md).
+- **0.7.0** — fluxos de auth: `MfaService` (TOTP), `ActivationService` (email) e
+  `PasswordResetService`, montados no `makeAuthRouter`. Veja
+  [Autenticação (JWT)](recipes/auth.md).
 
 ## Planejado
 
@@ -29,7 +32,6 @@ exposto como `MessagingProvider`.
 
 ### Outros candidatos
 
-- **fluxos de auth** — enrollment de MFA, ativação por email, reset de senha.
 - **stores Redis** — `SessionStore` e transporte de `SSEBroker` em Redis para
   deploys multi-réplica.
 - **metrics** — métricas de GPU opcionais e um router Prometheus `/metrics`.
