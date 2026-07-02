@@ -4,6 +4,29 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.4.0] — 2026-07-02
+
+### Added
+
+- **integrations**: a channel-agnostic `MessagingProvider` contract and
+  `WhatsAppProvider` — a typed client for the `zap-api` service (REST send +
+  session control, `/ws` inbound subscription over the optional `ws` peer),
+  plus `makeWhatsAppWebhookRouter` for the inbound webhook and the
+  `InboundMessage` schema.
+
+## [0.3.0] — 2026-07-02
+
+### Added
+
+- **utils**: `getClientIp` (trusted-header resolution), `TOTPHelper` (native
+  RFC 6238 MFA — no external dep), `HTTPClient` + `RetryPolicy` +
+  `CircuitOpenError` (resilient `fetch`), `MetricsUtils` (CPU/memory/uptime +
+  Prometheus exporter), `EmailUtils` (optional `nodemailer` peer).
+- **webpush**: `WebPushDispatcher` (optional `web-push` peer), `WebPushError` /
+  `WebPushGoneError`, and subscription/payload Zod schemas.
+- **docs**: recipe "MFA, HTTP client, Web Push and more" (PT + EN) and a Roadmap
+  page describing the planned `integrations/` module (WhatsApp via `zap-api`).
+
 ## [0.2.0] — 2026-06-29
 
 ### Added

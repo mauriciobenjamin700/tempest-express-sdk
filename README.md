@@ -36,6 +36,9 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **cache / queue / tasks** | `CacheManager` (+`cached`), `BrokerManager` (memory/RabbitMQ), `TaskManager` |
 | **sse / websockets** | `SSEBroker`/`sseResponse`, transport-agnostic `WebSocketHub` + `attachWebSocketHub` |
 | **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage` |
+| **webpush / email** | `WebPushDispatcher` (VAPID), `EmailUtils` (SMTP) |
+| **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus), `getClientIp` |
+| **integrations** | `MessagingProvider` contract, `WhatsAppProvider` (zap-api client), `makeWhatsAppWebhookRouter` |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
 
 ## Quick start
@@ -90,8 +93,13 @@ refresh + JWT guards), cache, sessions, queue (RabbitMQ), background tasks, SSE,
 WebSockets, feature flags, object storage, CLI `generate`/`secret`/`docker-compose`,
 and the bilingual MkDocs docs site.
 
-Not yet ported from `tempest-fastapi-sdk`: webpush, metrics, admin, and the
-MFA / email / password-reset flows.
+Also shipped: the `integrations/` module — a typed WhatsApp client over
+[`zap-api`](https://github.com/mauriciobenjamin700) behind a shared
+`MessagingProvider` contract.
+
+Planned (see [ROADMAP.md](./ROADMAP.md)): more `MessagingProvider` channels
+(SMS/Telegram), an admin UI, MFA-enrollment/email-activation/password-reset
+flows, and Redis-backed session/SSE stores.
 
 ## License
 

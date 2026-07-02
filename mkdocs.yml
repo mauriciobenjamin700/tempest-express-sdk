@@ -78,6 +78,9 @@ plugins:
             "Tempo real (WebSocket + SSE)": "Real-time (WebSocket + SSE)"
             "Cache, fila e tarefas": "Cache, queue and tasks"
             "Feature flags e storage": "Feature flags and storage"
+            "MFA, HTTP client, Web Push e mais": "MFA, HTTP client, Web Push and more"
+            "Integrações: WhatsApp (zap-api)": "Integrations: WhatsApp (zap-api)"
+            Roadmap: Roadmap
             Changelog: Changelog
 
 nav:
@@ -90,4 +93,7 @@ nav:
       - "Tempo real (WebSocket + SSE)": recipes/realtime.md
       - "Cache, fila e tarefas": recipes/jobs.md
       - "Feature flags e storage": recipes/flags-storage.md
+      - "MFA, HTTP client, Web Push e mais": recipes/server-utils.md
+      - "Integrações: WhatsApp (zap-api)": recipes/whatsapp.md
+  - Roadmap: roadmap.md
   - Changelog: changelog.md

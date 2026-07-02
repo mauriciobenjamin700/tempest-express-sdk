@@ -1,6 +1,6 @@
 {
   "name": "tempest-express-sdk",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "Shared Express/Zod/tempest-db-js building blocks: base schemas, repository, exceptions, pagination, settings and native Swagger + Redoc — the conventions used across Tempest projects, ported from tempest-fastapi-sdk.",
   "type": "module",
   "license": "MIT",
@@ -63,7 +63,9 @@
     "amqplib": "^0.10.0",
     "bcryptjs": "^2.4.3 || ^3.0.0",
     "jsonwebtoken": "^9.0.0",
+    "nodemailer": "^6.9.0",
     "tempest-db-js": ">=0.1.0",
+    "web-push": "^3.6.0",
     "ws": "^8.0.0"
   },
   "peerDependenciesMeta": {
@@ -74,6 +76,12 @@
       "optional": true
     },
     "jsonwebtoken": {
+      "optional": true
+    },
+    "nodemailer": {
+      "optional": true
+    },
+    "web-push": {
       "optional": true
     },
     "ws": {
@@ -88,13 +96,17 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.0",
     "@types/swagger-ui-dist": "^3.30.6",
+    "@types/nodemailer": "^6.4.16",
+    "@types/web-push": "^3.6.4",
     "@types/ws": "^8.5.12",
     "amqplib": "^0.10.4",
     "bcryptjs": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.16",
     "tempest-db-js": "^0.1.0",
     "tsup": "^8.3.0",
     "ws": "^8.18.0",
+    "web-push": "^3.6.7",
     "tsx": "^4.19.2",
     "typescript": "^5.7.0",
     "vitest": "^2.1.9"
