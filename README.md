@@ -38,7 +38,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage` |
 | **webpush / email** | `WebPushDispatcher` (VAPID), `EmailUtils` (SMTP) |
 | **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus), `getClientIp` |
-| **integrations** | `MessagingProvider` contract, `WhatsAppProvider` (zap-api client), `makeWhatsAppWebhookRouter` |
+| **integrations** | `MessagingProvider` contract; `WhatsAppProvider` (zap-api), `TelegramProvider` (Bot API), `TwilioSmsProvider` (SMS) + webhook receivers |
 | **admin** | `AdminSite` + `makeAdminRouter` — JSON admin with auto-derived CRUD + introspection |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
 
@@ -98,9 +98,8 @@ Also shipped: the `integrations/` module — a typed WhatsApp client over
 [`zap-api`](https://github.com/mauriciobenjamin700) behind a shared
 `MessagingProvider` contract.
 
-Planned (see [ROADMAP.md](./ROADMAP.md)): more `MessagingProvider` channels
-(SMS/Telegram), MFA-enrollment/email-activation/password-reset flows, and
-Redis-backed session/SSE stores.
+Planned (see [ROADMAP.md](./ROADMAP.md)): MFA-enrollment / email-activation /
+password-reset auth flows, and Redis-backed session/SSE stores.
 
 ## License
 

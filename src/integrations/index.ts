@@ -18,3 +18,14 @@ export {
   makeWhatsAppWebhookRouter,
   type WhatsAppWebhookOptions,
 } from "@/integrations/webhook";
+export {
+  TelegramProvider,
+  type TelegramProviderOptions,
+} from "@/integrations/telegram";
+export {
+  TwilioSmsProvider,
+  type TwilioSmsProviderOptions,
+  type TwilioWebhookOptions,
+  makeTwilioWebhookRouter,
+  validateTwilioSignature,
+} from "@/integrations/sms";

@@ -15,14 +15,17 @@
 - **0.5.0** — `admin/`: admin JSON (`AdminSite` + `makeAdminRouter`) com CRUD
   auto-derivado, introspecção `_meta`, validação Zod e guard plugável.
   Veja a receita [Admin (API JSON)](recipes/admin.md).
+- **0.6.0** — `integrations/`: `TelegramProvider` (Bot API, envio + polling) e
+  `TwilioSmsProvider` (SMS) + `makeTwilioWebhookRouter` (assinatura validada).
+  Veja a receita [SMS e Telegram](recipes/sms-telegram.md).
 
 ## Planejado
 
 ### Mais canais sob `MessagingProvider`
 
-O módulo `integrations/` chegou na 0.4.0 com WhatsApp. Os próximos canais reusam
-o mesmo contrato (`sendText`, `sendMedia`, `onMessage`, `status`): SMS
-(ex.: Twilio), Telegram e provedores de email transacional.
+WhatsApp (0.4.0), Telegram + SMS (0.6.0) já rodam sob o contrato compartilhado.
+Candidatos futuros o reusam: outros provedores de SMS e email transacional
+exposto como `MessagingProvider`.
 
 ### Outros candidatos
 

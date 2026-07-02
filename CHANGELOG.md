@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.6.0] — 2026-07-02
+
+### Added
+
+- **integrations**: `TelegramProvider` (Bot API — send + `getUpdates`
+  long-polling inbound) and `TwilioSmsProvider` (SMS send) +
+  `makeTwilioWebhookRouter` with `X-Twilio-Signature` validation
+  (`validateTwilioSignature`). `MessagingProvider.onMessage`/`checkNumber` are
+  now optional so channels without a live subscription fit the contract.
+
 ## [0.5.0] — 2026-07-02
 
 ### Added

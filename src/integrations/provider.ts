@@ -66,7 +66,12 @@ export type InboundMessage = z.infer<typeof inboundMessageSchema>;
 /** Handler invoked for each inbound message. */
 export type InboundHandler = (message: InboundMessage) => Promise<void> | void;
 
-/** A channel-agnostic messaging provider. */
+/**
+ * A channel-agnostic messaging provider. `sendText`/`sendMedia`/`status` are
+ * universal; `checkNumber` and `onMessage` are optional because not every
+ * channel supports them (e.g. SMS has no persistent subscription — its inbound
+ * arrives via a webhook receiver instead).
+ */
 export interface MessagingProvider {
   /** Send a text message. */
   sendText(to: string, text: string, options?: SendOptions): Promise<OutboundResult>;
@@ -76,15 +81,17 @@ export interface MessagingProvider {
     media: OutboundMedia,
     options?: SendOptions,
   ): Promise<OutboundResult>;
-  /** Whether a number exists on the channel. */
-  checkNumber(number: string): Promise<boolean>;
   /** The current session/connection status. */
   status(): Promise<string>;
+  /** Whether a number/handle exists on the channel (when supported). */
+  checkNumber?(number: string): Promise<boolean>;
   /**
    * Subscribe to inbound messages; resolves to an unsubscribe function.
+   * Present only on channels with a live subscription (WhatsApp `/ws`,
+   * Telegram long-polling).
    *
    * @param handler - Invoked for each inbound message.
    * @param room - Conversation to scope to; `"*"` for all. Default `"*"`.
    */
-  onMessage(handler: InboundHandler, room?: string): Promise<() => Promise<void>>;
+  onMessage?(handler: InboundHandler, room?: string): Promise<() => Promise<void>>;
 }

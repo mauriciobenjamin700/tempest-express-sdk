@@ -13,14 +13,16 @@
   (typed `zap-api` client, REST + `/ws`) + `makeWhatsAppWebhookRouter`.
 - **0.5.0** — `admin/`: JSON admin API (`AdminSite` + `makeAdminRouter`) with
   auto-derived CRUD, `_meta` introspection, Zod validation and a pluggable guard.
+- **0.6.0** — `integrations/`: `TelegramProvider` (Bot API, send + polling) and
+  `TwilioSmsProvider` (SMS) + `makeTwilioWebhookRouter` (signature-validated).
 
 ## Planned
 
 ### More channels under `MessagingProvider`
 
-The `integrations/` module shipped in 0.4.0 with WhatsApp. Next channels reuse
-the same contract (`sendText`, `sendMedia`, `onMessage`, `status`): SMS
-(e.g. Twilio), Telegram, and transactional email providers.
+WhatsApp (0.4.0), Telegram + SMS (0.6.0) ship under the shared contract. Future
+candidates reuse it too: additional SMS vendors, and transactional-email
+providers exposed as a `MessagingProvider`.
 
 ### Other candidates
 
