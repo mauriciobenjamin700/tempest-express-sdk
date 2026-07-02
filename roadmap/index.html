@@ -631,6 +631,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../recipes/sms-telegram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrações: SMS e Telegram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../recipes/admin/" class="md-nav__link">
         
   
@@ -922,12 +950,15 @@
 <li><strong>0.5.0</strong> — <code>admin/</code>: admin JSON (<code>AdminSite</code> + <code>makeAdminRouter</code>) com CRUD
   auto-derivado, introspecção <code>_meta</code>, validação Zod e guard plugável.
   Veja a receita <a href="../recipes/admin/">Admin (API JSON)</a>.</li>
+<li><strong>0.6.0</strong> — <code>integrations/</code>: <code>TelegramProvider</code> (Bot API, envio + polling) e
+  <code>TwilioSmsProvider</code> (SMS) + <code>makeTwilioWebhookRouter</code> (assinatura validada).
+  Veja a receita <a href="../recipes/sms-telegram/">SMS e Telegram</a>.</li>
 </ul>
 <h2 id="planejado">Planejado<a class="headerlink" href="#planejado" title="Permanent link">&para;</a></h2>
 <h3 id="mais-canais-sob-messagingprovider">Mais canais sob <code>MessagingProvider</code><a class="headerlink" href="#mais-canais-sob-messagingprovider" title="Permanent link">&para;</a></h3>
-<p>O módulo <code>integrations/</code> chegou na 0.4.0 com WhatsApp. Os próximos canais reusam
-o mesmo contrato (<code>sendText</code>, <code>sendMedia</code>, <code>onMessage</code>, <code>status</code>): SMS
-(ex.: Twilio), Telegram e provedores de email transacional.</p>
+<p>WhatsApp (0.4.0), Telegram + SMS (0.6.0) já rodam sob o contrato compartilhado.
+Candidatos futuros o reusam: outros provedores de SMS e email transacional
+exposto como <code>MessagingProvider</code>.</p>
 <h3 id="outros-candidatos">Outros candidatos<a class="headerlink" href="#outros-candidatos" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>fluxos de auth</strong> — enrollment de MFA, ativação por email, reset de senha.</li>

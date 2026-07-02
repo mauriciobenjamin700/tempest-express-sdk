@@ -10,19 +10,19 @@
       
       
       
-        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/server-utils/">
+        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/sms-telegram/">
       
       
-        <link rel="prev" href="../flags-storage/">
+        <link rel="prev" href="../whatsapp/">
       
       
-        <link rel="next" href="../whatsapp/">
+        <link rel="next" href="../admin/">
       
       
         
           <link rel="alternate" href="./" hreflang="pt">
         
-          <link rel="alternate" href="../../en/recipes/server-utils/" hreflang="en">
+          <link rel="alternate" href="../../en/recipes/sms-telegram/" hreflang="en">
         
       
       
@@ -31,7 +31,7 @@
     
     
       
-        <title>MFA, HTTP client, Web Push e mais - tempest-express-sdk</title>
+        <title>Integrações: SMS e Telegram - tempest-express-sdk</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mfa-http-client-web-push-e-mais" class="md-skip">
+        <a href="#integracoes-sms-e-telegram" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MFA, HTTP client, Web Push e mais
+              Integrações: SMS e Telegram
             
           </span>
         </div>
@@ -181,7 +181,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../../en/recipes/server-utils/" hreflang="en" class="md-select__link">
+            <a href="../../en/recipes/sms-telegram/" hreflang="en" class="md-select__link">
               English (US)
             </a>
           </li>
@@ -574,37 +574,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MFA, HTTP client, Web Push e mais
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../server-utils/" class="md-nav__link">
         
   
   
@@ -620,103 +593,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Índice">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Índice
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#mfa-totp" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MFA (TOTP)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#http-client-resiliente" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        HTTP client resiliente
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#web-push-vapid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Web Push (VAPID)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#email" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Email
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#metricas" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Métricas
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#client-ip-confiavel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Client IP confiável
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recapitulando" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recapitulando
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -754,10 +630,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../sms-telegram/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrações: SMS e Telegram
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -773,6 +676,87 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#telegram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Telegram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sms-twilio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMS (Twilio)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SMS (Twilio)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#webhook-de-entrada-validado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Webhook de entrada (validado)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#programe-contra-o-contrato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Programe contra o contrato
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recapitulando" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recapitulando
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -894,10 +878,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mfa-totp" class="md-nav__link">
+  <a href="#telegram" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MFA (TOTP)
+        Telegram
       
     </span>
   </a>
@@ -905,54 +889,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#http-client-resiliente" class="md-nav__link">
+  <a href="#sms-twilio" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HTTP client resiliente
+        SMS (Twilio)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SMS (Twilio)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#webhook-de-entrada-validado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Webhook de entrada (validado)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#web-push-vapid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Web Push (VAPID)
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#email" class="md-nav__link">
+  <a href="#programe-contra-o-contrato" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Email
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#metricas" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Métricas
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#client-ip-confiavel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Client IP confiável
+        Programe contra o contrato
       
     </span>
   </a>
@@ -990,85 +958,74 @@
   
 
 
-<h1 id="mfa-http-client-web-push-e-mais">MFA, HTTP client, Web Push e mais<a class="headerlink" href="#mfa-http-client-web-push-e-mais" title="Permanent link">&para;</a></h1>
-<p>Utilidades de servidor prontas para produção.</p>
-<h2 id="mfa-totp">MFA (TOTP)<a class="headerlink" href="#mfa-totp" title="Permanent link">&para;</a></h2>
-<p><code>TOTPHelper</code> é nativo (<code>node:crypto</code>, RFC 6238) — sem dependência externa.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">TOTPHelper</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<h1 id="integracoes-sms-e-telegram">Integrações: SMS e Telegram<a class="headerlink" href="#integracoes-sms-e-telegram" title="Permanent link">&para;</a></h1>
+<p>Mais canais sob o mesmo contrato <code>MessagingProvider</code> — troque de canal sem mudar
+o código de negócio.</p>
+<h2 id="telegram">Telegram<a class="headerlink" href="#telegram" title="Permanent link">&para;</a></h2>
+<p>Cliente da Bot API (sem SDK). Envia por REST e recebe por long-polling.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">TelegramProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">totp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TOTPHelper</span><span class="p">({</span><span class="w"> </span><span class="nx">issuer</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Minha App&quot;</span><span class="w"> </span><span class="p">});</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">totp</span><span class="p">.</span><span class="nx">generateSecret</span><span class="p">();</span><span class="w">                     </span><span class="c1">// persista no usuário</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">totp</span><span class="p">.</span><span class="nx">provisioningUri</span><span class="p">(</span><span class="nx">secret</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ana@example.com&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// renderize como QR</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nx">totp</span><span class="p">.</span><span class="nx">verify</span><span class="p">(</span><span class="nx">secret</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;123456&quot;</span><span class="p">);</span><span class="w">                            </span><span class="c1">// true / false (janela ±1)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">tg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TelegramProvider</span><span class="p">({</span><span class="w"> </span><span class="nx">token</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.TELEGRAM_BOT_TOKEN</span><span class="o">!</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">tg</span><span class="p">.</span><span class="nx">sendText</span><span class="p">(</span><span class="s2">&quot;&lt;chat_id&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Olá do bot 🤖&quot;</span><span class="p">);</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">await</span><span class="w"> </span><span class="nx">tg</span><span class="p">.</span><span class="nx">sendMedia</span><span class="p">(</span><span class="s2">&quot;&lt;chat_id&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">kind</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;image&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">media</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://.../foto.jpg&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">caption</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;oi&quot;</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">// Receber (long-polling getUpdates):</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kd">const</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">tg</span><span class="p">.</span><span class="nx">onMessage</span><span class="p">((</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;recebida:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">msg</span><span class="p">.</span><span class="kr">from</span><span class="p">,</span><span class="w"> </span><span class="nx">msg</span><span class="p">.</span><span class="nx">text</span><span class="p">);</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">});</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">// depois: await stop();</span>
 </code></pre></div>
-<h2 id="http-client-resiliente">HTTP client resiliente<a class="headerlink" href="#http-client-resiliente" title="Permanent link">&para;</a></h2>
-<p><code>HTTPClient</code> embrulha o <code>fetch</code> nativo com retry (backoff) + circuit breaker por
-host.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">HTTPClient</span><span class="p">,</span><span class="w"> </span><span class="nx">RetryPolicy</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<h2 id="sms-twilio">SMS (Twilio)<a class="headerlink" href="#sms-twilio" title="Permanent link">&para;</a></h2>
+<p>Cliente REST do Twilio. Enviar não tem dependência; receber é por webhook (SMS
+não tem assinatura persistente, então <code>onMessage</code> não existe neste provider).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">TwilioSmsProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">http</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">HTTPClient</span><span class="p">({</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">baseUrl</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://api.exemplo.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nx">retryPolicy</span><span class="o">:</span><span class="w"> </span><span class="kt">new</span><span class="w"> </span><span class="nx">RetryPolicy</span><span class="p">(</span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="mf">200</span><span class="p">),</span><span class="w">   </span><span class="c1">// 3 tentativas, backoff base 200ms</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nx">breakerThreshold</span><span class="o">:</span><span class="w"> </span><span class="kt">5</span><span class="p">,</span><span class="w">                     </span><span class="c1">// abre após 5 falhas seguidas</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">sms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TwilioSmsProvider</span><span class="p">({</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">accountSid</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.TWILIO_SID</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nx">authToken</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.TWILIO_TOKEN</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="kr">from</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;+15550000000&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">});</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;/status&quot;</span><span class="p">);</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">await</span><span class="w"> </span><span class="nx">sms</span><span class="p">.</span><span class="nx">sendText</span><span class="p">(</span><span class="s2">&quot;+15551112222&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Seu código é 1234&quot;</span><span class="p">);</span>
 </code></pre></div>
-<h2 id="web-push-vapid">Web Push (VAPID)<a class="headerlink" href="#web-push-vapid" title="Permanent link">&para;</a></h2>
-<div class="admonition info">
-<p class="admonition-title">Peer opcional</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>npm<span class="w"> </span>install<span class="w"> </span>web-push
+<h3 id="webhook-de-entrada-validado">Webhook de entrada (validado)<a class="headerlink" href="#webhook-de-entrada-validado" title="Permanent link">&para;</a></h3>
+<p>O <code>makeTwilioWebhookRouter</code> valida a assinatura <code>X-Twilio-Signature</code> (HMAC-SHA1)
+e entrega um <code>InboundMessage</code> tipado.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createApp</span><span class="p">,</span><span class="w"> </span><span class="nx">makeTwilioWebhookRouter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">createApp</span><span class="p">({</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nx">configure</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nx">a</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="nx">makeTwilioWebhookRouter</span><span class="p">({</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="nx">authToken</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.TWILIO_TOKEN</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="nx">publicUrl</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://api.suaempresa.com/sms/inbound&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// atrás de proxy</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">        </span><span class="nx">onMessage</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">          </span><span class="k">await</span><span class="w"> </span><span class="nx">handleSms</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span><span class="w"> </span><span class="c1">// { from, messageId, text, ... }</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="p">}),</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="p">);</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">});</span>
 </code></pre></div>
-</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">WebPushDispatcher</span><span class="p">,</span><span class="w"> </span><span class="nx">WebPushGoneError</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<p>Assinatura inválida → <strong>401</strong>. Responde <code>&lt;Response&gt;&lt;/Response&gt;</code> (TwiML vazio).</p>
+<h2 id="programe-contra-o-contrato">Programe contra o contrato<a class="headerlink" href="#programe-contra-o-contrato" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MessagingProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">push</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">WebPushDispatcher</span><span class="p">({</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nx">subject</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;mailto:admin@exemplo.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nx">publicKey</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.VAPID_PUBLIC</span><span class="o">!</span><span class="p">,</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nx">privateKey</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.VAPID_PRIVATE</span><span class="o">!</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">});</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">push</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">subscription</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Olá&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Nova mensagem&quot;</span><span class="w"> </span><span class="p">});</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">WebPushGoneError</span><span class="p">)</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">removeSubscription</span><span class="p">(</span><span class="nx">subscription</span><span class="p">);</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">}</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">// Funciona com WhatsApp, Telegram ou SMS — injete o provider.</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">notify</span><span class="p">(</span><span class="nx">provider</span><span class="o">:</span><span class="w"> </span><span class="kt">MessagingProvider</span><span class="p">,</span><span class="w"> </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">provider</span><span class="p">.</span><span class="nx">sendText</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span><span class="w"> </span><span class="nx">text</span><span class="p">);</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="email">Email<a class="headerlink" href="#email" title="Permanent link">&para;</a></h2>
-<div class="admonition info">
-<p class="admonition-title">Peer opcional</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>npm<span class="w"> </span>install<span class="w"> </span>nodemailer
-</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Capacidades por canal</p>
+<p><code>sendText</code>/<code>sendMedia</code>/<code>status</code> existem em todos. <code>onMessage</code> existe onde há
+assinatura viva (WhatsApp <code>/ws</code>, Telegram polling); <code>checkNumber</code> só no
+WhatsApp. Cheque a presença do método antes de chamar em código genérico.</p>
 </div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">EmailUtils</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">EmailUtils</span><span class="p">({</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nx">host</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;smtp.exemplo.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nx">user</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;no-reply@exemplo.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.SMTP_PASS</span><span class="o">!</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="kr">from</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;no-reply@exemplo.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">});</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">await</span><span class="w"> </span><span class="nx">email</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span><span class="w"> </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;ana@example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">subject</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Bem-vinda&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">html</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;&lt;b&gt;Oi&lt;/b&gt;&quot;</span><span class="w"> </span><span class="p">});</span>
-</code></pre></div>
-<h2 id="metricas">Métricas<a class="headerlink" href="#metricas" title="Permanent link">&para;</a></h2>
-<p><code>MetricsUtils</code> lê CPU/memória/uptime do <code>node:os</code>/<code>process</code>, com exporter
-Prometheus.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MetricsUtils</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;/metrics&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">_req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nx">res</span><span class="p">.</span><span class="kr">type</span><span class="p">(</span><span class="s2">&quot;text/plain&quot;</span><span class="p">).</span><span class="nx">send</span><span class="p">(</span><span class="nx">MetricsUtils</span><span class="p">.</span><span class="nx">toPrometheus</span><span class="p">());</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">});</span>
-</code></pre></div>
-<h2 id="client-ip-confiavel">Client IP confiável<a class="headerlink" href="#client-ip-confiavel" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">getClientIp</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1">// Atrás de proxy: confie APENAS no header que a edge define (nunca X-Forwarded-For cru).</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">ip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">getClientIp</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">trustedHeader</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;x-real-ip&quot;</span><span class="w"> </span><span class="p">});</span>
-</code></pre></div>
 <h2 id="recapitulando">Recapitulando<a class="headerlink" href="#recapitulando" title="Permanent link">&para;</a></h2>
-<p>MFA nativo, HTTP client resiliente, Web Push/email (peers opcionais), métricas
-Prometheus e resolução de IP segura — as peças de servidor que faltavam.</p>
+<p>WhatsApp, Telegram e SMS compartilham o <code>MessagingProvider</code>. Telegram recebe por
+polling; SMS por webhook assinado; todos enviam com a mesma interface.</p>
 
 
 

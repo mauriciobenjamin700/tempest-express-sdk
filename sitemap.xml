@@ -85,6 +85,13 @@
         <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/server-utils/"/>
     </url>
     <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/sms-telegram/</loc>
+        <lastmod>2026-07-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/sms-telegram/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/sms-telegram/"/>
+    </url>
+    <url>
         <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/whatsapp/</loc>
         <lastmod>2026-07-02</lastmod>
         <changefreq>daily</changefreq>
@@ -174,6 +181,13 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/server-utils/"/>
         <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/server-utils/"/>
+    </url>
+    <url>
+        <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/sms-telegram/</loc>
+        <lastmod>2026-07-02</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/sms-telegram/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/recipes/sms-telegram/"/>
     </url>
     <url>
         <loc>https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/whatsapp/</loc>

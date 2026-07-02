@@ -10,17 +10,17 @@
       
       
       
-        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/whatsapp/">
+        <link rel="canonical" href="https://mauriciobenjamin700.github.io/tempest-express-sdk/en/recipes/sms-telegram/">
       
       
-        <link rel="prev" href="../server-utils/">
+        <link rel="prev" href="../whatsapp/">
       
       
-        <link rel="next" href="../sms-telegram/">
+        <link rel="next" href="../admin/">
       
       
         
-          <link rel="alternate" href="../../../recipes/whatsapp/" hreflang="pt">
+          <link rel="alternate" href="../../../recipes/sms-telegram/" hreflang="pt">
         
           <link rel="alternate" href="./" hreflang="en">
         
@@ -31,7 +31,7 @@
     
     
       
-        <title>Integrations: WhatsApp (zap-api) - tempest-express-sdk</title>
+        <title>Integrations: SMS and Telegram - tempest-express-sdk</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#integrations-whatsapp-zap-api" class="md-skip">
+        <a href="#integrations-sms-and-telegram" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Integrations: WhatsApp (zap-api)
+              Integrations: SMS and Telegram
             
           </span>
         </div>
@@ -175,7 +175,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../../recipes/whatsapp/" hreflang="pt" class="md-select__link">
+            <a href="../../../recipes/sms-telegram/" hreflang="pt" class="md-select__link">
               Português (BR)
             </a>
           </li>
@@ -602,6 +602,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../whatsapp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations: WhatsApp (zap-api)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -621,7 +649,7 @@
   <span class="md-ellipsis">
     
   
-    Integrations: WhatsApp (zap-api)
+    Integrations: SMS and Telegram
   
 
     
@@ -639,7 +667,7 @@
   <span class="md-ellipsis">
     
   
-    Integrations: WhatsApp (zap-api)
+    Integrations: SMS and Telegram
   
 
     
@@ -665,10 +693,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sending-messages" class="md-nav__link">
+  <a href="#telegram" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sending messages
+        Telegram
       
     </span>
   </a>
@@ -676,32 +704,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#receiving-in-real-time-ws" class="md-nav__link">
+  <a href="#sms-twilio" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Receiving in real time (/ws)
+        SMS (Twilio)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SMS (Twilio)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inbound-webhook-validated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbound webhook (validated)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#receiving-via-webhook" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Receiving via webhook
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-messagingprovider-contract" class="md-nav__link">
+  <a href="#program-against-the-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The MessagingProvider contract
+        Program against the contract
       
     </span>
   </a>
@@ -723,34 +757,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../sms-telegram/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Integrations: SMS and Telegram
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -872,10 +878,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sending-messages" class="md-nav__link">
+  <a href="#telegram" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sending messages
+        Telegram
       
     </span>
   </a>
@@ -883,32 +889,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#receiving-in-real-time-ws" class="md-nav__link">
+  <a href="#sms-twilio" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Receiving in real time (/ws)
+        SMS (Twilio)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SMS (Twilio)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inbound-webhook-validated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbound webhook (validated)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#receiving-via-webhook" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Receiving via webhook
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-messagingprovider-contract" class="md-nav__link">
+  <a href="#program-against-the-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The MessagingProvider contract
+        Program against the contract
       
     </span>
   </a>
@@ -946,78 +958,74 @@
   
 
 
-<h1 id="integrations-whatsapp-zap-api">Integrations: WhatsApp (zap-api)<a class="headerlink" href="#integrations-whatsapp-zap-api" title="Permanent link">&para;</a></h1>
-<p>The <code>integrations</code> module ships a typed client for the
-<a href="https://github.com/mauriciobenjamin700"><code>zap-api</code></a> service behind a
-<code>MessagingProvider</code> contract — send over REST, receive in real time over <code>/ws</code>,
-plus a ready inbound-webhook receiver.</p>
-<h2 id="sending-messages">Sending messages<a class="headerlink" href="#sending-messages" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">WhatsAppProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<h1 id="integrations-sms-and-telegram">Integrations: SMS and Telegram<a class="headerlink" href="#integrations-sms-and-telegram" title="Permanent link">&para;</a></h1>
+<p>More channels under the same <code>MessagingProvider</code> contract — swap channels
+without touching business code.</p>
+<h2 id="telegram">Telegram<a class="headerlink" href="#telegram" title="Permanent link">&para;</a></h2>
+<p>A Bot API client (no SDK). Sends over REST, receives via long-polling.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">TelegramProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">wa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">WhatsAppProvider</span><span class="p">({</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nx">baseUrl</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://zap.example.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nx">apiKey</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.ZAP_API_KEY</span><span class="o">!</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">});</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">tg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TelegramProvider</span><span class="p">({</span><span class="w"> </span><span class="nx">token</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.TELEGRAM_BOT_TOKEN</span><span class="o">!</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">tg</span><span class="p">.</span><span class="nx">sendText</span><span class="p">(</span><span class="s2">&quot;&lt;chat_id&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Hello from the bot 🤖&quot;</span><span class="p">);</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">await</span><span class="w"> </span><span class="nx">tg</span><span class="p">.</span><span class="nx">sendMedia</span><span class="p">(</span><span class="s2">&quot;&lt;chat_id&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">kind</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;image&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">media</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://.../photo.jpg&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">caption</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;hi&quot;</span><span class="w"> </span><span class="p">});</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">await</span><span class="w"> </span><span class="nx">wa</span><span class="p">.</span><span class="nx">sendText</span><span class="p">(</span><span class="s2">&quot;5511999999999&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Hello!&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">idempotencyKey</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;order-42&quot;</span><span class="w"> </span><span class="p">});</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="k">await</span><span class="w"> </span><span class="nx">wa</span><span class="p">.</span><span class="nx">sendMedia</span><span class="p">(</span><span class="s2">&quot;5511999999999&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nx">kind</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;image&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="nx">media</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://example.com/photo.jpg&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nx">caption</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Caption&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">});</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="k">await</span><span class="w"> </span><span class="nx">wa</span><span class="p">.</span><span class="nx">checkNumber</span><span class="p">(</span><span class="s2">&quot;5511999999999&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// true/false</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="k">await</span><span class="w"> </span><span class="nx">wa</span><span class="p">.</span><span class="nx">status</span><span class="p">();</span><span class="w">                      </span><span class="c1">// &quot;connected&quot; | &quot;connecting&quot; | &quot;disconnected&quot;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">// Receive (long-polling getUpdates):</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kd">const</span><span class="w"> </span><span class="nx">stop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">tg</span><span class="p">.</span><span class="nx">onMessage</span><span class="p">((</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;received:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">msg</span><span class="p">.</span><span class="kr">from</span><span class="p">,</span><span class="w"> </span><span class="nx">msg</span><span class="p">.</span><span class="nx">text</span><span class="p">);</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">});</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">// later: await stop();</span>
 </code></pre></div>
-<div class="admonition info">
-<p class="admonition-title">Optional peer for real-time</p>
-<p>Sending (REST) uses the built-in <code>HTTPClient</code> — no dependency. Receiving
-over <code>/ws</code> requires the <code>ws</code> peer:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>npm<span class="w"> </span>install<span class="w"> </span>ws
-</code></pre></div></p>
-</div>
-<h2 id="receiving-in-real-time-ws">Receiving in real time (<code>/ws</code>)<a class="headerlink" href="#receiving-in-real-time-ws" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">unsubscribe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">wa</span><span class="p">.</span><span class="nx">onMessage</span><span class="p">((</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;received:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">msg</span><span class="p">.</span><span class="kr">from</span><span class="p">,</span><span class="w"> </span><span class="nx">msg</span><span class="p">.</span><span class="nx">text</span><span class="p">);</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">},</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// room &quot;*&quot; = all conversations; or pass a JID</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">// later:</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">await</span><span class="w"> </span><span class="nx">unsubscribe</span><span class="p">();</span>
+<h2 id="sms-twilio">SMS (Twilio)<a class="headerlink" href="#sms-twilio" title="Permanent link">&para;</a></h2>
+<p>A Twilio REST client. Sending is dependency-free; receiving is via webhook (SMS
+has no persistent subscription, so this provider has no <code>onMessage</code>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">TwilioSmsProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">sms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TwilioSmsProvider</span><span class="p">({</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nx">accountSid</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.TWILIO_SID</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nx">authToken</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.TWILIO_TOKEN</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="kr">from</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;+15550000000&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">});</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">await</span><span class="w"> </span><span class="nx">sms</span><span class="p">.</span><span class="nx">sendText</span><span class="p">(</span><span class="s2">&quot;+15551112222&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Your code is 1234&quot;</span><span class="p">);</span>
 </code></pre></div>
-<h2 id="receiving-via-webhook">Receiving via webhook<a class="headerlink" href="#receiving-via-webhook" title="Permanent link">&para;</a></h2>
-<p>If <code>zap-api</code> has <code>WEBHOOK_URL</code> pointing at your service, mount the receiver — it
-validates <code>x-api-key</code> and delivers a typed <code>InboundMessage</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createApp</span><span class="p">,</span><span class="w"> </span><span class="nx">makeWhatsAppWebhookRouter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<h3 id="inbound-webhook-validated">Inbound webhook (validated)<a class="headerlink" href="#inbound-webhook-validated" title="Permanent link">&para;</a></h3>
+<p><code>makeTwilioWebhookRouter</code> validates the <code>X-Twilio-Signature</code> (HMAC-SHA1) and
+delivers a typed <code>InboundMessage</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createApp</span><span class="p">,</span><span class="w"> </span><span class="nx">makeTwilioWebhookRouter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">createApp</span><span class="p">({</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nx">configure</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nx">a</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="nx">makeTwilioWebhookRouter</span><span class="p">({</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="nx">authToken</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.TWILIO_TOKEN</span><span class="o">!</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="nx">publicUrl</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://api.yourco.com/sms/inbound&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// behind a proxy</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">        </span><span class="nx">onMessage</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">          </span><span class="k">await</span><span class="w"> </span><span class="nx">handleSms</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span><span class="w"> </span><span class="c1">// { from, messageId, text, ... }</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="p">}),</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="p">);</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">});</span>
+</code></pre></div>
+<p>Invalid signature → <strong>401</strong>. Responds with an empty <code>&lt;Response&gt;&lt;/Response&gt;</code> (TwiML).</p>
+<h2 id="program-against-the-contract">Program against the contract<a class="headerlink" href="#program-against-the-contract" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MessagingProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">createApp</span><span class="p">({</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nx">configure</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">a</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nx">a</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">      </span><span class="nx">makeWhatsAppWebhookRouter</span><span class="p">({</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">        </span><span class="nx">apiKey</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.WEBHOOK_API_KEY</span><span class="o">!</span><span class="p">,</span><span class="w"> </span><span class="c1">// validates x-api-key (constant-time)</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">        </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;/whatsapp/inbound&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">        </span><span class="nx">onMessage</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">          </span><span class="k">await</span><span class="w"> </span><span class="nx">handleInbound</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span><span class="w"> </span><span class="c1">// { from, messageId, text, mediaType, timestamp }</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">        </span><span class="p">},</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">      </span><span class="p">}),</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="p">);</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="p">});</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">// Works with WhatsApp, Telegram or SMS — inject the provider.</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">notify</span><span class="p">(</span><span class="nx">provider</span><span class="o">:</span><span class="w"> </span><span class="kt">MessagingProvider</span><span class="p">,</span><span class="w"> </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">provider</span><span class="p">.</span><span class="nx">sendText</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span><span class="w"> </span><span class="nx">text</span><span class="p">);</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
 </code></pre></div>
-<p>Wrong key → <strong>401</strong> in the canonical envelope; invalid payload → <strong>422</strong>.</p>
-<h2 id="the-messagingprovider-contract">The <code>MessagingProvider</code> contract<a class="headerlink" href="#the-messagingprovider-contract" title="Permanent link">&para;</a></h2>
-<p><code>WhatsAppProvider</code> implements <code>MessagingProvider</code> (<code>sendText</code>, <code>sendMedia</code>,
-<code>checkNumber</code>, <code>status</code>, <code>onMessage</code>). Program against the interface to swap
-channels (SMS, Telegram — on the roadmap) or mock it in tests.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">MessagingProvider</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">notify</span><span class="p">(</span><span class="nx">provider</span><span class="o">:</span><span class="w"> </span><span class="kt">MessagingProvider</span><span class="p">,</span><span class="w"> </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">provider</span><span class="p">.</span><span class="nx">sendText</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Your order is out for delivery 🚚&quot;</span><span class="p">);</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
-</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Per-channel capabilities</p>
+<p><code>sendText</code>/<code>sendMedia</code>/<code>status</code> exist on all. <code>onMessage</code> exists where there
+is a live subscription (WhatsApp <code>/ws</code>, Telegram polling); <code>checkNumber</code> is
+WhatsApp-only. Check the method is present before calling it in generic code.</p>
+</div>
 <h2 id="recap">Recap<a class="headerlink" href="#recap" title="Permanent link">&para;</a></h2>
-<p>A typed zap-api client (REST + <code>/ws</code>) plus a webhook receiver, behind a
-swappable provider contract. Sending is dependency-free; receiving over WS uses
-the optional <code>ws</code> peer.</p>
+<p>WhatsApp, Telegram and SMS share <code>MessagingProvider</code>. Telegram receives via
+polling; SMS via a signed webhook; all send through the same interface.</p>
 
 
 

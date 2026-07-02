@@ -631,6 +631,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../recipes/sms-telegram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations: SMS and Telegram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../recipes/admin/" class="md-nav__link">
         
   
@@ -922,12 +950,15 @@
 <li><strong>0.5.0</strong> — <code>admin/</code>: JSON admin (<code>AdminSite</code> + <code>makeAdminRouter</code>) with
   auto-derived CRUD, <code>_meta</code> introspection, Zod validation and a pluggable guard.
   See the <a href="../recipes/admin/">Admin (JSON API)</a> recipe.</li>
+<li><strong>0.6.0</strong> — <code>integrations/</code>: <code>TelegramProvider</code> (Bot API, send + polling) and
+  <code>TwilioSmsProvider</code> (SMS) + <code>makeTwilioWebhookRouter</code> (signature-validated).
+  See the <a href="../recipes/sms-telegram/">SMS and Telegram</a> recipe.</li>
 </ul>
 <h2 id="planned">Planned<a class="headerlink" href="#planned" title="Permanent link">&para;</a></h2>
 <h3 id="more-channels-under-messagingprovider">More channels under <code>MessagingProvider</code><a class="headerlink" href="#more-channels-under-messagingprovider" title="Permanent link">&para;</a></h3>
-<p>The <code>integrations/</code> module shipped in 0.4.0 with WhatsApp. Next channels reuse
-the same contract (<code>sendText</code>, <code>sendMedia</code>, <code>onMessage</code>, <code>status</code>): SMS
-(e.g. Twilio), Telegram, and transactional email providers.</p>
+<p>WhatsApp (0.4.0), Telegram + SMS (0.6.0) ship under the shared contract. Future
+candidates reuse it too: additional SMS vendors and a transactional-email
+provider exposed as a <code>MessagingProvider</code>.</p>
 <h3 id="other-candidates">Other candidates<a class="headerlink" href="#other-candidates" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>auth flows</strong> — MFA enrollment, email activation, password reset.</li>
