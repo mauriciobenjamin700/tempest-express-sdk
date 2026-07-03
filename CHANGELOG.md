@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.11.0] — 2026-07-02
+
+### Added
+
+- **integrations**: `broadcastText` (fan a message out to many recipients with
+  bounded concurrency + per-recipient results) and `MessagingHub` (named
+  providers with `send`/`broadcast` by channel).
+
 ## [0.10.0] — 2026-07-02
 
 ### Added

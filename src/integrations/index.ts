@@ -33,3 +33,9 @@ export {
   EmailProvider,
   type EmailProviderOptions,
 } from "@/integrations/email";
+export {
+  type BroadcastOptions,
+  type BroadcastResult,
+  MessagingHub,
+  broadcastText,
+} from "@/integrations/broadcast";

@@ -91,6 +91,27 @@ async function notify(provider: MessagingProvider, to: string, text: string) {
 }
 ```
 
+## Broadcast e multi-canal
+
+`broadcastText` envia uma mensagem a vários destinatários por um provider, com
+concorrência limitada e resultado por destinatário (uma falha não aborta o lote).
+`MessagingHub` registra providers por nome.
+
+```ts
+import { MessagingHub, broadcastText } from "tempest-express-sdk";
+
+const results = await broadcastText(wa, ["5511...", "5521..."], "Promo!", { concurrency: 20 });
+const falhas = results.filter((r) => !r.ok);
+
+const hub = new MessagingHub()
+  .register("whatsapp", wa)
+  .register("sms", sms)
+  .register("email", emailProvider);
+
+await hub.send("sms", "+15551112222", "Código 1234");
+await hub.broadcast("whatsapp", numeros, "Aviso");
+```
+
 !!! note "Capacidades por canal"
     `sendText`/`sendMedia`/`status` existem em todos. `onMessage` existe onde há
     assinatura viva (WhatsApp `/ws`, Telegram polling); `checkNumber` só no

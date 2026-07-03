@@ -27,6 +27,8 @@
   (endpoint `/metrics` Prometheus). Veja [MFA, HTTP client…](recipes/server-utils.md).
 - **0.10.0** — `EmailProvider` (email como `MessagingProvider`) e MFA no login
   (challenge no `UserAuthService` + `POST /auth/mfa/challenge`).
+- **0.11.0** — helpers de broadcast: `broadcastText` (fan-out com concorrência)
+  e `MessagingHub` (canais nomeados com `send`/`broadcast`).
 
 ## Planejado
 
@@ -40,5 +42,6 @@ exposto como `MessagingProvider`.
 
 - Mais canais `MessagingProvider` (outros provedores de SMS, canais de push)
   sob o contrato compartilhado.
-- Helpers de broadcast sobre `MessagingProvider` (enviar a vários destinatários
-  em vários canais).
+
+O SDK já cobre a superfície do `tempest-fastapi-sdk` relevante para Node/Express;
+uma `1.0.0` é o próximo marco natural quando a API estabilizar no uso real.

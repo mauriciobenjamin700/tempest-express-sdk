@@ -27,6 +27,8 @@
   (`/metrics` Prometheus endpoint). See [MFA, HTTP client…](recipes/server-utils.md).
 - **0.10.0** — `EmailProvider` (email as a `MessagingProvider`) and MFA at login
   (challenge flow in `UserAuthService` + `POST /auth/mfa/challenge`).
+- **0.11.0** — broadcast helpers: `broadcastText` (bounded-concurrency fan-out)
+  and `MessagingHub` (named channels with `send`/`broadcast`).
 
 ## Planned
 
@@ -40,5 +42,6 @@ provider exposed as a `MessagingProvider`.
 
 - More `MessagingProvider` channels (additional SMS vendors, push channels)
   under the shared contract.
-- Broadcast helpers over `MessagingProvider` (fan a message to many recipients
-  across channels).
+
+The SDK now covers the `tempest-fastapi-sdk` surface relevant to Node/Express; a
+`1.0.0` is a natural next milestone once the API settles in real use.
