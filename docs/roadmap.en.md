@@ -30,18 +30,56 @@
 - **0.11.0** — broadcast helpers: `broadcastText` (bounded-concurrency fan-out)
   and `MessagingHub` (named channels with `send`/`broadcast`).
 
-## Planned
+## Goal: full parity with `tempest-fastapi-sdk`
 
-### More channels under `MessagingProvider`
+The target is **feature parity** with `tempest-fastapi-sdk`, keeping the
+`integrations/` module (WhatsApp/Telegram/SMS/Email + `MessagingHub`/broadcast)
+as the **Node-only differential** — a first-class messaging layer the Python SDK
+does not have. Core, data, auth, real-time, cache/queue/tasks, flags, metrics and
+CLI are already at parity or close; the items below close the remaining gaps.
 
-WhatsApp (0.4.0), Telegram + SMS (0.6.0) ship under the shared contract. Future
-candidates reuse it too: additional SMS vendors and a transactional-email
-provider exposed as a `MessagingProvider`.
+### HTTP hardening middlewares
 
-### Other candidates
+- CSRF, rate limiting (memory + Redis), idempotency keys, body-size limit,
+  graceful shutdown, standalone request-id middleware, request tracing.
+- `PrometheusMiddleware` (per-request histogram) complementing the existing
+  system `/metrics` router.
 
-- More `MessagingProvider` channels (additional SMS vendors, push channels)
-  under the shared contract.
+### OAuth, webhooks & meta routers
 
-The SDK now covers the `tempest-fastapi-sdk` surface relevant to Node/Express; a
-`1.0.0` is a natural next milestone once the API settles in real use.
+- OAuth clients (Google, GitHub) + `OIDCProvider`.
+- Webhook signature verifier (HMAC/RSA), `tool-spec` router, logs router.
+- Auth locale negotiation + optional HTML page renderer.
+
+### Advanced DB
+
+- Transactional outbox (`OutboxRelay`), audit log model + `AuditMixin`,
+  `SoftDeleteMixin`/`MFAMixin`, tenant-scoped repository, slow-query logger,
+  database backup, `BaseUserModel` + token models, snapshot/diff.
+
+### Typed settings
+
+- Domain settings fragments/classes: `AuthSettings`, `JWTSettings`,
+  `EmailSettings`, `RedisSettings`, `RabbitMQSettings`, `SessionSettings`,
+  `UploadSettings`, etc. (composed onto `baseAppSettingsShape`).
+
+### Schemas, storage, utils, CLI
+
+- Delta-sync pagination (`SyncFilterSchema`/`SyncPaginationSchema`), pagination
+  link headers, `LogEntrySchema`.
+- MinIO/S3 `UploadStorage` backend (alongside `LocalUploadStorage`).
+- Field types (`CentsField`/`PriceField`/`HexColorField`/… as Zod), full
+  `DownloadUtils`, `LogUtils` with `500.log` routing.
+- CLI: `user`, `lint`, `config`, and real DB-migration wiring over `tempest-db-js`.
+
+### Testing helpers
+
+- In-memory DB/test fixtures (mirrors the Python `testing` module).
+
+### Out of scope
+
+- `vision` (ort-vision) — belongs to `ort-vision-sdk`, not this SDK.
+- The server-rendered (jinja) HTML admin — superseded by the JSON `admin` API +
+  a decoupled frontend.
+
+`1.0.0` is cut once these close and the API settles in real use.
