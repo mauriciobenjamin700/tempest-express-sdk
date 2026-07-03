@@ -8,3 +8,9 @@ export {
   sseResponse,
 } from "@/sse/eventStream";
 export { SSEBroker } from "@/sse/broker";
+export {
+  RedisSSEBroker,
+  type RedisSSEBrokerOptions,
+  type RedisPublisherLike,
+  type RedisSubscriberLike,
+} from "@/sse/redisBroker";

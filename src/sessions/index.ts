@@ -16,3 +16,7 @@ export {
   parseCookies,
   sessionCookie,
 } from "@/sessions/middleware";
+export {
+  RedisSessionStore,
+  type SessionRedisLike,
+} from "@/sessions/redisStore";

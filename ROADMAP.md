@@ -17,6 +17,8 @@
   `TwilioSmsProvider` (SMS) + `makeTwilioWebhookRouter` (signature-validated).
 - **0.7.0** — auth flows: `MfaService` (TOTP), `ActivationService` (email) and
   `PasswordResetService`, wired into `makeAuthRouter`.
+- **0.8.0** — Redis stores: `RedisSessionStore` and `RedisSSEBroker` (pub/sub)
+  for multi-replica deployments.
 
 ## Planned
 
@@ -28,6 +30,4 @@ providers exposed as a `MessagingProvider`.
 
 ### Other candidates
 
-- **cache/session Redis stores** — first-party Redis-backed `SessionStore` and
-  a Redis `SSEBroker` transport for multi-replica deployments.
 - **metrics** — optional GPU metrics and a `/metrics` Prometheus router.

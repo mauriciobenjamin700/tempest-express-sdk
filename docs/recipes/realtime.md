@@ -61,7 +61,44 @@ broker.publish("feed", { price: 42 }, "tick");
     `EventStream` envia um comentário `: ping` periódico (15s por padrão) pra
     manter a conexão viva. Configure com `new SSEBroker({ heartbeatSeconds })`.
 
+## Multi-réplica com Redis
+
+O `SSEBroker` em memória só alcança clientes do **mesmo processo**. Para várias
+réplicas, use `RedisSSEBroker` (pub/sub) — um `publish` em qualquer nó chega aos
+clientes SSE de todos. Passe o client principal + uma conexão dedicada de
+subscriber (`client.duplicate()`), regra do pub/sub do Redis.
+
+```ts
+import { RedisSSEBroker } from "tempest-express-sdk";
+import { createClient } from "redis";
+
+const pub = createClient({ url: "redis://localhost" });
+const sub = pub.duplicate();
+await pub.connect();
+await sub.connect();
+
+const broker = new RedisSSEBroker(pub, sub);
+
+app.get("/api/feed", async (req, res) => {
+  const stream = await broker.register("feed");
+  req.on("close", () => void broker.unregister("feed", stream));
+  void sseResponse(req, res, stream);
+});
+
+await broker.publish("feed", { price: 42 }, "tick"); // alcança todas as réplicas
+```
+
+Sessões também têm store Redis para multi-réplica — `RedisSessionStore` (mesmo
+`SessionService`, só troca o store):
+
+```ts
+import { RedisSessionStore, SessionService } from "tempest-express-sdk";
+
+const sessions = new SessionService({ store: new RedisSessionStore(pub) });
+```
+
 ## Recapitulando
 
 WebSocket para bidirecional com tópicos e entrega por usuário; SSE para push
-unidirecional simples sobre HTTP, sem dependências.
+unidirecional sobre HTTP; `RedisSSEBroker` + `RedisSessionStore` para escalar em
+várias réplicas — todos injetando o client `redis` (peer opcional).

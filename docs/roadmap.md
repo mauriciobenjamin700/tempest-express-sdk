@@ -21,6 +21,8 @@
 - **0.7.0** — fluxos de auth: `MfaService` (TOTP), `ActivationService` (email) e
   `PasswordResetService`, montados no `makeAuthRouter`. Veja
   [Autenticação (JWT)](recipes/auth.md).
+- **0.8.0** — stores Redis: `RedisSessionStore` e `RedisSSEBroker` (pub/sub) para
+  deploys multi-réplica. Veja [Tempo real](recipes/realtime.md).
 
 ## Planejado
 
@@ -32,6 +34,4 @@ exposto como `MessagingProvider`.
 
 ### Outros candidatos
 
-- **stores Redis** — `SessionStore` e transporte de `SSEBroker` em Redis para
-  deploys multi-réplica.
 - **metrics** — métricas de GPU opcionais e um router Prometheus `/metrics`.

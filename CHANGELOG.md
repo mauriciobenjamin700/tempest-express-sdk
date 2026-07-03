@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.8.0] — 2026-07-02
+
+### Added
+
+- **sessions**: `RedisSessionStore` — a Redis-backed `SessionStore` (per-user
+  index, TTL, lazy prune) for multi-replica deployments.
+- **sse**: `RedisSSEBroker` — cross-replica SSE fan-out over Redis pub/sub
+  (injected publisher + dedicated subscriber connection).
+
+### Changed
+
+- Bumped the `tempest-db-js` peer to `>=0.3.0` (track the latest).
+
 ## [0.7.0] — 2026-07-02
 
 ### Added
