@@ -23,6 +23,8 @@
   [Autenticação (JWT)](recipes/auth.md).
 - **0.8.0** — stores Redis: `RedisSessionStore` e `RedisSSEBroker` (pub/sub) para
   deploys multi-réplica. Veja [Tempo real](recipes/realtime.md).
+- **0.9.0** — métricas: GPU opcional (`nvidia-smi`) + `makeMetricsRouter`
+  (endpoint `/metrics` Prometheus). Veja [MFA, HTTP client…](recipes/server-utils.md).
 
 ## Planejado
 
@@ -34,4 +36,5 @@ exposto como `MessagingProvider`.
 
 ### Outros candidatos
 
-- **metrics** — métricas de GPU opcionais e um router Prometheus `/metrics`.
+- Mais canais `MessagingProvider` (outros provedores de SMS, um provedor de
+  email transacional) sob o contrato compartilhado.

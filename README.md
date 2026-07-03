@@ -37,7 +37,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **sse / websockets** | `SSEBroker`/`sseResponse` (+ `RedisSSEBroker`), transport-agnostic `WebSocketHub` + `attachWebSocketHub` |
 | **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage` |
 | **webpush / email** | `WebPushDispatcher` (VAPID), `EmailUtils` (SMTP) |
-| **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus), `getClientIp` |
+| **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus, GPU), `makeMetricsRouter`, `getClientIp` |
 | **integrations** | `MessagingProvider` contract; `WhatsAppProvider` (zap-api), `TelegramProvider` (Bot API), `TwilioSmsProvider` (SMS) + webhook receivers |
 | **admin** | `AdminSite` + `makeAdminRouter` — JSON admin with auto-derived CRUD + introspection |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
@@ -98,8 +98,9 @@ Also shipped: the `integrations/` module — a typed WhatsApp client over
 [`zap-api`](https://github.com/mauriciobenjamin700) behind a shared
 `MessagingProvider` contract.
 
-Planned (see [ROADMAP.md](./ROADMAP.md)): optional GPU metrics + a `/metrics`
-Prometheus router, and additional `MessagingProvider` channels.
+Planned (see [ROADMAP.md](./ROADMAP.md)): additional `MessagingProvider`
+channels (more SMS vendors, a transactional-email provider) under the shared
+contract.
 
 ## License
 

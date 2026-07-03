@@ -78,14 +78,23 @@ await email.send({ to: "ana@example.com", subject: "Bem-vinda", html: "<b>Oi</b>
 ## Métricas
 
 `MetricsUtils` lê CPU/memória/uptime do `node:os`/`process`, com exporter
-Prometheus.
+Prometheus. Use `makeMetricsRouter` para expor `/metrics` direto:
+
+```ts
+import { makeMetricsRouter } from "tempest-express-sdk";
+
+app.use(makeMetricsRouter({ includeGpu: true }));
+// GET /metrics → text/plain Prometheus (CPU, memória, uptime + GPU quando houver)
+```
+
+GPU é opcional e sem dependência — `includeGpu` chama `nvidia-smi` por baixo e
+retorna `[]` quando ausente (adiciona gauges `gpu_utilization_percent{gpu="N"}`,
+`gpu_memory_used_mb`, `gpu_temperature_celsius`). Passe um `guard` para manter o
+endpoint na rede interna. Também dá pra renderizar manualmente:
 
 ```ts
 import { MetricsUtils } from "tempest-express-sdk";
-
-app.get("/metrics", (_req, res) => {
-  res.type("text/plain").send(MetricsUtils.toPrometheus());
-});
+const text = MetricsUtils.toPrometheus(MetricsUtils.system(), await MetricsUtils.gpus());
 ```
 
 ## Client IP confiável

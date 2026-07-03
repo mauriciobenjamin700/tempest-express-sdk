@@ -32,6 +32,10 @@ export {
   makeHealthRouter,
 } from "@/api/health";
 export {
+  type MetricsRouterOptions,
+  makeMetricsRouter,
+} from "@/api/metrics";
+export {
   type CreateAppOpenApi,
   type CreateAppOptions,
   type RunServerOptions,

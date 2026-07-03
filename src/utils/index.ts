@@ -67,6 +67,7 @@ export {
 } from "@/utils/httpClient";
 export {
   type CPUMetrics,
+  type GPUMetrics,
   type MemoryMetrics,
   MetricsUtils,
   type SystemMetrics,

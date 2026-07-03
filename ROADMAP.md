@@ -19,6 +19,8 @@
   `PasswordResetService`, wired into `makeAuthRouter`.
 - **0.8.0** — Redis stores: `RedisSessionStore` and `RedisSSEBroker` (pub/sub)
   for multi-replica deployments.
+- **0.9.0** — metrics: optional GPU metrics (`nvidia-smi`) + `makeMetricsRouter`
+  (`/metrics` Prometheus endpoint).
 
 ## Planned
 
@@ -30,4 +32,7 @@ providers exposed as a `MessagingProvider`.
 
 ### Other candidates
 
-- **metrics** — optional GPU metrics and a `/metrics` Prometheus router.
+- More `MessagingProvider` channels (additional SMS vendors, a
+  transactional-email provider) under the shared contract.
+- A `MessagingProvider`-based email channel unifying `EmailUtils` with the
+  integrations surface.
