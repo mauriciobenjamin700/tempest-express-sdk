@@ -1071,6 +1071,11 @@ um <strong>store dedicado</strong> (implemente só os que usar).</p>
   vai no link por email. Token inválido/expirado → <strong>401</strong>.</li>
 <li><strong>MFA</strong>: <code>TOTPHelper</code> nativo (RFC 6238). <code>enroll</code> gera o segredo e a URI de QR;
   <code>confirm</code> verifica um código e liga o MFA; código errado → <strong>422</strong>.</li>
+<li><strong>MFA no login (challenge)</strong>: passe <code>mfa</code> também ao <code>UserAuthService</code>. Para
+  usuários com MFA ligado, <code>POST /auth/login</code> responde
+  <code>{ mfaRequired: true, mfaToken }</code> (sem tokens); o cliente conclui com
+  <code>POST /auth/mfa/challenge { mfaToken, code }</code> → tokens. Código/token
+  inválido → <strong>401</strong>. Sem MFA ligado, o login devolve os tokens direto.</li>
 <li><strong>Anti-enumeração</strong>: <code>password-reset/request</code> sempre responde 202; o <code>token</code> só
   volta no corpo em setup dev (em produção, o serviço envia por email).</li>
 </ul>

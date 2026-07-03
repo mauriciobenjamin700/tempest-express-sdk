@@ -960,6 +960,8 @@
   for multi-replica deployments. See <a href="../recipes/realtime/">Real-time</a>.</li>
 <li><strong>0.9.0</strong> — metrics: optional GPU metrics (<code>nvidia-smi</code>) + <code>makeMetricsRouter</code>
   (<code>/metrics</code> Prometheus endpoint). See <a href="../recipes/server-utils/">MFA, HTTP client…</a>.</li>
+<li><strong>0.10.0</strong> — <code>EmailProvider</code> (email as a <code>MessagingProvider</code>) and MFA at login
+  (challenge flow in <code>UserAuthService</code> + <code>POST /auth/mfa/challenge</code>).</li>
 </ul>
 <h2 id="planned">Planned<a class="headerlink" href="#planned" title="Permanent link">&para;</a></h2>
 <h3 id="more-channels-under-messagingprovider">More channels under <code>MessagingProvider</code><a class="headerlink" href="#more-channels-under-messagingprovider" title="Permanent link">&para;</a></h3>
@@ -968,8 +970,10 @@ candidates reuse it too: additional SMS vendors and a transactional-email
 provider exposed as a <code>MessagingProvider</code>.</p>
 <h3 id="other-candidates">Other candidates<a class="headerlink" href="#other-candidates" title="Permanent link">&para;</a></h3>
 <ul>
-<li>More <code>MessagingProvider</code> channels (additional SMS vendors, a
-  transactional-email provider) under the shared contract.</li>
+<li>More <code>MessagingProvider</code> channels (additional SMS vendors, push channels)
+  under the shared contract.</li>
+<li>Broadcast helpers over <code>MessagingProvider</code> (fan a message to many recipients
+  across channels).</li>
 </ul>
 
 

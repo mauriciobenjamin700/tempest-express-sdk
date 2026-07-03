@@ -960,6 +960,8 @@
   deploys multi-réplica. Veja <a href="../recipes/realtime/">Tempo real</a>.</li>
 <li><strong>0.9.0</strong> — métricas: GPU opcional (<code>nvidia-smi</code>) + <code>makeMetricsRouter</code>
   (endpoint <code>/metrics</code> Prometheus). Veja <a href="../recipes/server-utils/">MFA, HTTP client…</a>.</li>
+<li><strong>0.10.0</strong> — <code>EmailProvider</code> (email como <code>MessagingProvider</code>) e MFA no login
+  (challenge no <code>UserAuthService</code> + <code>POST /auth/mfa/challenge</code>).</li>
 </ul>
 <h2 id="planejado">Planejado<a class="headerlink" href="#planejado" title="Permanent link">&para;</a></h2>
 <h3 id="mais-canais-sob-messagingprovider">Mais canais sob <code>MessagingProvider</code><a class="headerlink" href="#mais-canais-sob-messagingprovider" title="Permanent link">&para;</a></h3>
@@ -968,8 +970,10 @@ Candidatos futuros o reusam: outros provedores de SMS e email transacional
 exposto como <code>MessagingProvider</code>.</p>
 <h3 id="outros-candidatos">Outros candidatos<a class="headerlink" href="#outros-candidatos" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Mais canais <code>MessagingProvider</code> (outros provedores de SMS, um provedor de
-  email transacional) sob o contrato compartilhado.</li>
+<li>Mais canais <code>MessagingProvider</code> (outros provedores de SMS, canais de push)
+  sob o contrato compartilhado.</li>
+<li>Helpers de broadcast sobre <code>MessagingProvider</code> (enviar a vários destinatários
+  em vários canais).</li>
 </ul>
 
 

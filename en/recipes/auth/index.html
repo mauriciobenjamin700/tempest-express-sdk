@@ -1071,6 +1071,11 @@ when a token is present, without rejecting anonymous callers.</p>
   plaintext travels in the emailed link. Invalid/expired token → <strong>401</strong>.</li>
 <li><strong>MFA</strong>: native <code>TOTPHelper</code> (RFC 6238). <code>enroll</code> generates the secret + QR
   URI; <code>confirm</code> verifies a code and turns MFA on; a wrong code → <strong>422</strong>.</li>
+<li><strong>MFA at login (challenge)</strong>: also pass <code>mfa</code> to <code>UserAuthService</code>. For users
+  with MFA enabled, <code>POST /auth/login</code> returns <code>{ mfaRequired: true, mfaToken }</code>
+  (no tokens); the client completes it with
+  <code>POST /auth/mfa/challenge { mfaToken, code }</code> → tokens. An invalid code/token
+  → <strong>401</strong>. Without MFA enabled, login returns tokens directly.</li>
 <li><strong>Anti-enumeration</strong>: <code>password-reset/request</code> always returns 202; the <code>token</code>
   is echoed only in dev setups (in production the service emails it).</li>
 </ul>
