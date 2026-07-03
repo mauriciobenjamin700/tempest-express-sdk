@@ -25,6 +25,8 @@
   deploys multi-réplica. Veja [Tempo real](recipes/realtime.md).
 - **0.9.0** — métricas: GPU opcional (`nvidia-smi`) + `makeMetricsRouter`
   (endpoint `/metrics` Prometheus). Veja [MFA, HTTP client…](recipes/server-utils.md).
+- **0.10.0** — `EmailProvider` (email como `MessagingProvider`) e MFA no login
+  (challenge no `UserAuthService` + `POST /auth/mfa/challenge`).
 
 ## Planejado
 
@@ -36,5 +38,7 @@ exposto como `MessagingProvider`.
 
 ### Outros candidatos
 
-- Mais canais `MessagingProvider` (outros provedores de SMS, um provedor de
-  email transacional) sob o contrato compartilhado.
+- Mais canais `MessagingProvider` (outros provedores de SMS, canais de push)
+  sob o contrato compartilhado.
+- Helpers de broadcast sobre `MessagingProvider` (enviar a vários destinatários
+  em vários canais).

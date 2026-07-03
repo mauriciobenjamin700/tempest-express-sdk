@@ -92,6 +92,16 @@ export class MfaService {
   }
 
   /**
+   * Whether MFA is enabled for a user (used to gate the login challenge).
+   *
+   * @param userId - The user.
+   * @returns `true` when MFA is enabled.
+   */
+  async isEnabled(userId: string): Promise<boolean> {
+    return this.store.isEnabled(userId);
+  }
+
+  /**
    * Disable MFA after verifying a code.
    *
    * @param userId - The user.

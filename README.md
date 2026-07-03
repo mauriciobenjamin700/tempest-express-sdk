@@ -38,7 +38,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage` |
 | **webpush / email** | `WebPushDispatcher` (VAPID), `EmailUtils` (SMTP) |
 | **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus, GPU), `makeMetricsRouter`, `getClientIp` |
-| **integrations** | `MessagingProvider` contract; `WhatsAppProvider` (zap-api), `TelegramProvider` (Bot API), `TwilioSmsProvider` (SMS) + webhook receivers |
+| **integrations** | `MessagingProvider` contract; `WhatsAppProvider` (zap-api), `TelegramProvider` (Bot API), `TwilioSmsProvider` (SMS), `EmailProvider` + webhook receivers |
 | **admin** | `AdminSite` + `makeAdminRouter` — JSON admin with auto-derived CRUD + introspection |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
 

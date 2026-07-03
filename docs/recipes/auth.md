@@ -131,6 +131,11 @@ Rotas montadas:
   vai no link por email. Token inválido/expirado → **401**.
 - **MFA**: `TOTPHelper` nativo (RFC 6238). `enroll` gera o segredo e a URI de QR;
   `confirm` verifica um código e liga o MFA; código errado → **422**.
+- **MFA no login (challenge)**: passe `mfa` também ao `UserAuthService`. Para
+  usuários com MFA ligado, `POST /auth/login` responde
+  `{ mfaRequired: true, mfaToken }` (sem tokens); o cliente conclui com
+  `POST /auth/mfa/challenge { mfaToken, code }` → tokens. Código/token
+  inválido → **401**. Sem MFA ligado, o login devolve os tokens direto.
 - **Anti-enumeração**: `password-reset/request` sempre responde 202; o `token` só
   volta no corpo em setup dev (em produção, o serviço envia por email).
 

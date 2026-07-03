@@ -15,6 +15,7 @@ import {
   activationSchema,
   authResponseSchema,
   loginSchema,
+  mfaChallengeSchema,
   mfaCodeSchema,
   passwordResetConfirmSchema,
   passwordResetRequestSchema,
@@ -144,6 +145,11 @@ export function makeAuthRouter(options: AuthRouterOptions): Router {
 
   if (options.mfa) {
     const mfa = options.mfa;
+    // Unguarded: completes the login challenge using the short-lived mfaToken.
+    router.post(`${prefix}/mfa/challenge`, async (req, res) => {
+      const { mfaToken, code } = mfaChallengeSchema.parse(req.body);
+      res.json(await service.verifyMfaChallenge(mfaToken, code));
+    });
     const requireUser = (req: Parameters<typeof getAuth>[0]): string => {
       const claims = getAuth(req);
       if (!claims || typeof claims.sub !== "string") {

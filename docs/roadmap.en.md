@@ -25,6 +25,8 @@
   for multi-replica deployments. See [Real-time](recipes/realtime.md).
 - **0.9.0** — metrics: optional GPU metrics (`nvidia-smi`) + `makeMetricsRouter`
   (`/metrics` Prometheus endpoint). See [MFA, HTTP client…](recipes/server-utils.md).
+- **0.10.0** — `EmailProvider` (email as a `MessagingProvider`) and MFA at login
+  (challenge flow in `UserAuthService` + `POST /auth/mfa/challenge`).
 
 ## Planned
 
@@ -36,5 +38,7 @@ provider exposed as a `MessagingProvider`.
 
 ### Other candidates
 
-- More `MessagingProvider` channels (additional SMS vendors, a
-  transactional-email provider) under the shared contract.
+- More `MessagingProvider` channels (additional SMS vendors, push channels)
+  under the shared contract.
+- Broadcast helpers over `MessagingProvider` (fan a message to many recipients
+  across channels).

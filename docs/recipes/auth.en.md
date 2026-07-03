@@ -131,6 +131,11 @@ Mounted routes:
   plaintext travels in the emailed link. Invalid/expired token → **401**.
 - **MFA**: native `TOTPHelper` (RFC 6238). `enroll` generates the secret + QR
   URI; `confirm` verifies a code and turns MFA on; a wrong code → **422**.
+- **MFA at login (challenge)**: also pass `mfa` to `UserAuthService`. For users
+  with MFA enabled, `POST /auth/login` returns `{ mfaRequired: true, mfaToken }`
+  (no tokens); the client completes it with
+  `POST /auth/mfa/challenge { mfaToken, code }` → tokens. An invalid code/token
+  → **401**. Without MFA enabled, login returns tokens directly.
 - **Anti-enumeration**: `password-reset/request` always returns 202; the `token`
   is echoed only in dev setups (in production the service emails it).
 

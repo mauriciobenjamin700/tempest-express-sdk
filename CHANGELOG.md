@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.10.0] — 2026-07-02
+
+### Added
+
+- **integrations**: `EmailProvider` — a `MessagingProvider` over `EmailUtils`, so
+  email joins the WhatsApp/Telegram/SMS contract.
+- **auth**: MFA at login. With an `MfaService` wired into `UserAuthService`,
+  `login` returns `{ mfaRequired, mfaToken }` for enrolled users; complete it via
+  `verifyMfaChallenge` / `POST /auth/mfa/challenge`.
+
 ## [0.9.0] — 2026-07-02
 
 ### Added

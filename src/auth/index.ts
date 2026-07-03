@@ -7,6 +7,8 @@ export {
   authResponseSchema,
   type LoginInput,
   loginSchema,
+  type MfaChallengeInput,
+  mfaChallengeSchema,
   type MfaCodeInput,
   mfaCodeSchema,
   mfaEnrollResponseSchema,
@@ -25,6 +27,8 @@ export {
 } from "@/auth/schemas";
 export {
   type AuthUser,
+  type LoginResult,
+  type MfaChallenge,
   type UserAuthServiceOptions,
   type UserStore,
   UserAuthService,

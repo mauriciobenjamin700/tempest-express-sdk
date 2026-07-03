@@ -21,6 +21,8 @@
   for multi-replica deployments.
 - **0.9.0** — metrics: optional GPU metrics (`nvidia-smi`) + `makeMetricsRouter`
   (`/metrics` Prometheus endpoint).
+- **0.10.0** — `EmailProvider` (email as a `MessagingProvider`) and MFA at login
+  (challenge flow in `UserAuthService` + `POST /auth/mfa/challenge`).
 
 ## Planned
 
@@ -32,7 +34,7 @@ providers exposed as a `MessagingProvider`.
 
 ### Other candidates
 
-- More `MessagingProvider` channels (additional SMS vendors, a
-  transactional-email provider) under the shared contract.
-- A `MessagingProvider`-based email channel unifying `EmailUtils` with the
-  integrations surface.
+- More `MessagingProvider` channels (additional SMS vendors, push channels)
+  under the shared contract.
+- Batch/broadcast helpers over `MessagingProvider` (fan a message to many
+  recipients across channels).

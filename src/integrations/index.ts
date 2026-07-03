@@ -29,3 +29,7 @@ export {
   makeTwilioWebhookRouter,
   validateTwilioSignature,
 } from "@/integrations/sms";
+export {
+  EmailProvider,
+  type EmailProviderOptions,
+} from "@/integrations/email";

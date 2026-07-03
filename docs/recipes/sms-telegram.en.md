@@ -64,6 +64,22 @@ const app = await createApp({
 
 Invalid signature → **401**. Responds with an empty `<Response></Response>` (TwiML).
 
+## Email as a channel
+
+`EmailProvider` also implements `MessagingProvider` (over `EmailUtils`), so email
+notifications use the same interface.
+
+```ts
+import { EmailProvider, EmailUtils } from "tempest-express-sdk";
+
+const email = new EmailUtils({ host: "smtp.example.com", from: "no-reply@example.com" });
+const provider = new EmailProvider({ email, subject: "Notice" });
+
+await provider.sendText("ana@example.com", "Your order is out for delivery");
+```
+
+Email has no `onMessage`/`checkNumber` (send-only).
+
 ## Program against the contract
 
 ```ts

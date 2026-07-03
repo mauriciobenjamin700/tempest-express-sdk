@@ -84,6 +84,14 @@ export const mfaCodeSchema = z
   .object({ code: z.string().min(1).openapi({ description: "Authenticator code." }) })
   .openapi("MfaCode");
 
+/** MFA login-challenge body (`POST /auth/mfa/challenge`). */
+export const mfaChallengeSchema = z
+  .object({
+    mfaToken: z.string().min(1).openapi({ description: "Challenge token from login." }),
+    code: z.string().min(1).openapi({ description: "Authenticator code." }),
+  })
+  .openapi("MfaChallenge");
+
 /** Activation body (`POST /auth/activate`). */
 export const activationSchema = z
   .object({ token: z.string().min(1).openapi({ description: "Activation token." }) })
@@ -109,6 +117,7 @@ export type TokenPair = z.infer<typeof tokenPairSchema>;
 export type UserPublic = z.infer<typeof userPublicSchema>;
 export type AuthResponse = z.infer<typeof authResponseSchema>;
 export type MfaCodeInput = z.infer<typeof mfaCodeSchema>;
+export type MfaChallengeInput = z.infer<typeof mfaChallengeSchema>;
 export type ActivationInput = z.infer<typeof activationSchema>;
 export type PasswordResetRequestInput = z.infer<typeof passwordResetRequestSchema>;
 export type PasswordResetConfirmInput = z.infer<typeof passwordResetConfirmSchema>;
