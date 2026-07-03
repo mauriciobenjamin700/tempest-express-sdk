@@ -962,6 +962,8 @@
   (<code>/metrics</code> Prometheus endpoint). See <a href="../recipes/server-utils/">MFA, HTTP client…</a>.</li>
 <li><strong>0.10.0</strong> — <code>EmailProvider</code> (email as a <code>MessagingProvider</code>) and MFA at login
   (challenge flow in <code>UserAuthService</code> + <code>POST /auth/mfa/challenge</code>).</li>
+<li><strong>0.11.0</strong> — broadcast helpers: <code>broadcastText</code> (bounded-concurrency fan-out)
+  and <code>MessagingHub</code> (named channels with <code>send</code>/<code>broadcast</code>).</li>
 </ul>
 <h2 id="planned">Planned<a class="headerlink" href="#planned" title="Permanent link">&para;</a></h2>
 <h3 id="more-channels-under-messagingprovider">More channels under <code>MessagingProvider</code><a class="headerlink" href="#more-channels-under-messagingprovider" title="Permanent link">&para;</a></h3>
@@ -972,9 +974,9 @@ provider exposed as a <code>MessagingProvider</code>.</p>
 <ul>
 <li>More <code>MessagingProvider</code> channels (additional SMS vendors, push channels)
   under the shared contract.</li>
-<li>Broadcast helpers over <code>MessagingProvider</code> (fan a message to many recipients
-  across channels).</li>
 </ul>
+<p>The SDK now covers the <code>tempest-fastapi-sdk</code> surface relevant to Node/Express; a
+<code>1.0.0</code> is a natural next milestone once the API settles in real use.</p>
 
 
 
