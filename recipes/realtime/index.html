@@ -575,6 +575,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multi-replica-com-redis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-réplica com Redis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#recapitulando" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -872,6 +883,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multi-replica-com-redis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-réplica com Redis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#recapitulando" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -955,9 +977,39 @@ faz o streaming na resposta Express.</p>
 <p><code>EventStream</code> envia um comentário <code>: ping</code> periódico (15s por padrão) pra
 manter a conexão viva. Configure com <code>new SSEBroker({ heartbeatSeconds })</code>.</p>
 </div>
+<h2 id="multi-replica-com-redis">Multi-réplica com Redis<a class="headerlink" href="#multi-replica-com-redis" title="Permanent link">&para;</a></h2>
+<p>O <code>SSEBroker</code> em memória só alcança clientes do <strong>mesmo processo</strong>. Para várias
+réplicas, use <code>RedisSSEBroker</code> (pub/sub) — um <code>publish</code> em qualquer nó chega aos
+clientes SSE de todos. Passe o client principal + uma conexão dedicada de
+subscriber (<code>client.duplicate()</code>), regra do pub/sub do Redis.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">RedisSSEBroker</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;redis&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">pub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createClient</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;redis://localhost&quot;</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">sub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">pub</span><span class="p">.</span><span class="nx">duplicate</span><span class="p">();</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">await</span><span class="w"> </span><span class="nx">pub</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="k">await</span><span class="w"> </span><span class="nx">sub</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="kd">const</span><span class="w"> </span><span class="nx">broker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">RedisSSEBroker</span><span class="p">(</span><span class="nx">pub</span><span class="p">,</span><span class="w"> </span><span class="nx">sub</span><span class="p">);</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;/api/feed&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">broker</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s2">&quot;feed&quot;</span><span class="p">);</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="nx">req</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;close&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="nx">broker</span><span class="p">.</span><span class="nx">unregister</span><span class="p">(</span><span class="s2">&quot;feed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">stream</span><span class="p">));</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">  </span><span class="ow">void</span><span class="w"> </span><span class="nx">sseResponse</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">,</span><span class="w"> </span><span class="nx">stream</span><span class="p">);</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="p">});</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="k">await</span><span class="w"> </span><span class="nx">broker</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s2">&quot;feed&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">price</span><span class="o">:</span><span class="w"> </span><span class="kt">42</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="s2">&quot;tick&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// alcança todas as réplicas</span>
+</code></pre></div>
+<p>Sessões também têm store Redis para multi-réplica — <code>RedisSessionStore</code> (mesmo
+<code>SessionService</code>, só troca o store):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">RedisSessionStore</span><span class="p">,</span><span class="w"> </span><span class="nx">SessionService</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">&quot;tempest-express-sdk&quot;</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">sessions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">SessionService</span><span class="p">({</span><span class="w"> </span><span class="nx">store</span><span class="o">:</span><span class="w"> </span><span class="kt">new</span><span class="w"> </span><span class="nx">RedisSessionStore</span><span class="p">(</span><span class="nx">pub</span><span class="p">)</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
 <h2 id="recapitulando">Recapitulando<a class="headerlink" href="#recapitulando" title="Permanent link">&para;</a></h2>
 <p>WebSocket para bidirecional com tópicos e entrega por usuário; SSE para push
-unidirecional simples sobre HTTP, sem dependências.</p>
+unidirecional sobre HTTP; <code>RedisSSEBroker</code> + <code>RedisSessionStore</code> para escalar em
+várias réplicas — todos injetando o client <code>redis</code> (peer opcional).</p>
 
 
 

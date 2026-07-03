@@ -956,6 +956,8 @@
 <li><strong>0.7.0</strong> — fluxos de auth: <code>MfaService</code> (TOTP), <code>ActivationService</code> (email) e
   <code>PasswordResetService</code>, montados no <code>makeAuthRouter</code>. Veja
   <a href="../recipes/auth/">Autenticação (JWT)</a>.</li>
+<li><strong>0.8.0</strong> — stores Redis: <code>RedisSessionStore</code> e <code>RedisSSEBroker</code> (pub/sub) para
+  deploys multi-réplica. Veja <a href="../recipes/realtime/">Tempo real</a>.</li>
 </ul>
 <h2 id="planejado">Planejado<a class="headerlink" href="#planejado" title="Permanent link">&para;</a></h2>
 <h3 id="mais-canais-sob-messagingprovider">Mais canais sob <code>MessagingProvider</code><a class="headerlink" href="#mais-canais-sob-messagingprovider" title="Permanent link">&para;</a></h3>
@@ -964,8 +966,6 @@ Candidatos futuros o reusam: outros provedores de SMS e email transacional
 exposto como <code>MessagingProvider</code>.</p>
 <h3 id="outros-candidatos">Outros candidatos<a class="headerlink" href="#outros-candidatos" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>stores Redis</strong> — <code>SessionStore</code> e transporte de <code>SSEBroker</code> em Redis para
-  deploys multi-réplica.</li>
 <li><strong>metrics</strong> — métricas de GPU opcionais e um router Prometheus <code>/metrics</code>.</li>
 </ul>
 
