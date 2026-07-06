@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.14.0] — 2026-07-06
+
+### Added
+
+- **testing**: framework-agnostic in-memory test-database helpers mirroring the
+  Python `testing` module — `createTestDatabase(models)` stands up a
+  `tempest-db-js` engine over in-memory SQLite with tables reflected from the
+  models (one shared connection backs the DDL and every session), returning
+  `{ engine, session(), close() }`; `withTestDatabase(models, fn)` scopes it to a
+  block and always disposes. No temp files, no migrations, no external service.
+
 ## [0.13.0] — 2026-07-06
 
 ### Added

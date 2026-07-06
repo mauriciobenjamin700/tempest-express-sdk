@@ -82,6 +82,7 @@ plugins:
             "Feature flags e storage": "Feature flags and storage"
             "MFA, HTTP client, Web Push e mais": "MFA, HTTP client, Web Push and more"
             "Endurecimento HTTP (middlewares)": "HTTP hardening (middlewares)"
+            "Testes (banco em memória)": "Testing (in-memory database)"
             "Integrações: WhatsApp (zap-api)": "Integrations: WhatsApp (zap-api)"
             "Integrações: SMS e Telegram": "Integrations: SMS and Telegram"
             "Admin (API JSON)": "Admin (JSON API)"
@@ -102,6 +103,7 @@ nav:
       - "Feature flags e storage": recipes/flags-storage.md
       - "MFA, HTTP client, Web Push e mais": recipes/server-utils.md
       - "Endurecimento HTTP (middlewares)": recipes/hardening.md
+      - "Testes (banco em memória)": recipes/testing.md
       - "Integrações: WhatsApp (zap-api)": recipes/whatsapp.md
       - "Integrações: SMS e Telegram": recipes/sms-telegram.md
       - "Admin (API JSON)": recipes/admin.md

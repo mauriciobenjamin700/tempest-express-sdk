@@ -9,6 +9,15 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.14.0] — 2026-07-06
+
+### Added
+
+- **testing**: framework-agnostic in-memory test-database helpers —
+  `createTestDatabase(models)` stands up a `tempest-db-js` engine over in-memory
+  SQLite with tables reflected from the models; `withTestDatabase(models, fn)`
+  scopes it to a block and always disposes.
+
 ## [0.13.0] — 2026-07-06
 
 ### Added

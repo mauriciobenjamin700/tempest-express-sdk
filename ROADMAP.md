@@ -34,6 +34,8 @@
   stores, IP/header/JWT keys), `bodySizeLimitMiddleware`, `csrfMiddleware`,
   `idempotencyMiddleware` (memory + Redis), `GracefulShutdown`,
   `requestTracingMiddleware`, `prometheusMiddleware`/`HttpMetrics`.
+- **0.14.0** — testing helpers: `createTestDatabase(models)` +
+  `withTestDatabase` — in-memory SQLite engine with tables reflected from models.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -64,10 +66,6 @@ the remaining gaps.
 - Field types (`CentsField`/`PriceField`/`HexColorField`/… as Zod), full
   `DownloadUtils`, `LogUtils` with `500.log` routing.
 - CLI: `user`, `lint`, `config`, and real DB-migration wiring over `tempest-db-js`.
-
-### Testing helpers
-
-- In-memory DB/test fixtures (mirrors the Python `testing` module).
 
 ### Out of scope
 

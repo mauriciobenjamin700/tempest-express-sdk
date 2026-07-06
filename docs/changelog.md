@@ -9,6 +9,15 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.14.0] — 2026-07-06
+
+### Adicionado
+
+- **testing**: helpers de banco em memória agnósticos de framework —
+  `createTestDatabase(models)` sobe um engine `tempest-db-js` sobre SQLite em
+  memória com as tabelas refletidas dos models; `withTestDatabase(models, fn)`
+  escopa a um bloco e sempre fecha.
+
 ## [0.13.0] — 2026-07-06
 
 ### Adicionado
