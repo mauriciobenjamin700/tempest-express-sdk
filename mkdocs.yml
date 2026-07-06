@@ -77,6 +77,11 @@ plugins:
             "Glossário": "Glossary"
             Instalação: Installation
             Tutorial: Tutorial
+            "Projeto guiado": "Guided project"
+            "Lista de Tarefas": "Task list API"
+            "1. Setup e o primeiro modelo": "1. Setup and the first model"
+            "2. CRUD completo": "2. Full CRUD"
+            "3. Polimento: erros e filtros": "3. Polish: errors and filters"
             Receitas: Recipes
             "Configuração (settings tipados)": "Configuration (typed settings)"
             "Banco de dados (models + repositories)": "Database (models + repositories)"
@@ -107,6 +112,11 @@ nav:
       - "Glossário": getting-started/glossary.md
   - Instalação: installation.md
   - Tutorial: tutorial.md
+  - Projeto guiado:
+      - "Lista de Tarefas": learn/index.md
+      - "1. Setup e o primeiro modelo": learn/01-setup.md
+      - "2. CRUD completo": learn/02-crud.md
+      - "3. Polimento: erros e filtros": learn/03-polish.md
   - Receitas:
       - "Configuração (settings tipados)": recipes/settings.md
       - "Banco de dados (models + repositories)": recipes/database.md
