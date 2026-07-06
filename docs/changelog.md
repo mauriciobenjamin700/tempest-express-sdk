@@ -9,6 +9,15 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.15.0] — 2026-07-06
+
+### Adicionado
+
+- **db**: camada avançada — `TenantScopedRepository` (isolamento multi-tenant),
+  `BaseOutboxModel` + `OutboxRelay` (outbox transacional), `BaseAuditLogModel` +
+  `snapshot`/`diffSnapshots` (trilha de auditoria) e modelos base opt-in
+  `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel`.
+
 ## [0.14.0] — 2026-07-06
 
 ### Adicionado

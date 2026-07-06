@@ -75,6 +75,7 @@ plugins:
             Receitas: Recipes
             "Configuração (settings tipados)": "Configuration (typed settings)"
             "Banco de dados (models + repositories)": "Database (models + repositories)"
+            "Banco de dados avançado": "Advanced database"
             "Autenticação (JWT)": "Authentication (JWT)"
             "Utilidades BR": "BR utilities"
             "Tempo real (WebSocket + SSE)": "Real-time (WebSocket + SSE)"
@@ -96,6 +97,7 @@ nav:
   - Receitas:
       - "Configuração (settings tipados)": recipes/settings.md
       - "Banco de dados (models + repositories)": recipes/database.md
+      - "Banco de dados avançado": recipes/database-advanced.md
       - "Autenticação (JWT)": recipes/auth.md
       - "Utilidades BR": recipes/br-utils.md
       - "Tempo real (WebSocket + SSE)": recipes/realtime.md

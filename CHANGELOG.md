@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.15.0] — 2026-07-06
+
+### Added
+
+- **db**: advanced database layer mirroring `db.tenant` / `db.audit` /
+  `db.outbox` / `db.user_model` — `TenantScopedRepository` (per-tenant read
+  filtering + write stamping, cross-tenant `getById` throws), `BaseOutboxModel` +
+  `OutboxRelay` (transactional outbox with at-least-once delivery, retry
+  backoff), `BaseAuditLogModel` + `snapshot` / `diffSnapshots` (who-changed-what
+  audit trail), and opt-in base models `BaseUserModel`, `BaseUserTokenModel`,
+  `BaseUserRefreshTokenModel` (+ `UserTokenPurpose`, `AuditAction`,
+  `OutboxStatus`).
+
 ## [0.14.0] — 2026-07-06
 
 ### Added

@@ -36,6 +36,9 @@
   `requestTracingMiddleware`, `prometheusMiddleware`/`HttpMetrics`.
 - **0.14.0** — testing helpers: `createTestDatabase(models)` +
   `withTestDatabase` — in-memory SQLite engine with tables reflected from models.
+- **0.15.0** — advanced DB: `TenantScopedRepository`, `BaseOutboxModel` +
+  `OutboxRelay`, `BaseAuditLogModel` + `snapshot`/`diffSnapshots`, and base
+  `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel` models.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -52,11 +55,12 @@ the remaining gaps.
 - Webhook signature verifier (HMAC/RSA), `tool-spec` router, logs router.
 - Auth locale negotiation + optional HTML page renderer.
 
-### Advanced DB
+### Advanced DB (remaining)
 
-- Transactional outbox (`OutboxRelay`), audit log model + `AuditMixin`,
-  `SoftDeleteMixin`/`MFAMixin`, tenant-scoped repository, slow-query logger,
-  database backup, `BaseUserModel` + token models, snapshot/diff helpers.
+- Slow-query logger and database backup helper. (The transactional outbox,
+  audit log model + snapshot/diff, tenant-scoped repository and base
+  user/token models shipped in 0.15.0; soft-delete/audit "mixins" ship as the
+  `deletedAtColumn`/`createdByColumn`/`updatedByColumn` factories.)
 
 ### Schemas, storage, utils, CLI
 
