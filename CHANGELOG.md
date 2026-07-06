@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.18.0] — 2026-07-06
+
+### Added
+
+- **utils**: `sendFileDownload` (range-aware disk streaming → `206`),
+  `sendBytesDownload` and traversal-safe `resolveDownloadPath` (`utils.download`).
+- **utils**: `configureFileLogging` — routes every `JSONLogger` record to
+  per-level files + a dedicated `500.log`; `LEVEL_LOG_FILES` / `HTTP_500_LOG_FILE`.
+- **core**: `addLogSink` / `LogSink` — register a sink invoked for every emitted
+  record (what `configureFileLogging` builds on).
+- **api**: `makeLogsRouter` — a guardable, paginated read endpoint over the log
+  files (`source` ∈ all/debug/info/warning/error/500).
+
 ## [0.17.0] — 2026-07-06
 
 ### Added

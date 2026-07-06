@@ -9,6 +9,14 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.18.0] — 2026-07-06
+
+### Added
+
+- **utils**: `sendFileDownload` (Range/206), `sendBytesDownload`,
+  `resolveDownloadPath` (traversal-safe) and `configureFileLogging` (per-level
+  files + `500.log`); **core** `addLogSink`; **api** `makeLogsRouter`.
+
 ## [0.17.0] — 2026-07-06
 
 ### Added

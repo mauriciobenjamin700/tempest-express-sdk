@@ -44,6 +44,9 @@
 - **0.17.0** — schema extras: validated field types (`centsField`/`priceField`/
   `slugField`/…), delta-sync pagination (`syncFilterSchema`/`syncPaginationSchema`),
   `buildPaginationLinkHeader` (RFC-5988), `logEntrySchema`.
+- **0.18.0** — downloads + file logs: `sendFileDownload` (Range/206),
+  `sendBytesDownload`, `resolveDownloadPath`, `configureFileLogging` (per-level +
+  `500.log`), `addLogSink`, `makeLogsRouter`.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -67,15 +70,14 @@ the remaining gaps.
   user/token models shipped in 0.15.0; soft-delete/audit "mixins" ship as the
   `deletedAtColumn`/`createdByColumn`/`updatedByColumn` factories.)
 
-### Storage, utils, CLI (remaining)
+### Storage & CLI (remaining)
 
 - MinIO/S3 `UploadStorage` backend (alongside `LocalUploadStorage`) — needs a
   peer-dep decision (`minio` / AWS SDK).
-- `DownloadUtils` (streaming/range downloads), `LogUtils` with `500.log` routing
-  + a logs router over `logEntrySchema`.
 - CLI: `user`, `lint`, `config`.
-  (Delta-sync pagination, link headers, `logEntrySchema` and the Zod field types
-  shipped in 0.17.0.)
+  (Delta-sync pagination, link headers, `logEntrySchema`, the Zod field types,
+  the range-aware downloads and the file-log routing + logs router shipped in
+  0.17.0–0.18.0.)
 
 ### Out of scope
 

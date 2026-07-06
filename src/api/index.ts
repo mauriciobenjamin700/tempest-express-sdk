@@ -64,3 +64,8 @@ export {
   type ToolSpecOptions,
   makeToolSpecRouter,
 } from "@/api/toolSpec";
+export {
+  type LogSource,
+  type LogsRouterOptions,
+  makeLogsRouter,
+} from "@/api/logs";

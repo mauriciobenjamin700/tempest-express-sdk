@@ -9,7 +9,7 @@
  */
 
 /** SDK version the generated project depends on (kept in sync at release). */
-const SDK_VERSION = "^0.17.0";
+const SDK_VERSION = "^0.18.0";
 
 /**
  * Build the file map for a new service named `name`.

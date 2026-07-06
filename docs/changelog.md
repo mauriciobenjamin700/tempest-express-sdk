@@ -9,6 +9,14 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.18.0] — 2026-07-06
+
+### Adicionado
+
+- **utils**: `sendFileDownload` (Range/206), `sendBytesDownload`,
+  `resolveDownloadPath` (anti-traversal) e `configureFileLogging` (arquivos por
+  nível + `500.log`); **core** `addLogSink`; **api** `makeLogsRouter`.
+
 ## [0.17.0] — 2026-07-06
 
 ### Adicionado
