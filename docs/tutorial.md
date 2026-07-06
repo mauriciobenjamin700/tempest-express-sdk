@@ -112,6 +112,9 @@ class ItemModel extends BaseModel {
 Use `BaseRepository` / `BaseService` / `BaseController` para a pilha completa —
 ou rode `tempest-express generate Item` e tudo isso é gerado para você.
 
+O guia completo — modelar tabelas, conectar a engine, subir o repository, filtrar,
+paginar e migrar — está em [Banco de dados (models + repositories)](recipes/database.md).
+
 ## Recapitulando
 
 Você montou um app, registrou um schema com OpenAPI, serviu Swagger/Redoc nativos,

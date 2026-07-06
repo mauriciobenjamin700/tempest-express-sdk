@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Docs
+
+- **recipes/database**: new bilingual guide (PT-BR + EN) teaching how to model
+  tables with `BaseModel` + the `column` factory, connect an engine, stand up a
+  typed `BaseRepository`, filter by convention, paginate, add the opt-in
+  soft-delete/audit columns, compose the `repository → service → controller`
+  stack, and run migrations via the `tempest-db` CLI — the faithful port of the
+  `tempest-fastapi-sdk` "Banco de dados" recipe. Linked from the tutorial and the
+  recipes nav.
+
 ## [0.11.0] — 2026-07-02
 
 ### Added

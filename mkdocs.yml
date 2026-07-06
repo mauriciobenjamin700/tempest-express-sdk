@@ -73,6 +73,7 @@ plugins:
             Instalação: Installation
             Tutorial: Tutorial
             Receitas: Recipes
+            "Banco de dados (models + repositories)": "Database (models + repositories)"
             "Autenticação (JWT)": "Authentication (JWT)"
             "Utilidades BR": "BR utilities"
             "Tempo real (WebSocket + SSE)": "Real-time (WebSocket + SSE)"
@@ -90,6 +91,7 @@ nav:
   - Instalação: installation.md
   - Tutorial: tutorial.md
   - Receitas:
+      - "Banco de dados (models + repositories)": recipes/database.md
       - "Autenticação (JWT)": recipes/auth.md
       - "Utilidades BR": recipes/br-utils.md
       - "Tempo real (WebSocket + SSE)": recipes/realtime.md
