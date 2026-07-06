@@ -47,6 +47,8 @@
 - **0.18.0** — downloads + file logs: `sendFileDownload` (Range/206),
   `sendBytesDownload`, `resolveDownloadPath`, `configureFileLogging` (per-level +
   `500.log`), `addLogSink`, `makeLogsRouter`.
+- **0.19.0** — `S3UploadStorage` (MinIO/S3 backend) and CLI `lint` / `config` /
+  `user`. This closes the parity roadmap below.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -54,30 +56,20 @@ The target is **feature parity** with `tempest-fastapi-sdk`, with the
 `integrations/` module (WhatsApp/Telegram/SMS/Email + `MessagingHub`/broadcast)
 kept as the **Node-only differential** — a first-class messaging layer the Python
 SDK does not have. The core, data, auth, real-time, cache/queue/tasks, flags,
-metrics and CLI surfaces are already at parity or close; the items below close
-the remaining gaps.
+metrics, storage and CLI surfaces are at parity (0.12.0–0.19.0). Only a few
+niche items remain open.
 
-### Meta routers (remaining)
+### Remaining gaps
 
-- Logs router (ships with the `LogUtils` / `500.log` routing work below).
-- Optional HTML page renderer for the auth flows (auth locale negotiation is
-  already covered by `MessageCatalog.negotiate`).
+- **Slow-query logger** — blocked: `tempest-db-js` does not yet expose a
+  per-statement timing hook (its `onQuery` gives SQL + params, no duration).
+  Ships once that lands upstream.
+- **Database backup helper** — a `pg_dump`/SQLite-copy convenience wrapper.
+- **Optional HTML page renderer** for the bundled auth flows. Deliberately
+  deferred: this SDK favors the JSON auth API + a decoupled frontend (auth
+  locale negotiation is already covered by `MessageCatalog.negotiate`).
 
-### Advanced DB (remaining)
-
-- Slow-query logger and database backup helper. (The transactional outbox,
-  audit log model + snapshot/diff, tenant-scoped repository and base
-  user/token models shipped in 0.15.0; soft-delete/audit "mixins" ship as the
-  `deletedAtColumn`/`createdByColumn`/`updatedByColumn` factories.)
-
-### Storage & CLI (remaining)
-
-- MinIO/S3 `UploadStorage` backend (alongside `LocalUploadStorage`) — needs a
-  peer-dep decision (`minio` / AWS SDK).
-- CLI: `user`, `lint`, `config`.
-  (Delta-sync pagination, link headers, `logEntrySchema`, the Zod field types,
-  the range-aware downloads and the file-log routing + logs router shipped in
-  0.17.0–0.18.0.)
+Everything else in the parity target has shipped.
 
 ### Out of scope
 

@@ -1,2 +1,2 @@
 /** The installed SDK version. Single source of truth for the barrel + CLI. */
-export const VERSION = "0.18.0";
+export const VERSION = "0.19.0";

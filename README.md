@@ -35,7 +35,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **auth** | `UserAuthService`, JWT middleware + role guards, `makeAuthRouter`; MFA (`MfaService`), email activation, password reset |
 | **cache / queue / tasks** | `CacheManager` (+`cached`), `BrokerManager` (memory/RabbitMQ), `TaskManager` |
 | **sse / websockets** | `SSEBroker`/`sseResponse` (+ `RedisSSEBroker`), transport-agnostic `WebSocketHub` + `attachWebSocketHub` |
-| **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage` |
+| **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage`/`S3UploadStorage` (MinIO/S3) |
 | **webpush / email** | `WebPushDispatcher` (VAPID), `EmailUtils` (SMTP) |
 | **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus, GPU), `makeMetricsRouter`, `getClientIp` |
 | **integrations** | `MessagingProvider` contract; `WhatsAppProvider` (zap-api), `TelegramProvider` (Bot API), `TwilioSmsProvider` (SMS), `EmailProvider`, `MessagingHub` + `broadcastText`, webhook receivers |

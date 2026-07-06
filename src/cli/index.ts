@@ -8,11 +8,15 @@
  *   - `--help`      — print usage.
  */
 
-import { randomBytes } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import { randomBytes, randomUUID } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { dockerComposeFile, projectFiles, resourceFiles } from "@/cli/template";
+import { baseAppSettingsSchema, loadSettings } from "@/settings/base";
+import { PasswordUtils } from "@/utils/password";
 import { VERSION } from "@/version";
 
 const USAGE = `tempest-express — Express SDK CLI
@@ -23,6 +27,10 @@ Usage:
   tempest-express secret [--bytes <n>]             Print a random secret
   tempest-express docker-compose [--dir <path>]    Write a docker-compose.yml
   tempest-express db                               Migration guidance
+  tempest-express lint [--dir <path>]              Run Biome check in a project
+  tempest-express config [--dir <path>]            Print the resolved base settings
+  tempest-express user --email <e> --password <p> [--admin]
+                                                   Print a ready-to-insert user record
   tempest-express --version                        Print the version
   tempest-express --help                           Show this help
 `;
@@ -33,6 +41,28 @@ const DB_HELP = `Migrations are handled by tempest-db-js (programmatic API):
 
 See https://www.npmjs.com/package/tempest-db-js for the migration workflow.
 `;
+
+/** Parse a `.env` file's `KEY=VALUE` lines into a record (ignores comments). */
+function parseDotEnv(path: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!existsSync(path)) return out;
+  for (const raw of readFileSync(path, "utf8").split("\n")) {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq === -1) continue;
+    const key = line.slice(0, eq).trim();
+    let value = line.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    out[key] = value;
+  }
+  return out;
+}
 
 /** Write a project file map under `root`, creating directories as needed. */
 async function writeFiles(root: string, files: Record<string, string>): Promise<void> {
@@ -83,6 +113,9 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<numb
       help: { type: "boolean", short: "h" },
       dir: { type: "string", default: "." },
       bytes: { type: "string", default: "32" },
+      email: { type: "string" },
+      password: { type: "string" },
+      admin: { type: "boolean", default: false },
     },
   });
 
@@ -141,16 +174,53 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<numb
     return 0;
   }
 
+  if (command === "lint") {
+    const target = resolve(dir);
+    const result = spawnSync("npx", ["biome", "check", target], {
+      stdio: "inherit",
+      shell: process.platform === "win32",
+    });
+    return result.status ?? 1;
+  }
+
+  if (command === "config") {
+    const env = { ...process.env, ...parseDotEnv(join(resolve(dir), ".env")) };
+    const settings = loadSettings(baseAppSettingsSchema, env);
+    process.stdout.write(`${JSON.stringify(settings, null, 2)}\n`);
+    return 0;
+  }
+
+  if (command === "user") {
+    const { email, password } = values;
+    if (!email || !password) {
+      process.stderr.write("error: `user` requires --email and --password\n");
+      return 1;
+    }
+    const hashedPassword = await new PasswordUtils().hash(password);
+    const record = {
+      id: randomUUID(),
+      email,
+      hashedPassword,
+      isAdmin: Boolean(values.admin),
+      isActive: true,
+    };
+    process.stdout.write(`${JSON.stringify(record, null, 2)}\n`);
+    return 0;
+  }
+
   process.stderr.write(`error: unknown command ${JSON.stringify(command)}\n\n${USAGE}`);
   return 1;
 }
 
-main()
-  .then((code) => {
-    process.exitCode = code;
-  })
-  .catch((error: unknown) => {
-    const message = error instanceof Error ? error.message : String(error);
-    process.stderr.write(`error: ${message}\n`);
-    process.exitCode = 1;
-  });
+// Auto-run as a binary, but stay importable from tests without executing.
+if (!process.env.VITEST) {
+  main()
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      process.stderr.write(`error: ${message}\n`);
+      process.exitCode = 1;
+    });
+}

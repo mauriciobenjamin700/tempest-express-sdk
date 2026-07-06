@@ -9,6 +9,13 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.19.0] — 2026-07-06
+
+### Adicionado
+
+- **storage**: `S3UploadStorage` (mesma interface `UploadStorage` sobre MinIO/S3,
+  peer `minio` opcional). **cli**: `lint`, `config` e `user`.
+
 ## [0.18.0] — 2026-07-06
 
 ### Adicionado

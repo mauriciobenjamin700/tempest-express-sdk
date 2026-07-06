@@ -9,6 +9,13 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.19.0] — 2026-07-06
+
+### Added
+
+- **storage**: `S3UploadStorage` (same `UploadStorage` interface over MinIO/S3,
+  optional `minio` peer). **cli**: `lint`, `config` and `user`.
+
 ## [0.18.0] — 2026-07-06
 
 ### Added

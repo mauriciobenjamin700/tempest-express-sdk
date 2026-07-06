@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.19.0] — 2026-07-06
+
+### Added
+
+- **storage**: `S3UploadStorage` — the `UploadStorage` contract over a MinIO/S3
+  client (`minio`, an optional peer, lazy-loaded; or inject your own). Swaps with
+  `LocalUploadStorage` without touching call sites.
+- **cli**: `tempest-express lint` (runs Biome check), `config` (prints the
+  resolved base settings, reading `.env`), and `user --email --password [--admin]`
+  (prints a ready-to-insert user record with a bcrypt hash).
+
 ## [0.18.0] — 2026-07-06
 
 ### Added
