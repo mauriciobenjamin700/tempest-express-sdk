@@ -58,6 +58,19 @@ export {
   type ThrottleStatus,
 } from "@/utils/throttle";
 export { type ClientIpOptions, getClientIp } from "@/utils/clientIp";
+export {
+  type DownloadOptions,
+  resolveDownloadPath,
+  sendBytesDownload,
+  sendFileDownload,
+} from "@/utils/download";
+export {
+  type FileLoggingHandle,
+  type FileLoggingOptions,
+  HTTP_500_LOG_FILE,
+  LEVEL_LOG_FILES,
+  configureFileLogging,
+} from "@/utils/log";
 export { TOTPHelper, type TOTPOptions } from "@/utils/totp";
 export {
   CircuitOpenError,

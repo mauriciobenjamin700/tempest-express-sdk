@@ -11,6 +11,8 @@ export {
   JSONLogger,
   type LogExtra,
   type LogLevel,
+  type LogSink,
+  addLogSink,
   configureLogging,
 } from "@/core/logging";
 export {

@@ -20,6 +20,30 @@ export {
 } from "@/db/model";
 
 export {
+  BaseUserModel,
+  BaseUserRefreshTokenModel,
+  BaseUserTokenModel,
+  UserTokenPurpose,
+} from "@/db/userModel";
+export {
+  AuditAction,
+  BaseAuditLogModel,
+  type FieldChange,
+  diffSnapshots,
+  snapshot,
+} from "@/db/audit";
+export { TenantScopedRepository } from "@/db/tenant";
+export {
+  BaseOutboxModel,
+  OutboxRelay,
+  type OutboxPublisher,
+  type OutboxRelayOptions,
+  OutboxStatus,
+} from "@/db/outbox";
+export { type SlowQueryOptions, wrapWithSlowQueryLog } from "@/db/slowQuery";
+export { type BackupOptions, backupDatabase } from "@/db/backup";
+
+export {
   AsyncEngine,
   AsyncResult,
   AsyncSession,

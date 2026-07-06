@@ -4,6 +4,102 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
 [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota
 [SemVer](https://semver.org/lang/pt-BR/).
 
+!!! info "Histórico completo"
+    Esta página lista os destaques recentes. O histórico versão a versão
+    (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
+    do repositório.
+
+## [0.20.0] — 2026-07-06
+
+### Adicionado
+
+- **db**: `wrapWithSlowQueryLog` (log de queries lentas via wrap de driver) e
+  `backupDatabase` (backup por dialeto: `pg_dump`/cópia SQLite). **auth**:
+  `renderAuthResultPage` / `renderPasswordResetFormPage` (páginas HTML opcionais).
+
+## [0.19.0] — 2026-07-06
+
+### Adicionado
+
+- **storage**: `S3UploadStorage` (mesma interface `UploadStorage` sobre MinIO/S3,
+  peer `minio` opcional). **cli**: `lint`, `config` e `user`.
+
+## [0.18.0] — 2026-07-06
+
+### Adicionado
+
+- **utils**: `sendFileDownload` (Range/206), `sendBytesDownload`,
+  `resolveDownloadPath` (anti-traversal) e `configureFileLogging` (arquivos por
+  nível + `500.log`); **core** `addLogSink`; **api** `makeLogsRouter`.
+
+## [0.17.0] — 2026-07-06
+
+### Adicionado
+
+- **schemas**: tipos de campo validados (`centsField`, `priceField`, `slugField`,
+  `hexColorField`, `percentField`, `latitudeField`, …), paginação delta-sync
+  (`syncFilterSchema` / `syncPaginationSchema`), `buildPaginationLinkHeader`
+  (RFC-5988) e `logEntrySchema`.
+
+## [0.16.0] — 2026-07-06
+
+### Adicionado
+
+- **api**: clientes OAuth2/OIDC (`GoogleOAuthClient`, `GitHubOAuthClient`,
+  `OIDCProvider`) + `generateOAuthState`, `WebhookSignatureVerifier` (HMAC em
+  tempo constante sobre o corpo cru) e `makeToolSpecRouter` (manifesto em
+  `/tool-spec`).
+
+## [0.15.0] — 2026-07-06
+
+### Adicionado
+
+- **db**: camada avançada — `TenantScopedRepository` (isolamento multi-tenant),
+  `BaseOutboxModel` + `OutboxRelay` (outbox transacional), `BaseAuditLogModel` +
+  `snapshot`/`diffSnapshots` (trilha de auditoria) e modelos base opt-in
+  `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel`.
+
+## [0.14.0] — 2026-07-06
+
+### Adicionado
+
+- **testing**: helpers de banco em memória agnósticos de framework —
+  `createTestDatabase(models)` sobe um engine `tempest-db-js` sobre SQLite em
+  memória com as tabelas refletidas dos models; `withTestDatabase(models, fn)`
+  escopa a um bloco e sempre fecha.
+
+## [0.13.0] — 2026-07-06
+
+### Adicionado
+
+- **api/middlewares**: middlewares de endurecimento HTTP — `rateLimitMiddleware`
+  (janela deslizante; store memória + Redis; chaves por IP/header/JWT),
+  `bodySizeLimitMiddleware` (413), `csrfMiddleware` + `generateCsrfToken`,
+  `idempotencyMiddleware` (store memória + Redis), `GracefulShutdown`,
+  `requestTracingMiddleware` e `prometheusMiddleware` / `HttpMetrics`.
+
+### Alterado
+
+- **api**: `requestIdMiddleware` valida o `X-Request-ID` de entrada contra uma
+  whitelist ASCII antes de reusá-lo (evita CRLF/log injection).
+
+## [0.12.0] — 2026-07-06
+
+### Adicionado
+
+- **settings**: fragmentos de settings por domínio, espelhando os mixins do
+  `tempest-fastapi-sdk` — `authSettingsShape`, `jwtSettingsShape`,
+  `emailSettingsShape`, `redisSettingsShape`, `rabbitmqSettingsShape`,
+  `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`,
+  `webPushSettingsShape`, `webSocketSettingsShape`, `logSettingsShape`,
+  `tokenSettingsShape` (mesmos nomes de env + defaults). Mais os helpers
+  `envBoolean` (parseia `"false"` como `false`) e `envList` (CSV → `string[]`).
+
+### Documentação
+
+- **recipes/settings**: novo guia bilíngue de settings tipados.
+- **recipes/database**: novo guia bilíngue (models + repositories).
+
 ## [0.1.0] — 2026-06-29
 
 ### Adicionado

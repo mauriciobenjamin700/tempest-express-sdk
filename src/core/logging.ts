@@ -25,6 +25,27 @@ const LEVEL_ORDER: Record<LogLevel, number> = {
 /** Free-form structured context merged into the emitted record. */
 export type LogExtra = Record<string, unknown>;
 
+/** A sink receiving every emitted record (for file routing, shipping, …). */
+export type LogSink = (level: LogLevel, record: Record<string, unknown>) => void;
+
+const sinks: LogSink[] = [];
+
+/**
+ * Register a sink invoked for every record every {@link JSONLogger} emits (in
+ * addition to the stdout/stderr line). Used by `configureFileLogging` to route
+ * records into per-level + `500.log` files.
+ *
+ * @param sink - The sink callback. Errors thrown by it are swallowed.
+ * @returns A function that removes the sink.
+ */
+export function addLogSink(sink: LogSink): () => void {
+  sinks.push(sink);
+  return () => {
+    const index = sinks.indexOf(sink);
+    if (index !== -1) sinks.splice(index, 1);
+  };
+}
+
 /** A minimal structured logger writing one JSON line per record. */
 export class JSONLogger {
   /**
@@ -75,6 +96,13 @@ export class JSONLogger {
     const line = JSON.stringify(record);
     if (level === "error") process.stderr.write(`${line}\n`);
     else process.stdout.write(`${line}\n`);
+    for (const sink of sinks) {
+      try {
+        sink(level, record);
+      } catch {
+        // A sink must never break logging.
+      }
+    }
   }
 }
 

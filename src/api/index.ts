@@ -42,3 +42,30 @@ export {
   createApp,
   runServer,
 } from "@/api/server";
+export * from "@/api/middlewares";
+export {
+  BaseOAuthClient,
+  GitHubOAuthClient,
+  GoogleOAuthClient,
+  type OAuthClientOptions,
+  OAuthError,
+  type OAuthTokens,
+  type OAuthUser,
+  OIDCProvider,
+  type OIDCProviderOptions,
+  generateOAuthState,
+} from "@/api/oauth";
+export {
+  type WebhookSignatureOptions,
+  WebhookSignatureVerifier,
+} from "@/api/webhooks";
+export {
+  type SpecProvider,
+  type ToolSpecOptions,
+  makeToolSpecRouter,
+} from "@/api/toolSpec";
+export {
+  type LogSource,
+  type LogsRouterOptions,
+  makeLogsRouter,
+} from "@/api/logs";

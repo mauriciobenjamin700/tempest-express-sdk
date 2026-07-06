@@ -43,6 +43,9 @@ npm run dev
 | `tempest-express secret [--bytes 32]` | Gera um segredo aleatório (JWT/token) |
 | `tempest-express docker-compose` | Escreve um `docker-compose.yml` (Postgres + Redis) |
 | `tempest-express db` | Orientação sobre migrations (via `tempest-db-js`) |
+| `tempest-express lint [--dir .]` | Roda o Biome check no projeto |
+| `tempest-express config [--dir .]` | Imprime os settings base resolvidos (lê `.env`) |
+| `tempest-express user --email <e> --password <p> [--admin]` | Imprime um registro de usuário pronto pra inserir (hash bcrypt) |
 
 ## tsconfig recomendado
 

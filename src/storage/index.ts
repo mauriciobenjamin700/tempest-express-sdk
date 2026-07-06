@@ -8,3 +8,8 @@ export {
   type UploadStorage,
   buildContentDisposition,
 } from "@/storage/local";
+export {
+  type S3ClientLike,
+  S3UploadStorage,
+  type S3UploadStorageOptions,
+} from "@/storage/s3";

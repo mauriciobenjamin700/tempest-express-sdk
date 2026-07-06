@@ -9,9 +9,14 @@ Redoc** generated straight from your Zod schemas, and a layered
 router → controller → service → repository → model stack on top of
 [`tempest-db-js`](https://www.npmjs.com/package/tempest-db-js).
 
-!!! warning "Status: pre-alpha (v0.1.0)"
-    The foundation layer is built and tested. Several `tempest-fastapi-sdk`
-    feature modules are not yet ported (see the [Changelog](changelog.md)).
+!!! tip "Never used Node.js or JavaScript? Start here"
+    The [**Getting started from zero**](getting-started/node.md) track takes you
+    from "never opened a terminal" to a running app — install Node, the minimum
+    JS/TS, and your [first app](getting-started/first-app.md) step by step.
+
+!!! check "Status: parity with `tempest-fastapi-sdk` (v0.20.0)"
+    The SDK has reached feature parity with `tempest-fastapi-sdk`. See the
+    [Changelog](changelog.md) and the [Roadmap](roadmap.md).
 
 ## Why
 
@@ -61,6 +66,8 @@ On boot you already get:
 
 ## Next steps
 
+- 🌱 New here? [Getting started from zero](getting-started/node.md) → [Your first app](getting-started/first-app.md)
 - [Installation](installation.md)
 - [Tutorial](tutorial.md)
+- [Glossary](getting-started/glossary.md) — terms explained
 - [Authentication (JWT)](recipes/auth.md)

@@ -27,20 +27,23 @@ npm install tempest-express-sdk tempest-db-js express zod
 | --- | --- |
 | **core** | `JSONLogger`, `configureLogging`, request-id context (`getRequestId`, `runWithRequestContext`), `defineEnum` |
 | **exceptions** | `AppException` + `ConflictException` / `NotFoundException` / `UnauthorizedException` / `ForbiddenException` / `ValidationException` / `TooManyRequestsException` / `InvalidTokenException` / `ExpiredTokenException`, `MessageCatalog` (i18n) |
-| **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor pagination, `encodeCursor` / `decodeCursor` |
-| **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) |
-| **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers |
+| **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor + delta-sync pagination, `buildPaginationLinkHeader`, validated field types (`centsField`/`priceField`/`slugField`/…), `logEntrySchema` |
+| **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) + domain fragments (`jwtSettingsShape`, `authSettingsShape`, `emailSettingsShape`, `redisSettingsShape`, `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`, …), `envBoolean` / `envList` |
+| **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers; `TenantScopedRepository`, `BaseOutboxModel` + `OutboxRelay`, `BaseAuditLogModel` + `snapshot`/`diffSnapshots`, `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel`, `wrapWithSlowQueryLog`, `backupDatabase` |
 | **services / controllers** | `BaseService`, `BaseController` over a typed repository |
-| **utils** | CPF/CNPJ/CEP/phone/UF + cities, `PasswordUtils`, `JWTUtils`, opaque tokens, `AttemptThrottle` |
-| **auth** | `UserAuthService`, JWT middleware + role guards, `makeAuthRouter`; MFA (`MfaService`), email activation, password reset |
+| **utils** | CPF/CNPJ/CEP/phone/UF + cities, `PasswordUtils`, `JWTUtils`, opaque tokens, `AttemptThrottle`, `sendFileDownload`/`sendBytesDownload` (Range), `configureFileLogging` (per-level + `500.log`) |
+| **auth** | `UserAuthService`, JWT middleware + role guards, `makeAuthRouter`; MFA (`MfaService`), email activation, password reset; optional HTML pages (`renderAuthResultPage`, `renderPasswordResetFormPage`) |
 | **cache / queue / tasks** | `CacheManager` (+`cached`), `BrokerManager` (memory/RabbitMQ), `TaskManager` |
 | **sse / websockets** | `SSEBroker`/`sseResponse` (+ `RedisSSEBroker`), transport-agnostic `WebSocketHub` + `attachWebSocketHub` |
-| **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage` |
+| **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage`/`S3UploadStorage` (MinIO/S3) |
 | **webpush / email** | `WebPushDispatcher` (VAPID), `EmailUtils` (SMTP) |
 | **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus, GPU), `makeMetricsRouter`, `getClientIp` |
 | **integrations** | `MessagingProvider` contract; `WhatsAppProvider` (zap-api), `TelegramProvider` (Bot API), `TwilioSmsProvider` (SMS), `EmailProvider`, `MessagingHub` + `broadcastText`, webhook receivers |
 | **admin** | `AdminSite` + `makeAdminRouter` — JSON admin with auto-derived CRUD + introspection |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
+| **api/middlewares** | `rateLimitMiddleware` (memory/Redis stores, IP/header/JWT keys), `bodySizeLimitMiddleware`, `csrfMiddleware`, `idempotencyMiddleware` (memory/Redis), `GracefulShutdown`, `requestTracingMiddleware`, `prometheusMiddleware` / `HttpMetrics` |
+| **api/oauth** | `GoogleOAuthClient`, `GitHubOAuthClient`, `OIDCProvider`, `generateOAuthState`; `WebhookSignatureVerifier`; `makeToolSpecRouter` |
+| **testing** | `createTestDatabase`, `withTestDatabase` — in-memory SQLite engine with tables reflected from your models |
 
 ## Quick start
 

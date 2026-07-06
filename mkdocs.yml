@@ -70,15 +70,33 @@ plugins:
           site_name: tempest-express-sdk
           nav_translations:
             Início: Home
+            "Começando do zero": "Getting started from zero"
+            "Instalando o Node.js": "Installing Node.js"
+            "Essenciais de JavaScript e TypeScript": "JavaScript and TypeScript essentials"
+            "Seu primeiro app": "Your first app"
+            "Glossário": "Glossary"
             Instalação: Installation
             Tutorial: Tutorial
+            "Projeto guiado": "Guided project"
+            "Lista de Tarefas": "Task list API"
+            "1. Setup e o primeiro modelo": "1. Setup and the first model"
+            "2. CRUD completo": "2. Full CRUD"
+            "3. Polimento: erros e filtros": "3. Polish: errors and filters"
             Receitas: Recipes
+            "Configuração (settings tipados)": "Configuration (typed settings)"
+            "Banco de dados (models + repositories)": "Database (models + repositories)"
+            "Banco de dados avançado": "Advanced database"
             "Autenticação (JWT)": "Authentication (JWT)"
             "Utilidades BR": "BR utilities"
             "Tempo real (WebSocket + SSE)": "Real-time (WebSocket + SSE)"
             "Cache, fila e tarefas": "Cache, queue and tasks"
             "Feature flags e storage": "Feature flags and storage"
+            "Campos validados e paginação": "Validated fields and pagination"
             "MFA, HTTP client, Web Push e mais": "MFA, HTTP client, Web Push and more"
+            "Endurecimento HTTP (middlewares)": "HTTP hardening (middlewares)"
+            "OAuth, webhooks e meta endpoints": "OAuth, webhooks and meta endpoints"
+            "Downloads e logs em arquivo": "File downloads and logs"
+            "Testes (banco em memória)": "Testing (in-memory database)"
             "Integrações: WhatsApp (zap-api)": "Integrations: WhatsApp (zap-api)"
             "Integrações: SMS e Telegram": "Integrations: SMS and Telegram"
             "Admin (API JSON)": "Admin (JSON API)"
@@ -87,15 +105,33 @@ plugins:
 
 nav:
   - Início: index.md
+  - Começando do zero:
+      - "Instalando o Node.js": getting-started/node.md
+      - "Essenciais de JavaScript e TypeScript": getting-started/javascript.md
+      - "Seu primeiro app": getting-started/first-app.md
+      - "Glossário": getting-started/glossary.md
   - Instalação: installation.md
   - Tutorial: tutorial.md
+  - Projeto guiado:
+      - "Lista de Tarefas": learn/index.md
+      - "1. Setup e o primeiro modelo": learn/01-setup.md
+      - "2. CRUD completo": learn/02-crud.md
+      - "3. Polimento: erros e filtros": learn/03-polish.md
   - Receitas:
+      - "Configuração (settings tipados)": recipes/settings.md
+      - "Banco de dados (models + repositories)": recipes/database.md
+      - "Banco de dados avançado": recipes/database-advanced.md
       - "Autenticação (JWT)": recipes/auth.md
       - "Utilidades BR": recipes/br-utils.md
       - "Tempo real (WebSocket + SSE)": recipes/realtime.md
       - "Cache, fila e tarefas": recipes/jobs.md
       - "Feature flags e storage": recipes/flags-storage.md
+      - "Campos validados e paginação": recipes/fields.md
       - "MFA, HTTP client, Web Push e mais": recipes/server-utils.md
+      - "Endurecimento HTTP (middlewares)": recipes/hardening.md
+      - "OAuth, webhooks e meta endpoints": recipes/oauth-webhooks.md
+      - "Downloads e logs em arquivo": recipes/downloads-logs.md
+      - "Testes (banco em memória)": recipes/testing.md
       - "Integrações: WhatsApp (zap-api)": recipes/whatsapp.md
       - "Integrações: SMS e Telegram": recipes/sms-telegram.md
       - "Admin (API JSON)": recipes/admin.md

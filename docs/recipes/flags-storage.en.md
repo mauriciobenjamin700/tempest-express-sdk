@@ -33,8 +33,9 @@ app.get("/api/beta", makeFlagGuard(flags, "beta"), (_req, res) => res.json({ ok:
 
 ## Storage / uploads
 
-`UploadStorage` is the interface; `LocalUploadStorage` writes to the filesystem.
-For S3/MinIO, implement the same interface over your client.
+`UploadStorage` is the interface; `LocalUploadStorage` writes to the filesystem
+and `S3UploadStorage` writes to S3/MinIO — same contract, swap without touching
+call sites.
 
 ```ts
 import { LocalUploadStorage, buildContentDisposition } from "tempest-express-sdk";
@@ -55,6 +56,35 @@ result.url; // "https://cdn.example.com/avatars/123.png"
 res.setHeader("Content-Disposition", buildContentDisposition("report.pdf"));
 res.send(await storage.read("docs/report.pdf"));
 ```
+
+### S3 / MinIO
+
+`S3UploadStorage` implements the same interface over the `minio` client (an
+optional peer — `npm i minio`), lazy-loaded on first use. Swap the backend
+without changing the rest of the code:
+
+```ts
+import { S3UploadStorage } from "tempest-express-sdk";
+import { Client } from "minio";
+
+const storage = new S3UploadStorage({
+  bucket: "uploads",
+  publicBaseUrl: "https://cdn.example.com",
+  client: new Client({
+    endPoint: "s3.amazonaws.com",
+    useSSL: true,
+    accessKey: process.env.MINIO_ACCESS_KEY ?? "",
+    secretKey: process.env.MINIO_SECRET_KEY ?? "",
+    region: "us-east-1",
+  }),
+});
+
+await storage.save("avatars/123.png", bytes, { contentType: "image/png" });
+storage.url("avatars/123.png"); // "https://cdn.example.com/uploads/avatars/123.png"
+```
+
+Without a `client`, pass `endPoint`/`accessKey`/`secretKey`/… and the SDK builds
+the `minio` client on first use. The fields match `minioSettingsShape`.
 
 ## Recap
 

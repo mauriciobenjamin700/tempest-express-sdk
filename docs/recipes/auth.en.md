@@ -139,9 +139,40 @@ Mounted routes:
 - **Anti-enumeration**: `password-reset/request` always returns 202; the `token`
   is echoed only in dev setups (in production the service emails it).
 
+## HTML pages (optional)
+
+The SDK favors the JSON API + a decoupled frontend, but an email link
+(activation, reset) sometimes has to land on a **server** page — there's no SPA
+to route to. `renderAuthResultPage` and `renderPasswordResetFormPage` produce
+self-contained, theme-aware HTML pages (no template engine, no external assets):
+
+```ts
+import { renderAuthResultPage, renderPasswordResetFormPage } from "tempest-express-sdk";
+
+app.get("/activate", async (req, res) => {
+  const ok = await activation.activate(String(req.query.token)).then(() => true).catch(() => false);
+  res.type("html").send(
+    renderAuthResultPage({
+      ok,
+      title: ok ? "Account activated" : "Invalid link",
+      message: ok ? "You can sign in now." : "The link expired or was already used.",
+      ...(ok ? { cta: { href: "https://app/login", label: "Sign in" } } : {}),
+    }),
+  );
+});
+
+app.get("/reset", (req, res) => {
+  res.type("html").send(
+    renderPasswordResetFormPage({ action: "/auth/password-reset/confirm", token: String(req.query.token) }),
+  );
+});
+```
+
+All interpolated values are escaped (anti-XSS).
+
 ## Recap
 
 `UserStore` decouples auth from your database; `UserAuthService` handles hashing
 and tokens; the middleware guards routes by role; the MFA/activation/reset
-services mount the full flows over dedicated stores. Everything shows up in
-Swagger/Redoc.
+services mount the full flows over dedicated stores. Optional HTML pages cover
+email landings. Everything shows up in Swagger/Redoc.

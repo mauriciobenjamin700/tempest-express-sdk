@@ -29,4 +29,5 @@ export * from "@/integrations";
 export * from "@/admin";
 export * from "@/auth";
 export * from "@/api";
+export * from "@/testing";
 export { VERSION } from "@/version";

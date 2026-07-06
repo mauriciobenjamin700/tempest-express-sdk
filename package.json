@@ -1,6 +1,6 @@
 {
   "name": "tempest-express-sdk",
-  "version": "0.11.0",
+  "version": "0.20.0",
   "description": "Shared Express/Zod/tempest-db-js building blocks: base schemas, repository, exceptions, pagination, settings and native Swagger + Redoc — the conventions used across Tempest projects, ported from tempest-fastapi-sdk.",
   "type": "module",
   "license": "MIT",
@@ -63,6 +63,7 @@
     "amqplib": "^0.10.0",
     "bcryptjs": "^2.4.3 || ^3.0.0",
     "jsonwebtoken": "^9.0.0",
+    "minio": "^8.0.0",
     "nodemailer": "^6.9.0",
     "tempest-db-js": ">=0.3.0",
     "web-push": "^3.6.0",
@@ -76,6 +77,9 @@
       "optional": true
     },
     "jsonwebtoken": {
+      "optional": true
+    },
+    "minio": {
       "optional": true
     },
     "nodemailer": {

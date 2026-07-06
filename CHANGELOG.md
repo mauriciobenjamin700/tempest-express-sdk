@@ -4,6 +4,146 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.20.0] — 2026-07-06
+
+### Added
+
+- **db**: `wrapWithSlowQueryLog` — wraps an `AsyncDriver` to log statements at or
+  above a threshold (timing at the driver boundary, since `tempest-db-js`'s
+  `onQuery` has no duration); times reserved-transaction statements too.
+- **db**: `backupDatabase(url, dest)` — dialect-aware backup (`pg_dump` for
+  PostgreSQL, file copy for SQLite; in-memory refused).
+- **auth**: `renderAuthResultPage` and `renderPasswordResetFormPage` — optional,
+  self-contained, theme-aware, XSS-escaped HTML pages for email-link landings
+  (activation result, password-reset form).
+
+This closes the parity roadmap; the only open item (a slow-query timing hook in
+`createEngine`) is upstream in `tempest-db-js`.
+
+## [0.19.0] — 2026-07-06
+
+### Added
+
+- **storage**: `S3UploadStorage` — the `UploadStorage` contract over a MinIO/S3
+  client (`minio`, an optional peer, lazy-loaded; or inject your own). Swaps with
+  `LocalUploadStorage` without touching call sites.
+- **cli**: `tempest-express lint` (runs Biome check), `config` (prints the
+  resolved base settings, reading `.env`), and `user --email --password [--admin]`
+  (prints a ready-to-insert user record with a bcrypt hash).
+
+## [0.18.0] — 2026-07-06
+
+### Added
+
+- **utils**: `sendFileDownload` (range-aware disk streaming → `206`),
+  `sendBytesDownload` and traversal-safe `resolveDownloadPath` (`utils.download`).
+- **utils**: `configureFileLogging` — routes every `JSONLogger` record to
+  per-level files + a dedicated `500.log`; `LEVEL_LOG_FILES` / `HTTP_500_LOG_FILE`.
+- **core**: `addLogSink` / `LogSink` — register a sink invoked for every emitted
+  record (what `configureFileLogging` builds on).
+- **api**: `makeLogsRouter` — a guardable, paginated read endpoint over the log
+  files (`source` ∈ all/debug/info/warning/error/500).
+
+## [0.17.0] — 2026-07-06
+
+### Added
+
+- **schemas**: validated Zod field types mirroring `utils.fields` —
+  `positiveIntField`, `nonNegativeIntField`, `centsField`, `portField`,
+  `ratingField`, `positiveFloatField`, `nonNegativeFloatField`, `percentField`,
+  `ratioField`, `latitudeField`, `longitudeField`, `nonEmptyStrField`,
+  `slugField`, `hexColorField`, `priceField`.
+- **schemas**: delta-sync pagination (`syncFilterSchema` / `syncPaginationSchema`)
+  for offline-first clients, keyed on the server clock.
+- **schemas**: `buildPaginationLinkHeader` — an RFC-5988 `Link` header
+  (first/prev/next/last) for offset pagination.
+- **schemas**: `logEntrySchema` — the structured log-record shape (open, so
+  `extra` keys pass through).
+
+## [0.16.0] — 2026-07-06
+
+### Added
+
+- **api**: OAuth2/OIDC clients mirroring `api.oauth` — `GoogleOAuthClient`,
+  `GitHubOAuthClient`, generic `OIDCProvider` (authorize URL → code exchange →
+  userinfo), `generateOAuthState`, `OAuthUser`/`OAuthTokens`/`OAuthError`.
+- **api**: `WebhookSignatureVerifier` (`api.webhooks`) — constant-time HMAC
+  verification of an inbound webhook signature over the raw body, with hex/base64
+  encodings, an optional prefix, and an Express middleware.
+- **api**: `makeToolSpecRouter` (`api.routers.tool_spec`) — a root-prefix
+  capability manifest endpoint accepting a static object or a sync/async provider.
+
+## [0.15.0] — 2026-07-06
+
+### Added
+
+- **db**: advanced database layer mirroring `db.tenant` / `db.audit` /
+  `db.outbox` / `db.user_model` — `TenantScopedRepository` (per-tenant read
+  filtering + write stamping, cross-tenant `getById` throws), `BaseOutboxModel` +
+  `OutboxRelay` (transactional outbox with at-least-once delivery, retry
+  backoff), `BaseAuditLogModel` + `snapshot` / `diffSnapshots` (who-changed-what
+  audit trail), and opt-in base models `BaseUserModel`, `BaseUserTokenModel`,
+  `BaseUserRefreshTokenModel` (+ `UserTokenPurpose`, `AuditAction`,
+  `OutboxStatus`).
+
+## [0.14.0] — 2026-07-06
+
+### Added
+
+- **testing**: framework-agnostic in-memory test-database helpers mirroring the
+  Python `testing` module — `createTestDatabase(models)` stands up a
+  `tempest-db-js` engine over in-memory SQLite with tables reflected from the
+  models (one shared connection backs the DDL and every session), returning
+  `{ engine, session(), close() }`; `withTestDatabase(models, fn)` scopes it to a
+  block and always disposes. No temp files, no migrations, no external service.
+
+## [0.13.0] — 2026-07-06
+
+### Added
+
+- **api/middlewares**: HTTP hardening middlewares mirroring `api.middlewares` —
+  `rateLimitMiddleware` (sliding window; `MemoryRateLimitStore` +
+  `RedisRateLimitStore`; `keyByIp` / `keyByHeader` / `keyByJwtClaim` /
+  `keyByJwtSubject`), `bodySizeLimitMiddleware` (413 on oversize),
+  `csrfMiddleware` + `generateCsrfToken` (double-submit cookie),
+  `idempotencyMiddleware` (`MemoryIdempotencyStore` + `RedisIdempotencyStore`),
+  `GracefulShutdown` (drain in-flight requests → 503), `requestTracingMiddleware`
+  (structured access log) and `prometheusMiddleware` / `HttpMetrics`
+  (per-request counter + latency histogram).
+
+### Changed
+
+- **api**: `requestIdMiddleware` now validates the inbound `X-Request-ID`
+  against a printable-ASCII whitelist before reusing it (prevents CRLF/log
+  injection via a spoofed header); malformed values get a fresh UUID.
+
+## [0.12.0] — 2026-07-06
+
+### Added
+
+- **settings**: composable domain settings fragments mirroring the
+  `tempest-fastapi-sdk` mixins — `authSettingsShape`, `jwtSettingsShape`,
+  `emailSettingsShape`, `redisSettingsShape`, `rabbitmqSettingsShape`,
+  `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`,
+  `webPushSettingsShape`, `webSocketSettingsShape`, `logSettingsShape`,
+  `tokenSettingsShape` (same env var names + defaults). Plus `envBoolean`
+  (parses `"false"` as `false`, unlike `z.coerce.boolean()`) and `envList`
+  (CSV → `string[]`) helpers.
+
+### Fixed
+
+- **cli**: the `new` scaffold pinned `tempest-express-sdk` at `^0.1.0`, which
+  cannot resolve a `0.12.x` release. Bumped to `^0.12.0`.
+
+### Docs
+
+- **recipes/settings**: new bilingual guide for composing typed settings.
+- **recipes/database**: new bilingual guide (models + repositories) teaching
+  `BaseModel` + the `column` factory, the engine, `BaseRepository`, convention
+  filters, pagination, opt-in soft-delete/audit columns, the
+  `repository → service → controller` stack, and `tempest-db` migrations — the
+  faithful port of the `tempest-fastapi-sdk` "Banco de dados" recipe.
+
 ## [0.11.0] — 2026-07-02
 
 ### Added

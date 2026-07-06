@@ -60,3 +60,9 @@ export {
   type AuthRouterOptions,
   makeAuthRouter,
 } from "@/auth/router";
+export {
+  type AuthResultPageOptions,
+  type PasswordResetFormOptions,
+  renderAuthResultPage,
+  renderPasswordResetFormPage,
+} from "@/auth/htmlPages";
