@@ -70,6 +70,11 @@ plugins:
           site_name: tempest-express-sdk
           nav_translations:
             Início: Home
+            "Começando do zero": "Getting started from zero"
+            "Instalando o Node.js": "Installing Node.js"
+            "Essenciais de JavaScript e TypeScript": "JavaScript and TypeScript essentials"
+            "Seu primeiro app": "Your first app"
+            "Glossário": "Glossary"
             Instalação: Installation
             Tutorial: Tutorial
             Receitas: Recipes
@@ -95,6 +100,11 @@ plugins:
 
 nav:
   - Início: index.md
+  - Começando do zero:
+      - "Instalando o Node.js": getting-started/node.md
+      - "Essenciais de JavaScript e TypeScript": getting-started/javascript.md
+      - "Seu primeiro app": getting-started/first-app.md
+      - "Glossário": getting-started/glossary.md
   - Instalação: installation.md
   - Tutorial: tutorial.md
   - Receitas:

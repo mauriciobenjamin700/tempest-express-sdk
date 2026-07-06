@@ -9,9 +9,14 @@ nativos gerados direto dos seus schemas Zod, e uma pilha em camadas
 router → controller → service → repository → model sobre o
 [`tempest-db-js`](https://www.npmjs.com/package/tempest-db-js).
 
-!!! warning "Status: pré-alpha (v0.1.0)"
-    A camada de fundação está pronta e testada. Vários módulos do
-    `tempest-fastapi-sdk` ainda não foram portados (veja o [Changelog](changelog.md)).
+!!! tip "Nunca usou Node.js ou JavaScript? Comece aqui"
+    A trilha [**Começando do zero**](getting-started/node.md) leva você de "nunca
+    abri um terminal" até um app rodando — instalar o Node, o mínimo de JS/TS, e
+    o [primeiro app](getting-started/first-app.md) passo a passo.
+
+!!! check "Status: paridade com o `tempest-fastapi-sdk` (v0.20.0)"
+    O SDK atingiu paridade de features com o `tempest-fastapi-sdk`. Veja o
+    [Changelog](changelog.md) e o [Roadmap](roadmap.md).
 
 ## Por que usar
 
@@ -61,6 +66,8 @@ Ao subir, você já tem:
 
 ## Próximos passos
 
+- 🌱 Iniciante? [Começando do zero](getting-started/node.md) → [Seu primeiro app](getting-started/first-app.md)
 - [Instalação](installation.md)
 - [Tutorial](tutorial.md)
+- [Glossário](getting-started/glossary.md) — termos explicados
 - [Autenticação (JWT)](recipes/auth.md)
