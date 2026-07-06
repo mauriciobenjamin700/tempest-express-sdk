@@ -30,6 +30,10 @@
   `rabbitmqSettingsShape`, `sessionSettingsShape`, `uploadSettingsShape`,
   `minioSettingsShape`, `webPushSettingsShape`, `webSocketSettingsShape`,
   `logSettingsShape`, `tokenSettingsShape`) + `envBoolean`/`envList` helpers.
+- **0.13.0** — HTTP hardening middlewares: `rateLimitMiddleware` (memory + Redis
+  stores, IP/header/JWT keys), `bodySizeLimitMiddleware`, `csrfMiddleware`,
+  `idempotencyMiddleware` (memory + Redis), `GracefulShutdown`,
+  `requestTracingMiddleware`, `prometheusMiddleware`/`HttpMetrics`.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -39,13 +43,6 @@ kept as the **Node-only differential** — a first-class messaging layer the Pyt
 SDK does not have. The core, data, auth, real-time, cache/queue/tasks, flags,
 metrics and CLI surfaces are already at parity or close; the items below close
 the remaining gaps.
-
-### HTTP hardening middlewares
-
-- CSRF protection, rate limiting (memory + Redis), idempotency keys, body-size
-  limit, graceful shutdown, standalone request-id middleware, request tracing.
-- `PrometheusMiddleware` (per-request histogram) to complement the existing
-  system `/metrics` router.
 
 ### OAuth, webhooks & meta routers
 

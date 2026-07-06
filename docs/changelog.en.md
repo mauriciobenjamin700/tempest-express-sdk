@@ -9,6 +9,21 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.13.0] — 2026-07-06
+
+### Added
+
+- **api/middlewares**: HTTP hardening middlewares — `rateLimitMiddleware`
+  (sliding window; memory + Redis stores; key by IP/header/JWT),
+  `bodySizeLimitMiddleware` (413), `csrfMiddleware` + `generateCsrfToken`,
+  `idempotencyMiddleware` (memory + Redis stores), `GracefulShutdown`,
+  `requestTracingMiddleware` and `prometheusMiddleware` / `HttpMetrics`.
+
+### Changed
+
+- **api**: `requestIdMiddleware` validates the inbound `X-Request-ID` against an
+  ASCII whitelist before reusing it (prevents CRLF/log injection).
+
 ## [0.12.0] — 2026-07-06
 
 ### Added

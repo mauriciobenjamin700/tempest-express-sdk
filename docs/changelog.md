@@ -9,6 +9,21 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.13.0] — 2026-07-06
+
+### Adicionado
+
+- **api/middlewares**: middlewares de endurecimento HTTP — `rateLimitMiddleware`
+  (janela deslizante; store memória + Redis; chaves por IP/header/JWT),
+  `bodySizeLimitMiddleware` (413), `csrfMiddleware` + `generateCsrfToken`,
+  `idempotencyMiddleware` (store memória + Redis), `GracefulShutdown`,
+  `requestTracingMiddleware` e `prometheusMiddleware` / `HttpMetrics`.
+
+### Alterado
+
+- **api**: `requestIdMiddleware` valida o `X-Request-ID` de entrada contra uma
+  whitelist ASCII antes de reusá-lo (evita CRLF/log injection).
+
 ## [0.12.0] — 2026-07-06
 
 ### Adicionado

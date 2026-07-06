@@ -26,10 +26,17 @@ const logger = new JSONLogger("tempest_express_sdk.api.handlers");
 export const REQUEST_ID_HEADER = "X-Request-ID";
 
 /**
+ * Whitelist for inbound request IDs: printable ASCII, no whitespace or control
+ * characters, so a spoofed header can't inject CRLF into log lines or the
+ * echoed response header. Generous enough for UUIDs, ULIDs and trace IDs.
+ */
+const VALID_REQUEST_ID = /^[A-Za-z0-9._\-:+/=]{1,128}$/;
+
+/**
  * Middleware that establishes a request id and binds the request context.
  *
- * Reuses an inbound `X-Request-ID` when present, otherwise generates one, sets
- * it on the response, and runs the rest of the chain inside
+ * Reuses an inbound `X-Request-ID` when present **and well-formed**, otherwise
+ * generates one, sets it on the response, and runs the rest of the chain inside
  * {@link runWithRequestContext} so loggers and handlers can read it.
  *
  * @returns The configured middleware.
@@ -37,7 +44,7 @@ export const REQUEST_ID_HEADER = "X-Request-ID";
 export function requestIdMiddleware(): RequestHandler {
   return (req, res, next) => {
     const inbound = req.header(REQUEST_ID_HEADER);
-    const requestId = inbound && inbound.length > 0 ? inbound : randomUUID();
+    const requestId = inbound && VALID_REQUEST_ID.test(inbound) ? inbound : randomUUID();
     res.setHeader(REQUEST_ID_HEADER, requestId);
     runWithRequestContext({ requestId }, () => next());
   };

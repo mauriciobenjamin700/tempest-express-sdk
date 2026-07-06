@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.13.0] — 2026-07-06
+
+### Added
+
+- **api/middlewares**: HTTP hardening middlewares mirroring `api.middlewares` —
+  `rateLimitMiddleware` (sliding window; `MemoryRateLimitStore` +
+  `RedisRateLimitStore`; `keyByIp` / `keyByHeader` / `keyByJwtClaim` /
+  `keyByJwtSubject`), `bodySizeLimitMiddleware` (413 on oversize),
+  `csrfMiddleware` + `generateCsrfToken` (double-submit cookie),
+  `idempotencyMiddleware` (`MemoryIdempotencyStore` + `RedisIdempotencyStore`),
+  `GracefulShutdown` (drain in-flight requests → 503), `requestTracingMiddleware`
+  (structured access log) and `prometheusMiddleware` / `HttpMetrics`
+  (per-request counter + latency histogram).
+
+### Changed
+
+- **api**: `requestIdMiddleware` now validates the inbound `X-Request-ID`
+  against a printable-ASCII whitelist before reusing it (prevents CRLF/log
+  injection via a spoofed header); malformed values get a fresh UUID.
+
 ## [0.12.0] — 2026-07-06
 
 ### Added
