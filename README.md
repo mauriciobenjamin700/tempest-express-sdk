@@ -27,7 +27,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 | --- | --- |
 | **core** | `JSONLogger`, `configureLogging`, request-id context (`getRequestId`, `runWithRequestContext`), `defineEnum` |
 | **exceptions** | `AppException` + `ConflictException` / `NotFoundException` / `UnauthorizedException` / `ForbiddenException` / `ValidationException` / `TooManyRequestsException` / `InvalidTokenException` / `ExpiredTokenException`, `MessageCatalog` (i18n) |
-| **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor pagination, `encodeCursor` / `decodeCursor` |
+| **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor + delta-sync pagination, `buildPaginationLinkHeader`, validated field types (`centsField`/`priceField`/`slugField`/…), `logEntrySchema` |
 | **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) + domain fragments (`jwtSettingsShape`, `authSettingsShape`, `emailSettingsShape`, `redisSettingsShape`, `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`, …), `envBoolean` / `envList` |
 | **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers; `TenantScopedRepository`, `BaseOutboxModel` + `OutboxRelay`, `BaseAuditLogModel` + `snapshot`/`diffSnapshots`, `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel` |
 | **services / controllers** | `BaseService`, `BaseController` over a typed repository |

@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.17.0] — 2026-07-06
+
+### Added
+
+- **schemas**: validated Zod field types mirroring `utils.fields` —
+  `positiveIntField`, `nonNegativeIntField`, `centsField`, `portField`,
+  `ratingField`, `positiveFloatField`, `nonNegativeFloatField`, `percentField`,
+  `ratioField`, `latitudeField`, `longitudeField`, `nonEmptyStrField`,
+  `slugField`, `hexColorField`, `priceField`.
+- **schemas**: delta-sync pagination (`syncFilterSchema` / `syncPaginationSchema`)
+  for offline-first clients, keyed on the server clock.
+- **schemas**: `buildPaginationLinkHeader` — an RFC-5988 `Link` header
+  (first/prev/next/last) for offset pagination.
+- **schemas**: `logEntrySchema` — the structured log-record shape (open, so
+  `extra` keys pass through).
+
 ## [0.16.0] — 2026-07-06
 
 ### Added

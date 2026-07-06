@@ -81,6 +81,7 @@ plugins:
             "Tempo real (WebSocket + SSE)": "Real-time (WebSocket + SSE)"
             "Cache, fila e tarefas": "Cache, queue and tasks"
             "Feature flags e storage": "Feature flags and storage"
+            "Campos validados e paginação": "Validated fields and pagination"
             "MFA, HTTP client, Web Push e mais": "MFA, HTTP client, Web Push and more"
             "Endurecimento HTTP (middlewares)": "HTTP hardening (middlewares)"
             "OAuth, webhooks e meta endpoints": "OAuth, webhooks and meta endpoints"
@@ -104,6 +105,7 @@ nav:
       - "Tempo real (WebSocket + SSE)": recipes/realtime.md
       - "Cache, fila e tarefas": recipes/jobs.md
       - "Feature flags e storage": recipes/flags-storage.md
+      - "Campos validados e paginação": recipes/fields.md
       - "MFA, HTTP client, Web Push e mais": recipes/server-utils.md
       - "Endurecimento HTTP (middlewares)": recipes/hardening.md
       - "OAuth, webhooks e meta endpoints": recipes/oauth-webhooks.md

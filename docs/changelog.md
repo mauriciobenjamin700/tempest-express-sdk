@@ -9,6 +9,15 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.17.0] — 2026-07-06
+
+### Adicionado
+
+- **schemas**: tipos de campo validados (`centsField`, `priceField`, `slugField`,
+  `hexColorField`, `percentField`, `latitudeField`, …), paginação delta-sync
+  (`syncFilterSchema` / `syncPaginationSchema`), `buildPaginationLinkHeader`
+  (RFC-5988) e `logEntrySchema`.
+
 ## [0.16.0] — 2026-07-06
 
 ### Adicionado
