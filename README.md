@@ -29,10 +29,10 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **exceptions** | `AppException` + `ConflictException` / `NotFoundException` / `UnauthorizedException` / `ForbiddenException` / `ValidationException` / `TooManyRequestsException` / `InvalidTokenException` / `ExpiredTokenException`, `MessageCatalog` (i18n) |
 | **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor + delta-sync pagination, `buildPaginationLinkHeader`, validated field types (`centsField`/`priceField`/`slugField`/…), `logEntrySchema` |
 | **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) + domain fragments (`jwtSettingsShape`, `authSettingsShape`, `emailSettingsShape`, `redisSettingsShape`, `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`, …), `envBoolean` / `envList` |
-| **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers; `TenantScopedRepository`, `BaseOutboxModel` + `OutboxRelay`, `BaseAuditLogModel` + `snapshot`/`diffSnapshots`, `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel` |
+| **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers; `TenantScopedRepository`, `BaseOutboxModel` + `OutboxRelay`, `BaseAuditLogModel` + `snapshot`/`diffSnapshots`, `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel`, `wrapWithSlowQueryLog`, `backupDatabase` |
 | **services / controllers** | `BaseService`, `BaseController` over a typed repository |
 | **utils** | CPF/CNPJ/CEP/phone/UF + cities, `PasswordUtils`, `JWTUtils`, opaque tokens, `AttemptThrottle`, `sendFileDownload`/`sendBytesDownload` (Range), `configureFileLogging` (per-level + `500.log`) |
-| **auth** | `UserAuthService`, JWT middleware + role guards, `makeAuthRouter`; MFA (`MfaService`), email activation, password reset |
+| **auth** | `UserAuthService`, JWT middleware + role guards, `makeAuthRouter`; MFA (`MfaService`), email activation, password reset; optional HTML pages (`renderAuthResultPage`, `renderPasswordResetFormPage`) |
 | **cache / queue / tasks** | `CacheManager` (+`cached`), `BrokerManager` (memory/RabbitMQ), `TaskManager` |
 | **sse / websockets** | `SSEBroker`/`sseResponse` (+ `RedisSSEBroker`), transport-agnostic `WebSocketHub` + `attachWebSocketHub` |
 | **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage`/`S3UploadStorage` (MinIO/S3) |

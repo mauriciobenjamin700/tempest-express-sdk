@@ -9,6 +9,14 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.20.0] — 2026-07-06
+
+### Adicionado
+
+- **db**: `wrapWithSlowQueryLog` (log de queries lentas via wrap de driver) e
+  `backupDatabase` (backup por dialeto: `pg_dump`/cópia SQLite). **auth**:
+  `renderAuthResultPage` / `renderPasswordResetFormPage` (páginas HTML opcionais).
+
 ## [0.19.0] — 2026-07-06
 
 ### Adicionado

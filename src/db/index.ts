@@ -40,6 +40,8 @@ export {
   type OutboxRelayOptions,
   OutboxStatus,
 } from "@/db/outbox";
+export { type SlowQueryOptions, wrapWithSlowQueryLog } from "@/db/slowQuery";
+export { type BackupOptions, backupDatabase } from "@/db/backup";
 
 export {
   AsyncEngine,

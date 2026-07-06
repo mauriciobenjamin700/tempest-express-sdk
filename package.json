@@ -1,6 +1,6 @@
 {
   "name": "tempest-express-sdk",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "Shared Express/Zod/tempest-db-js building blocks: base schemas, repository, exceptions, pagination, settings and native Swagger + Redoc — the conventions used across Tempest projects, ported from tempest-fastapi-sdk.",
   "type": "module",
   "license": "MIT",

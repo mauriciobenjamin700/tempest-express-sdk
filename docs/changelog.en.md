@@ -9,6 +9,14 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.20.0] — 2026-07-06
+
+### Added
+
+- **db**: `wrapWithSlowQueryLog` (slow-query logging via a driver wrap) and
+  `backupDatabase` (dialect-aware: `pg_dump` / SQLite copy). **auth**:
+  `renderAuthResultPage` / `renderPasswordResetFormPage` (optional HTML pages).
+
 ## [0.19.0] — 2026-07-06
 
 ### Added

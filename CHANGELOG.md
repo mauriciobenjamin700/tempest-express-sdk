@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.20.0] — 2026-07-06
+
+### Added
+
+- **db**: `wrapWithSlowQueryLog` — wraps an `AsyncDriver` to log statements at or
+  above a threshold (timing at the driver boundary, since `tempest-db-js`'s
+  `onQuery` has no duration); times reserved-transaction statements too.
+- **db**: `backupDatabase(url, dest)` — dialect-aware backup (`pg_dump` for
+  PostgreSQL, file copy for SQLite; in-memory refused).
+- **auth**: `renderAuthResultPage` and `renderPasswordResetFormPage` — optional,
+  self-contained, theme-aware, XSS-escaped HTML pages for email-link landings
+  (activation result, password-reset form).
+
+This closes the parity roadmap; the only open item (a slow-query timing hook in
+`createEngine`) is upstream in `tempest-db-js`.
+
 ## [0.19.0] — 2026-07-06
 
 ### Added

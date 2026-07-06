@@ -48,7 +48,10 @@
   `sendBytesDownload`, `resolveDownloadPath`, `configureFileLogging` (per-level +
   `500.log`), `addLogSink`, `makeLogsRouter`.
 - **0.19.0** — `S3UploadStorage` (MinIO/S3 backend) and CLI `lint` / `config` /
-  `user`. This closes the parity roadmap below.
+  `user`.
+- **0.20.0** — `wrapWithSlowQueryLog` (driver-level slow-query logging),
+  `backupDatabase` (`pg_dump`/SQLite copy), and optional auth HTML pages
+  (`renderAuthResultPage` / `renderPasswordResetFormPage`). Parity reached.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -56,25 +59,20 @@ The target is **feature parity** with `tempest-fastapi-sdk`, with the
 `integrations/` module (WhatsApp/Telegram/SMS/Email + `MessagingHub`/broadcast)
 kept as the **Node-only differential** — a first-class messaging layer the Python
 SDK does not have. The core, data, auth, real-time, cache/queue/tasks, flags,
-metrics, storage and CLI surfaces are at parity (0.12.0–0.19.0). Only a few
-niche items remain open.
+metrics, storage, CLI and advanced-DB surfaces are at parity (0.12.0–0.20.0).
 
-### Remaining gaps
+### Status: parity reached ✅
 
-- **Slow-query logger** — blocked: `tempest-db-js` does not yet expose a
-  per-statement timing hook (its `onQuery` gives SQL + params, no duration).
-  Ships once that lands upstream.
-- **Database backup helper** — a `pg_dump`/SQLite-copy convenience wrapper.
-- **Optional HTML page renderer** for the bundled auth flows. Deliberately
-  deferred: this SDK favors the JSON auth API + a decoupled frontend (auth
-  locale negotiation is already covered by `MessageCatalog.negotiate`).
-
-Everything else in the parity target has shipped.
+Every item from the original parity target has shipped. The one caveat:
+`wrapWithSlowQueryLog` times at the driver boundary and so applies to engines
+built from an explicit driver — a per-statement timing hook on `createEngine`
+itself is an upstream `tempest-db-js` enhancement. `1.0.0` is cut once the API
+settles in real use.
 
 ### Out of scope
 
 - `vision` (ort-vision) — belongs to `ort-vision-sdk`, not this SDK.
 - The server-rendered (jinja) HTML admin — superseded by the JSON `admin` API +
-  a decoupled frontend.
-
-`1.0.0` is cut once these close and the API settles in real use.
+  a decoupled frontend. (The optional `renderAuthResultPage` /
+  `renderPasswordResetFormPage` helpers cover only email-link landings, not a
+  full server-rendered admin.)

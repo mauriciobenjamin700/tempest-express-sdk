@@ -155,9 +155,52 @@ class RefreshTokenModel extends BaseUserRefreshTokenModel {
 
 ---
 
+## 5. Log de queries lentas
+
+O `tempest-db-js` expõe SQL+params no `onQuery`, mas **sem duração** — então o
+timing acontece na camada do driver. `wrapWithSlowQueryLog` embrulha um
+`AsyncDriver` e loga cada statement que passar de um limiar (inclusive dentro de
+transações):
+
+```ts
+import { AsyncEngine, NodeSqliteDriver, wrapWithSlowQueryLog } from "tempest-express-sdk";
+
+const sync = NodeSqliteDriver.open("app.db");
+const timed = wrapWithSlowQueryLog(
+  { execute: (s, p) => Promise.resolve(sync.execute(s, p)), close: async () => sync.close() },
+  { thresholdMs: 200 }, // logParameters só em dev (pode conter PII)
+);
+const engine = new AsyncEngine(timed, "sqlite");
+```
+
+!!! note "Aplica-se a engines construídos por você"
+    `createEngine` ainda não expõe injeção de driver, então o wrap vale quando
+    você constrói o `AsyncEngine` a partir de um driver (SQLite, ou o mesmo
+    padrão dos [testes](testing.md)). Um hook de timing no `createEngine` é
+    upstream.
+
+## 6. Backup do banco
+
+`backupDatabase` detecta o dialeto pela URL: `pg_dump` no Postgres (precisa do
+binário no `PATH`), cópia de arquivo no SQLite.
+
+```ts
+import { backupDatabase } from "tempest-express-sdk";
+
+await backupDatabase("sqlite://./app.db", "./backups/app-2026-07-06.db");
+await backupDatabase(
+  "postgresql://app@localhost/app",
+  "./backups/app.dump",
+  { pgDumpArgs: ["-Fc", "--no-owner"] },
+);
+```
+
+SQLite em memória lança erro (nada a copiar).
+
 ## Recapitulando
 
 - `TenantScopedRepository` — isolamento por tenant à prova de esquecimento.
 - `BaseOutboxModel` + `OutboxRelay` — eventos publicados atomicamente com a escrita.
 - `BaseAuditLogModel` + `snapshot`/`diffSnapshots` — quem mudou o quê.
-- `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel` — modelos base opt-in. ✅
+- `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel` — modelos base opt-in.
+- `wrapWithSlowQueryLog` — loga queries lentas; `backupDatabase` — backup por dialeto. ✅

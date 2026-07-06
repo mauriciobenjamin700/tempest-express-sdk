@@ -156,9 +156,50 @@ class RefreshTokenModel extends BaseUserRefreshTokenModel {
 
 ---
 
+## 5. Slow-query logging
+
+`tempest-db-js` exposes SQL+params in `onQuery` but **no duration** — so timing
+happens at the driver layer. `wrapWithSlowQueryLog` wraps an `AsyncDriver` and
+logs every statement over a threshold (including inside transactions):
+
+```ts
+import { AsyncEngine, NodeSqliteDriver, wrapWithSlowQueryLog } from "tempest-express-sdk";
+
+const sync = NodeSqliteDriver.open("app.db");
+const timed = wrapWithSlowQueryLog(
+  { execute: (s, p) => Promise.resolve(sync.execute(s, p)), close: async () => sync.close() },
+  { thresholdMs: 200 }, // logParameters only in dev (may carry PII)
+);
+const engine = new AsyncEngine(timed, "sqlite");
+```
+
+!!! note "Applies to engines you construct"
+    `createEngine` does not yet expose driver injection, so the wrap applies when
+    you build the `AsyncEngine` from a driver (SQLite, or the same pattern as
+    [tests](testing.md)). A timing hook in `createEngine` is an upstream item.
+
+## 6. Database backup
+
+`backupDatabase` detects the dialect from the URL: `pg_dump` for Postgres (needs
+the binary on `PATH`), a file copy for SQLite.
+
+```ts
+import { backupDatabase } from "tempest-express-sdk";
+
+await backupDatabase("sqlite://./app.db", "./backups/app-2026-07-06.db");
+await backupDatabase(
+  "postgresql://app@localhost/app",
+  "./backups/app.dump",
+  { pgDumpArgs: ["-Fc", "--no-owner"] },
+);
+```
+
+In-memory SQLite throws (nothing to copy).
+
 ## Recap
 
 - `TenantScopedRepository` — forget-proof per-tenant isolation.
 - `BaseOutboxModel` + `OutboxRelay` — events published atomically with the write.
 - `BaseAuditLogModel` + `snapshot`/`diffSnapshots` — who changed what.
-- `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel` — opt-in base models. ✅
+- `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel` — opt-in base models.
+- `wrapWithSlowQueryLog` — logs slow queries; `backupDatabase` — per-dialect backup. ✅
