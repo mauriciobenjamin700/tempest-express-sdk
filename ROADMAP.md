@@ -39,6 +39,8 @@
 - **0.15.0** — advanced DB: `TenantScopedRepository`, `BaseOutboxModel` +
   `OutboxRelay`, `BaseAuditLogModel` + `snapshot`/`diffSnapshots`, and base
   `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel` models.
+- **0.16.0** — OAuth2/OIDC clients (`GoogleOAuthClient`, `GitHubOAuthClient`,
+  `OIDCProvider`), `WebhookSignatureVerifier`, and `makeToolSpecRouter`.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -49,11 +51,11 @@ SDK does not have. The core, data, auth, real-time, cache/queue/tasks, flags,
 metrics and CLI surfaces are already at parity or close; the items below close
 the remaining gaps.
 
-### OAuth, webhooks & meta routers
+### Meta routers (remaining)
 
-- OAuth clients (Google, GitHub) + `OIDCProvider`.
-- Webhook signature verifier (HMAC/RSA), `tool-spec` router, logs router.
-- Auth locale negotiation + optional HTML page renderer.
+- Logs router (ships with the `LogUtils` / `500.log` routing work below).
+- Optional HTML page renderer for the auth flows (auth locale negotiation is
+  already covered by `MessageCatalog.negotiate`).
 
 ### Advanced DB (remaining)
 

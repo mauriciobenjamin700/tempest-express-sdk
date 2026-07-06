@@ -42,6 +42,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **admin** | `AdminSite` + `makeAdminRouter` — JSON admin with auto-derived CRUD + introspection |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
 | **api/middlewares** | `rateLimitMiddleware` (memory/Redis stores, IP/header/JWT keys), `bodySizeLimitMiddleware`, `csrfMiddleware`, `idempotencyMiddleware` (memory/Redis), `GracefulShutdown`, `requestTracingMiddleware`, `prometheusMiddleware` / `HttpMetrics` |
+| **api/oauth** | `GoogleOAuthClient`, `GitHubOAuthClient`, `OIDCProvider`, `generateOAuthState`; `WebhookSignatureVerifier`; `makeToolSpecRouter` |
 | **testing** | `createTestDatabase`, `withTestDatabase` — in-memory SQLite engine with tables reflected from your models |
 
 ## Quick start

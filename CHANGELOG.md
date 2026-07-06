@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.16.0] — 2026-07-06
+
+### Added
+
+- **api**: OAuth2/OIDC clients mirroring `api.oauth` — `GoogleOAuthClient`,
+  `GitHubOAuthClient`, generic `OIDCProvider` (authorize URL → code exchange →
+  userinfo), `generateOAuthState`, `OAuthUser`/`OAuthTokens`/`OAuthError`.
+- **api**: `WebhookSignatureVerifier` (`api.webhooks`) — constant-time HMAC
+  verification of an inbound webhook signature over the raw body, with hex/base64
+  encodings, an optional prefix, and an Express middleware.
+- **api**: `makeToolSpecRouter` (`api.routers.tool_spec`) — a root-prefix
+  capability manifest endpoint accepting a static object or a sync/async provider.
+
 ## [0.15.0] — 2026-07-06
 
 ### Added

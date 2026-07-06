@@ -9,6 +9,15 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.16.0] — 2026-07-06
+
+### Added
+
+- **api**: OAuth2/OIDC clients (`GoogleOAuthClient`, `GitHubOAuthClient`,
+  `OIDCProvider`) + `generateOAuthState`, `WebhookSignatureVerifier`
+  (constant-time HMAC over the raw body) and `makeToolSpecRouter` (a `/tool-spec`
+  manifest endpoint).
+
 ## [0.15.0] — 2026-07-06
 
 ### Added
