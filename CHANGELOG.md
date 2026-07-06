@@ -4,17 +4,32 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.12.0] — 2026-07-06
+
+### Added
+
+- **settings**: composable domain settings fragments mirroring the
+  `tempest-fastapi-sdk` mixins — `authSettingsShape`, `jwtSettingsShape`,
+  `emailSettingsShape`, `redisSettingsShape`, `rabbitmqSettingsShape`,
+  `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`,
+  `webPushSettingsShape`, `webSocketSettingsShape`, `logSettingsShape`,
+  `tokenSettingsShape` (same env var names + defaults). Plus `envBoolean`
+  (parses `"false"` as `false`, unlike `z.coerce.boolean()`) and `envList`
+  (CSV → `string[]`) helpers.
+
+### Fixed
+
+- **cli**: the `new` scaffold pinned `tempest-express-sdk` at `^0.1.0`, which
+  cannot resolve a `0.12.x` release. Bumped to `^0.12.0`.
 
 ### Docs
 
-- **recipes/database**: new bilingual guide (PT-BR + EN) teaching how to model
-  tables with `BaseModel` + the `column` factory, connect an engine, stand up a
-  typed `BaseRepository`, filter by convention, paginate, add the opt-in
-  soft-delete/audit columns, compose the `repository → service → controller`
-  stack, and run migrations via the `tempest-db` CLI — the faithful port of the
-  `tempest-fastapi-sdk` "Banco de dados" recipe. Linked from the tutorial and the
-  recipes nav.
+- **recipes/settings**: new bilingual guide for composing typed settings.
+- **recipes/database**: new bilingual guide (models + repositories) teaching
+  `BaseModel` + the `column` factory, the engine, `BaseRepository`, convention
+  filters, pagination, opt-in soft-delete/audit columns, the
+  `repository → service → controller` stack, and `tempest-db` migrations — the
+  faithful port of the `tempest-fastapi-sdk` "Banco de dados" recipe.
 
 ## [0.11.0] — 2026-07-02
 

@@ -25,6 +25,11 @@
   (challenge flow in `UserAuthService` + `POST /auth/mfa/challenge`).
 - **0.11.0** — broadcast helpers: `broadcastText` (bounded-concurrency fan-out)
   and `MessagingHub` (named channels with `send`/`broadcast`).
+- **0.12.0** — typed settings fragments: domain shapes (`authSettingsShape`,
+  `jwtSettingsShape`, `emailSettingsShape`, `redisSettingsShape`,
+  `rabbitmqSettingsShape`, `sessionSettingsShape`, `uploadSettingsShape`,
+  `minioSettingsShape`, `webPushSettingsShape`, `webSocketSettingsShape`,
+  `logSettingsShape`, `tokenSettingsShape`) + `envBoolean`/`envList` helpers.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -53,12 +58,6 @@ the remaining gaps.
 - Transactional outbox (`OutboxRelay`), audit log model + `AuditMixin`,
   `SoftDeleteMixin`/`MFAMixin`, tenant-scoped repository, slow-query logger,
   database backup, `BaseUserModel` + token models, snapshot/diff helpers.
-
-### Typed settings
-
-- Domain settings fragments/classes: `AuthSettings`, `JWTSettings`,
-  `EmailSettings`, `RedisSettings`, `RabbitMQSettings`, `SessionSettings`,
-  `UploadSettings`, etc. (composed onto `baseAppSettingsShape`).
 
 ### Schemas, storage, utils, CLI
 

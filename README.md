@@ -28,7 +28,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 | **core** | `JSONLogger`, `configureLogging`, request-id context (`getRequestId`, `runWithRequestContext`), `defineEnum` |
 | **exceptions** | `AppException` + `ConflictException` / `NotFoundException` / `UnauthorizedException` / `ForbiddenException` / `ValidationException` / `TooManyRequestsException` / `InvalidTokenException` / `ExpiredTokenException`, `MessageCatalog` (i18n) |
 | **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor pagination, `encodeCursor` / `decodeCursor` |
-| **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) |
+| **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) + domain fragments (`jwtSettingsShape`, `authSettingsShape`, `emailSettingsShape`, `redisSettingsShape`, `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`, …), `envBoolean` / `envList` |
 | **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers |
 | **services / controllers** | `BaseService`, `BaseController` over a typed repository |
 | **utils** | CPF/CNPJ/CEP/phone/UF + cities, `PasswordUtils`, `JWTUtils`, opaque tokens, `AttemptThrottle` |

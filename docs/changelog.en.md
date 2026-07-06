@@ -4,6 +4,28 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+!!! info "Full history"
+    This page lists recent highlights. The full version-by-version history
+    (0.2.0–0.11.0) lives in the repository's
+    [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
+
+## [0.12.0] — 2026-07-06
+
+### Added
+
+- **settings**: composable domain settings fragments mirroring the
+  `tempest-fastapi-sdk` mixins — `authSettingsShape`, `jwtSettingsShape`,
+  `emailSettingsShape`, `redisSettingsShape`, `rabbitmqSettingsShape`,
+  `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`,
+  `webPushSettingsShape`, `webSocketSettingsShape`, `logSettingsShape`,
+  `tokenSettingsShape` (same env var names + defaults). Plus `envBoolean`
+  (parses `"false"` as `false`) and `envList` (CSV → `string[]`) helpers.
+
+### Docs
+
+- **recipes/settings**: new bilingual guide for typed settings.
+- **recipes/database**: new bilingual guide (models + repositories).
+
 ## [0.1.0] — 2026-06-29
 
 ### Added
