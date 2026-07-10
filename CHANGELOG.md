@@ -6,6 +6,11 @@ to [SemVer](https://semver.org/).
 
 ## [0.20.1] — 2026-07-09
 
+### Changed
+
+- **deps**: bump `tempest-db-js` to `>=0.4.0` (peer), `^0.4.0` (dev) and the CLI
+  scaffold template. No API changes; build and full suite green on 0.4.0.
+
 ### Fixed
 
 - **api**: Swagger UI now loads its assets when visited at `/docs` (no trailing

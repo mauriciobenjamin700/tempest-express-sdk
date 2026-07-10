@@ -11,6 +11,11 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
 
 ## [0.20.1] — 2026-07-09
 
+### Alterado
+
+- **deps**: `tempest-db-js` para `>=0.4.0` (peer), `^0.4.0` (dev) e no template
+  do CLI. Sem mudança de API; build e suíte completa verdes no 0.4.0.
+
 ### Corrigido
 
 - **api**: o Swagger UI agora carrega os assets ao ser acessado em `/docs` (sem

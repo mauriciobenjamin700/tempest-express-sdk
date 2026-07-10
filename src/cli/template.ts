@@ -33,7 +33,7 @@ export function projectFiles(name: string): Record<string, string> {
         },
         dependencies: {
           express: "^5.1.0",
-          "tempest-db-js": "^0.3.0",
+          "tempest-db-js": "^0.4.0",
           "tempest-express-sdk": SDK_VERSION,
           zod: "^3.24.1",
         },
