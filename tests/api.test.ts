@@ -75,6 +75,24 @@ describe("createApp", () => {
     expect(await redoc.text()).toContain("redoc");
   });
 
+  // Regression: asset URLs must be absolute so they resolve at `/docs` (no
+  // trailing slash) too. A relative `./assets/…` resolved against `/docs`
+  // fetches `/assets/…` — a 404 that leaves the UI blank.
+  it("loads Swagger UI assets at both /docs and /docs/", async () => {
+    for (const docsPath of ["/docs", "/docs/"]) {
+      const html = await (await fetch(`${base}${docsPath}`)).text();
+      const cssHref = html.match(/href="([^"]*swagger-ui\.css)"/)?.[1];
+      const jsSrc = html.match(/src="([^"]*swagger-ui-bundle\.js)"/)?.[1];
+      expect(cssHref).toBeDefined();
+      expect(jsSrc).toBeDefined();
+      // Resolve exactly as a browser would, relative to the visited page.
+      const cssUrl = new URL(cssHref as string, `${base}${docsPath}`);
+      const jsUrl = new URL(jsSrc as string, `${base}${docsPath}`);
+      expect((await fetch(cssUrl)).status).toBe(200);
+      expect((await fetch(jsUrl)).status).toBe(200);
+    }
+  });
+
   it("renders AppException as the canonical envelope", async () => {
     const res = await fetch(`${base}/api/boom`);
     expect(res.status).toBe(404);

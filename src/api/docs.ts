@@ -32,20 +32,28 @@ export function mountOpenApiJson(
   });
 }
 
-/** Build the Swagger UI bootstrap HTML pointing at `specUrl`. */
-function swaggerHtml(specUrl: string, title: string): string {
+/**
+ * Build the Swagger UI bootstrap HTML pointing at `specUrl`.
+ *
+ * Asset URLs are **absolute** (`${assetsBase}/…`), not relative. A relative
+ * `./assets/…` resolves against the request path, so visiting `/docs` (no
+ * trailing slash) would fetch `/assets/…` — a 404 that leaves the UI unstyled
+ * and non-functional. The absolute base resolves correctly at both `/docs` and
+ * `/docs/`.
+ */
+function swaggerHtml(specUrl: string, title: string, assetsBase: string): string {
   return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${title}</title>
-    <link rel="stylesheet" href="./assets/swagger-ui.css" />
+    <link rel="stylesheet" href="${assetsBase}/swagger-ui.css" />
   </head>
   <body>
     <div id="swagger-ui"></div>
-    <script src="./assets/swagger-ui-bundle.js"></script>
-    <script src="./assets/swagger-ui-standalone-preset.js"></script>
+    <script src="${assetsBase}/swagger-ui-bundle.js"></script>
+    <script src="${assetsBase}/swagger-ui-standalone-preset.js"></script>
     <script>
       window.ui = SwaggerUIBundle({
         url: ${JSON.stringify(specUrl)},
@@ -84,7 +92,7 @@ export function mountSwaggerUi(
   const assetsPath = `${path.replace(/\/$/, "")}/assets`;
   app.use(assetsPath, express.static(getAbsoluteFSPath()));
   const handler: RequestHandler = (_req, res) => {
-    res.type("html").send(swaggerHtml(specUrl, title));
+    res.type("html").send(swaggerHtml(specUrl, title, assetsPath));
   };
   app.get(path, handler);
 }
