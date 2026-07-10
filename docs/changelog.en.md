@@ -9,6 +9,25 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.20.1] — 2026-07-09
+
+### Fixed
+
+- **api**: Swagger UI now loads its assets when visited at `/docs` (no trailing
+  slash), not only `/docs/`. The bootstrap HTML referenced assets with a
+  relative path (`./assets/…`), which the browser resolved against `/docs` to
+  `/assets/…` — a 404 that left the UI blank/unstyled. Asset URLs are now
+  **absolute** (`/docs/assets/…`) and resolve at both paths.
+
+### Docs
+
+- New recipe **[Schemas (base, response and pagination)](recipes/schemas.md)** —
+  `toDict`, `baseResponseSchema`, the Create/Update/Response pattern, and offset
+  vs. cursor pagination.
+- New recipe **[API: `createApp`, OpenAPI, Swagger and Redoc](recipes/api.md)** —
+  full `createApp` option reference, the `configure` hook, and the 3-step OpenAPI
+  wiring.
+
 ## [0.20.0] — 2026-07-06
 
 ### Added

@@ -9,6 +9,25 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.20.1] — 2026-07-09
+
+### Corrigido
+
+- **api**: o Swagger UI agora carrega os assets ao ser acessado em `/docs` (sem
+  barra final), não só em `/docs/`. O HTML referenciava os assets por caminho
+  relativo (`./assets/…`), que o navegador resolvia contra `/docs` para
+  `/assets/…` — um 404 que deixava a página em branco/sem estilo. As URLs dos
+  assets agora são **absolutas** (`/docs/assets/…`) e resolvem nos dois caminhos.
+
+### Docs
+
+- Nova receita **[Schemas (base, resposta e paginação)](recipes/schemas.md)** —
+  `toDict`, `baseResponseSchema`, o padrão Create/Update/Response e paginação por
+  offset vs. cursor.
+- Nova receita **[API: `createApp`, OpenAPI, Swagger e Redoc](recipes/api.md)** —
+  referência completa das opções do `createApp`, o hook `configure` e a cablagem
+  de OpenAPI em 3 passos.
+
 ## [0.20.0] — 2026-07-06
 
 ### Adicionado

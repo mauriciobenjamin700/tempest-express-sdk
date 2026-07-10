@@ -84,6 +84,8 @@ plugins:
             "3. Polimento: erros e filtros": "3. Polish: errors and filters"
             Receitas: Recipes
             "Configuração (settings tipados)": "Configuration (typed settings)"
+            "Schemas (base, resposta e paginação)": "Schemas (base, response and pagination)"
+            "API: app, OpenAPI e docs": "API: app, OpenAPI and docs"
             "Banco de dados (models + repositories)": "Database (models + repositories)"
             "Banco de dados avançado": "Advanced database"
             "Autenticação (JWT)": "Authentication (JWT)"
@@ -119,6 +121,8 @@ nav:
       - "3. Polimento: erros e filtros": learn/03-polish.md
   - Receitas:
       - "Configuração (settings tipados)": recipes/settings.md
+      - "Schemas (base, resposta e paginação)": recipes/schemas.md
+      - "API: app, OpenAPI e docs": recipes/api.md
       - "Banco de dados (models + repositories)": recipes/database.md
       - "Banco de dados avançado": recipes/database-advanced.md
       - "Autenticação (JWT)": recipes/auth.md

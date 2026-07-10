@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.20.1] — 2026-07-09
+
+### Fixed
+
+- **api**: Swagger UI now loads its assets when visited at `/docs` (no trailing
+  slash), not only `/docs/`. The bootstrap HTML referenced assets with a
+  relative path (`./assets/…`), which the browser resolved against `/docs` to
+  `/assets/…` — a 404 that left the UI blank/unstyled. Asset URLs are now
+  **absolute** (`/docs/assets/…`) and resolve correctly at both paths.
+
+### Docs
+
+- New recipe **Schemas (base, response and pagination)** — `toDict`,
+  `baseResponseSchema`, the Create/Update/Response pattern, and offset vs cursor
+  pagination.
+- New recipe **API: `createApp`, OpenAPI, Swagger and Redoc** — full `createApp`
+  option reference, the `configure` hook, and the 3-step OpenAPI wiring (registry
+  → `register`/`registerPath` → `openapi`). Bilingual (PT-BR + EN-US).
+
 ## [0.20.0] — 2026-07-06
 
 ### Added
