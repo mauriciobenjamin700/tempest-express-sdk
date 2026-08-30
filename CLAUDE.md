@@ -145,6 +145,23 @@ Mudança **docs-only** (`docs/`, `README.md`, redação de docstring sem delta d
 assinatura) não bumpa versão, não entra no `CHANGELOG.md` e não ganha tag —
 commit `docs:` direto na `main`.
 
+## Autorização permanente: trabalho de issue vai até o npm
+
+**Trabalho que fecha issue deste repo está autorizado a seguir até o fim sem
+perguntar** — merge do PR e `npm publish` incluídos. Não pare no "abri o PR,
+mergeio?"; termine e reporte o que foi publicado.
+
+"Ao finalizar" é a checklist de release abaixo cumprida, não "o código parece
+pronto". Concretamente: `npm run check` e `npm run docs:check` verdes,
+verificação de consumidor com o tarball passando, changelog nos três arquivos,
+versão nos dois. Gate vermelho significa que a tarefa não acabou — aí para e
+conta o que quebrou, porque publicar é irreversível e `npm unpublish` só existe
+por 72h e só sem dependente.
+
+Fora dessa autorização, e continua valendo perguntar: apagar versão publicada,
+`--force` em push, mexer em configuração do repositório, ou qualquer coisa que
+o trabalho da issue não implicava.
+
 ## Release
 
 Qualquer coisa que toque código entregue segue o fluxo inteiro. Ordem:
