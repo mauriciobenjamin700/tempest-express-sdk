@@ -23,13 +23,9 @@ export const logEntrySchema = z
       .nullable()
       .optional()
       .openapi({ description: "Correlation id, when present." }),
-    stack: z
-      .string()
-      .nullable()
-      .optional()
-      .openapi({
-        description: "Formatted stack trace, when the record carries an error.",
-      }),
+    stack: z.string().nullable().optional().openapi({
+      description: "Formatted stack trace, when the record carries an error.",
+    }),
   })
   .loose();
 

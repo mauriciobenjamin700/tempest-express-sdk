@@ -151,7 +151,6 @@ export class HTTPClient {
         this.breakerRecord(host, true);
         if (attempt < this.retryPolicy.maxRetries) {
           await this.sleep(this.retryPolicy.sleepFor(attempt));
-          continue;
         }
       }
     }

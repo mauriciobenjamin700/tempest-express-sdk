@@ -14,18 +14,12 @@ import { looseBoolean } from "@/schemas/fields";
  * filters; the sync keys stay reserved.
  */
 export const syncFilterSchema = z.object({
-  since: z.coerce
-    .date()
-    .optional()
-    .openapi({
-      description: "High-water mark; only rows changed after this are returned.",
-    }),
-  cursor: z
-    .string()
-    .optional()
-    .openapi({
-      description: "Opaque cursor from the previous page; omit for the first.",
-    }),
+  since: z.coerce.date().optional().openapi({
+    description: "High-water mark; only rows changed after this are returned.",
+  }),
+  cursor: z.string().optional().openapi({
+    description: "Opaque cursor from the previous page; omit for the first.",
+  }),
   limit: z.coerce
     .number()
     .int()
@@ -57,10 +51,8 @@ export function syncPaginationSchema<T extends z.ZodType>(item: T) {
       .openapi({ description: "Cursor for the next page, or null when exhausted." }),
     hasMore: z.boolean().openapi({ description: "Whether another page is available." }),
     limit: z.number().int().min(1).openapi({ description: "The page size used." }),
-    serverTime: z.coerce
-      .date()
-      .openapi({
-        description: "Server instant to persist as the next `since` watermark.",
-      }),
+    serverTime: z.coerce.date().openapi({
+      description: "Server instant to persist as the next `since` watermark.",
+    }),
   });
 }
