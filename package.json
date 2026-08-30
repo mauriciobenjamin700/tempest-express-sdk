@@ -35,9 +35,7 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "engines": {
     "node": ">=20"
   },
@@ -49,9 +47,12 @@
     "test:watch": "vitest",
     "test:types": "tsc --noEmit",
     "lint": "biome check .",
+    "check": "npm run lint && npm run test:types && npm run test && npm run build",
     "format": "biome format --write .",
     "docs:serve": "mkdocs serve",
-    "docs:build": "mkdocs build --strict"
+    "docs:build": "mkdocs build --strict",
+    "docs:check-anchors": "node scripts/check-doc-anchors.mjs",
+    "docs:check": "npm run docs:build && npm run docs:check-anchors"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^9.1.0",

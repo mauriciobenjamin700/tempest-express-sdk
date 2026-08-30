@@ -59,11 +59,9 @@ export const hexColorField = z.string().regex(/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6
  * (e.g. `"19.90"`). Mirrors `PriceField` — `tempest-db-js` `numeric` columns map
  * to strings, so money stays exact instead of drifting through a float.
  */
-export const priceField = z
-  .string()
-  .regex(/^\d+(?:\.\d{1,2})?$/, {
-    message: 'Must be a decimal money string, e.g. "19.90".',
-  });
+export const priceField = z.string().regex(/^\d+(?:\.\d{1,2})?$/, {
+  message: 'Must be a decimal money string, e.g. "19.90".',
+});
 
 // --- Booleans ---------------------------------------------------------------
 

@@ -169,14 +169,15 @@ describe("activation flow", () => {
   it("activates a pending account", async () => {
     await post("/auth/signup", { email: "a@x.com", password: "password12" });
     const user = await store.findByEmail("a@x.com");
-    if (user) user.isActive = false;
+    if (!user) throw new Error("signup did not persist the user");
+    user.isActive = false;
 
     const activation = new ActivationService({ store });
-    const token = await activation.start(user!.id);
+    const token = await activation.start(user.id);
 
     const res = await post("/auth/activate", { token });
     expect(res.status).toBe(200);
-    expect((await store.findById(user!.id))?.isActive).toBe(true);
+    expect((await store.findById(user.id))?.isActive).toBe(true);
   });
 });
 
