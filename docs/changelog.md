@@ -34,6 +34,21 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
   de referência. Quem quer Redoc offline opta com `npm install redoc`; o resto
   não paga nada.
 
+- **api**: `SwaggerOptions.ui` — passthrough mesclado no construtor do
+  `SwaggerUIBundle`, então qualquer opção do Swagger UI que o JSON carregue fica
+  alcançável sem o SDK modelar uma a uma. Três defaults passam a diferir do
+  Swagger UI: `layout` é `"BaseLayout"` no lugar de `"StandaloneLayout"` (o
+  standalone renderiza a topbar **Explore**, um campo de URL editável que carrega
+  qualquer spec de qualquer origem — o ponto do editor do Swagger, superfície
+  errada para uma página que documenta um serviço), e `deepLinking` e
+  `persistAuthorization` viram `true` (operação linkável, e credencial que
+  sobrevive ao reload). `ui: { layout: "StandaloneLayout" }` traz a página antiga
+  de volta, com o script do standalone preset junto. `supportedSubmitMethods`
+  mantém o default do Swagger UI, então o **Try it out** continua executando todo
+  verbo até alguém restringir — o que agora é possível para API cujas chamadas
+  são irreversíveis. Função passada em `ui` lança no mount em vez de ser
+  descartada em silêncio pela serialização JSON. Closes #8.
+
 - **api**: exports novos `DEFAULT_DOCS_FAVICON`, `REDOC_CDN_URL`,
   `resolveRedocBundle` e o tipo `RedocBundleSource`.
 
@@ -51,7 +66,8 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
 
 ### Docs
 
-- A receita de API ganha as seções **Favicon** e **Redoc offline** (bilíngue),
+- A receita de API ganha as seções **Favicon**, **Configurando o Swagger UI** e
+  **Redoc offline** (bilíngue),
   com a tabela do `bundle`, o aviso de rede fechada e a nota honesta de que o
   Redoc ainda busca a marca d'água dele em `cdn.redoc.ly`, de dentro do bundle.
 

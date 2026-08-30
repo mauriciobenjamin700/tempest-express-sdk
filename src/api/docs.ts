@@ -104,6 +104,57 @@ export function mountOpenApiJson(
 }
 
 /**
+ * The Swagger UI constructor options this SDK sets before the caller's own.
+ *
+ * `layout` is `"BaseLayout"`, not the `"StandaloneLayout"` the Swagger demo
+ * uses: standalone renders the **Explore** topbar, an editable URL field that
+ * loads any spec from any origin. That is the point of the Swagger editor and
+ * the wrong surface for a page documenting one service. `deepLinking` and
+ * `persistAuthorization` are the two settings a reader of an authenticated
+ * reference notices immediately when they are missing — a linkable operation,
+ * and credentials that survive a reload.
+ */
+const SWAGGER_UI_DEFAULTS: Readonly<Record<string, unknown>> = Object.freeze({
+  deepLinking: true,
+  persistAuthorization: true,
+  layout: "BaseLayout",
+});
+
+/**
+ * Reject Swagger UI options that cannot survive the trip into the page.
+ *
+ * The options are serialized as JSON into an inline `<script>`, and
+ * `JSON.stringify` drops function values **silently** — a `requestInterceptor`
+ * passed here would simply never run, with nothing to indicate why.
+ *
+ * @param options - The caller's Swagger UI options.
+ * @param trail - Key path walked so far, for the error message.
+ * @throws {Error} When a value is a function.
+ */
+function assertSerializableUiOptions(options: unknown, trail: string[] = []): void {
+  if (typeof options === "function") {
+    throw new Error(
+      [
+        `mountSwaggerUi: \`ui.${trail.join(".")}\` is a function, and the options are`,
+        "serialized as JSON into the page, so it would be dropped silently. Swagger UI",
+        "options that take a callback have to be wired in the browser.",
+      ].join(" "),
+    );
+  }
+  if (Array.isArray(options)) {
+    options.forEach((entry, index) =>
+      assertSerializableUiOptions(entry, [...trail, String(index)]),
+    );
+    return;
+  }
+  if (typeof options === "object" && options !== null) {
+    for (const [key, value] of Object.entries(options)) {
+      assertSerializableUiOptions(value, [...trail, key]);
+    }
+  }
+}
+
+/**
  * Build the Swagger UI bootstrap HTML pointing at `specUrl`.
  *
  * Asset URLs are **absolute** (`${assetsBase}/…`), not relative. A relative
@@ -111,13 +162,34 @@ export function mountOpenApiJson(
  * trailing slash) would fetch `/assets/…` — a 404 that leaves the UI unstyled
  * and non-functional. The absolute base resolves correctly at both `/docs` and
  * `/docs/`.
+ *
+ * `presets` is assigned after the merge rather than passed through `ui`: its
+ * entries are live objects off `SwaggerUIBundle`, which JSON cannot carry. The
+ * standalone preset is loaded — and included — only when the effective layout
+ * is `"StandaloneLayout"`, so the default page ships neither the extra script
+ * nor the Explore topbar it powers.
  */
-function swaggerHtml(
-  specUrl: string,
-  title: string,
-  assetsBase: string,
-  favicon: string | false,
-): string {
+function swaggerHtml(options: {
+  specUrl: string;
+  title: string;
+  assetsBase: string;
+  favicon: string | false;
+  ui: Record<string, unknown>;
+}): string {
+  const { specUrl, title, assetsBase, favicon, ui } = options;
+  const merged: Record<string, unknown> = {
+    url: specUrl,
+    dom_id: "#swagger-ui",
+    ...SWAGGER_UI_DEFAULTS,
+    ...ui,
+  };
+  const standalone = merged.layout === "StandaloneLayout";
+  const presetScript = standalone
+    ? `\n    <script src="${escapeHtml(assetsBase)}/swagger-ui-standalone-preset.js"></script>`
+    : "";
+  const presets = standalone
+    ? "[SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset]"
+    : "[SwaggerUIBundle.presets.apis]";
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -128,15 +200,11 @@ function swaggerHtml(
   </head>
   <body>
     <div id="swagger-ui"></div>
-    <script src="${escapeHtml(assetsBase)}/swagger-ui-bundle.js"></script>
-    <script src="${escapeHtml(assetsBase)}/swagger-ui-standalone-preset.js"></script>
+    <script src="${escapeHtml(assetsBase)}/swagger-ui-bundle.js"></script>${presetScript}
     <script>
-      window.ui = SwaggerUIBundle({
-        url: ${scriptLiteral(specUrl)},
-        dom_id: "#swagger-ui",
-        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-        layout: "StandaloneLayout",
-      });
+      var options = ${scriptLiteral(merged)};
+      options.presets = ${presets};
+      window.ui = SwaggerUIBundle(options);
     </script>
   </body>
 </html>`;
@@ -151,6 +219,24 @@ export interface SwaggerOptions {
    * `false` to emit no tag, letting the browser request `/favicon.ico`.
    */
   favicon?: string | false;
+  /**
+   * Options merged into the `SwaggerUIBundle` constructor, after
+   * {@link SWAGGER_UI_DEFAULTS} and before `presets`. Anything Swagger UI
+   * accepts and JSON can carry.
+   *
+   * Two worth knowing:
+   *
+   * - `supportedSubmitMethods` — which verbs get a working **Try it out**.
+   *   Swagger UI enables all of them, so on an API with irreversible side
+   *   effects (sending, charging, dispatching) the docs page fires the real
+   *   thing. `["get"]` or `[]` narrows that.
+   * - `layout: "StandaloneLayout"` — restores the Explore topbar, along with
+   *   the standalone preset script it needs.
+   *
+   * Function values throw at mount time rather than being dropped silently by
+   * the JSON serialization.
+   */
+  ui?: Record<string, unknown>;
 }
 
 /**
@@ -161,7 +247,8 @@ export interface SwaggerOptions {
  * @param app - The Express application.
  * @param path - Mount path for the UI (e.g. `/docs`).
  * @param specUrl - URL the UI fetches the OpenAPI document from.
- * @param options - Page options.
+ * @param options - Page and Swagger UI options.
+ * @throws {Error} When `options.ui` carries a function value.
  */
 export function mountSwaggerUi(
   app: Express,
@@ -171,10 +258,14 @@ export function mountSwaggerUi(
 ): void {
   const title = options.title ?? "API docs";
   const favicon = options.favicon ?? DEFAULT_DOCS_FAVICON;
+  const ui = options.ui ?? {};
+  assertSerializableUiOptions(ui);
   const assetsPath = `${path.replace(/\/$/, "")}/assets`;
   app.use(assetsPath, express.static(getAbsoluteFSPath()));
   const handler: RequestHandler = (_req, res) => {
-    res.type("html").send(swaggerHtml(specUrl, title, assetsPath, favicon));
+    res
+      .type("html")
+      .send(swaggerHtml({ specUrl, title, assetsBase: assetsPath, favicon, ui }));
   };
   app.get(path, handler);
 }

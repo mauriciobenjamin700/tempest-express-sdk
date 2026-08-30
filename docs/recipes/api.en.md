@@ -181,7 +181,7 @@ Now the app serves:
 | `jsonPath` | `/openapi.json` | JSON route. |
 | `swaggerPath` | `/docs` | Swagger mount; `false` disables. |
 | `redocPath` | `/redoc` | Redoc mount; `false` disables. |
-| `swagger` | — | Swagger page's `{ title?, favicon? }`. |
+| `swagger` | — | Swagger page's `{ title?, favicon?, ui? }`. |
 | `redoc` | — | Redoc page's `{ title?, favicon?, bundle?, bundlePath?, scriptUrl? }`. |
 
 ### Favicon: both pages already ship one
@@ -213,6 +213,56 @@ const app = await createApp({
 `favicon: false` omits the tag — the browser goes back to requesting
 `/favicon.ico`, which is what you want when the root **does** have a real
 favicon to serve.
+
+### Configuring Swagger UI: the `ui` option
+
+`SwaggerOptions.ui` is passed straight into the `SwaggerUIBundle` constructor,
+after the SDK's defaults and before `presets`. Anything Swagger UI accepts and
+JSON can carry goes through it.
+
+Three defaults the SDK picks, differing from Swagger UI's own:
+
+| Option | Swagger UI | Here | Why |
+| --- | --- | --- | --- |
+| `layout` | `StandaloneLayout` | `BaseLayout` | No **Explore** topbar |
+| `deepLinking` | `false` | `true` | An operation becomes a shareable link |
+| `persistAuthorization` | `false` | `true` | Credentials survive a reload |
+
+!!! warning "Why move off `StandaloneLayout`"
+    Standalone renders the **Explore** topbar: an editable URL field that loads
+    **any spec from any origin**. It exists for the Swagger editor/demo, where
+    choosing the spec is the point. On a page documenting *one* service it is
+    surface nobody asked for — a reader swaps your spec for another and your URL
+    now documents someone else's API. Nothing of the server leaks, but there is
+    no reason to offer it either.
+
+    Want it back? `ui: { layout: "StandaloneLayout" }` — the SDK re-includes the
+    standalone preset script along with it.
+
+#### Turn "Try it out" off when the effect is irreversible
+
+Swagger UI enables **Try it out** for every verb. On a messaging gateway,
+`POST /message/send-text` from the docs page **sends a real message**:
+
+```ts
+mountSwaggerUi(app, "/docs", "/openapi.json", {
+  ui: { supportedSubmitMethods: ["get"] },   // only reads can be executed
+});
+
+mountSwaggerUi(app, "/docs", "/openapi.json", {
+  ui: { supportedSubmitMethods: [] },        // documents, does not execute
+});
+```
+
+The default stays Swagger UI's (every verb) — the right call for most APIs, and
+now it is a choice.
+
+!!! danger "A function in `ui` throws at mount time"
+    The options are serialized as JSON into the page's `<script>`, and
+    `JSON.stringify` **drops functions silently**. A `requestInterceptor` passed
+    here would simply never run, with nothing to indicate why — so
+    `mountSwaggerUi` throws right away, naming the offending key. Swagger UI
+    options that take a callback have to be wired in the browser.
 
 ### Offline Redoc: install `redoc` next to the service
 
@@ -307,6 +357,9 @@ file, version it or serve it from wherever you like.
   hand.
 - Docs in 3 steps: `createOpenApiRegistry()` → `register`/`registerPath` → pass
   the registry in `openapi`. You get `/openapi.json`, `/docs` and `/redoc`.
+- `swagger: { ui: {...} }` forwards options to `SwaggerUIBundle`; the defaults
+  here are `BaseLayout` (no Explore topbar), `deepLinking` and
+  `persistAuthorization`.
 - Swagger is offline; Redoc is too once `redoc` is installed (`bundle: "local"`
   to refuse the CDN fallback). Both pages ship a favicon, so no `/favicon.ico`
   request hits your API root.
