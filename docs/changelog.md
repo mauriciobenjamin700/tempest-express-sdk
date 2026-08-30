@@ -9,6 +9,52 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.23.0] — 2026-08-30
+
+### Adicionado
+
+- **api**: `mountSwaggerUi` e `mountRedoc` passam a emitir `<link rel="icon">`,
+  com default `DEFAULT_DOCS_FAVICON` — um SVG inline em `data:` URI. Sem ele o
+  browser pede `/favicon.ico` **na raiz da origem**, que num serviço só de API é
+  404, 401 atrás do middleware de auth, ou cai numa rota SPA: um erro vermelho no
+  console a cada visita a `/docs`. `SwaggerOptions` e `RedocOptions` aceitam
+  `favicon?: string | false`; `false` omite a tag. Closes #7.
+
+- **api**: `mountRedoc` serve o renderer **do próprio serviço** quando a nova
+  peer opcional `redoc` está instalada, então a página de referência funciona em
+  rede fechada. Novo `RedocOptions.bundle`: `"auto"` (default — local quando
+  disponível, CDN quando não), `"local"` (lança no mount se o `redoc` faltar,
+  para deploy air-gapped não degradar em silêncio para um pedido à CDN) e
+  `"cdn"`. `RedocOptions.bundlePath` serve uma cópia vendorizada; `scriptUrl`
+  continua ganhando dos dois.
+
+  `redoc` é **peer opcional**, não dependency: o pacote traz 22 dependências e
+  peers em `react`, `react-dom`, `styled-components`, `mobx` e `core-js` —
+  bounds que nenhum serviço backend deveria herdar só para renderizar uma página
+  de referência. Quem quer Redoc offline opta com `npm install redoc`; o resto
+  não paga nada.
+
+- **api**: exports novos `DEFAULT_DOCS_FAVICON`, `REDOC_CDN_URL`,
+  `resolveRedocBundle` e o tipo `RedocBundleSource`.
+
+### Corrigido
+
+- **api**: a página do Redoc não renderiza mais **em branco** quando o bundle
+  falha ao carregar. CDN bloqueada, CSP restritiva ou `scriptUrl` errado faziam
+  o `Redoc.init` nunca rodar e a página subia vazia, o que lê como serviço
+  quebrado. Agora ela diz qual URL falhou, confirma que o documento OpenAPI
+  continua servido, e explica como resolver.
+
+- **api**: título de página e URL de favicon passam por escape de HTML, e valor
+  embutido em `<script>` escapa `<`. Antes, título vindo de configuração podia
+  fechar o elemento `<title>` e injetar markup.
+
+### Docs
+
+- A receita de API ganha as seções **Favicon** e **Redoc offline** (bilíngue),
+  com a tabela do `bundle`, o aviso de rede fechada e a nota honesta de que o
+  Redoc ainda busca a marca d'água dele em `cdn.redoc.ly`, de dentro do bundle.
+
 ## [0.22.0] — 2026-08-30
 
 ### Corrigido

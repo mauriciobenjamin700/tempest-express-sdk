@@ -20,11 +20,15 @@ export {
 } from "@/api/openapi";
 export {
   type OpenApiDocument,
+  type RedocBundleSource,
   type RedocOptions,
   type SwaggerOptions,
+  DEFAULT_DOCS_FAVICON,
+  REDOC_CDN_URL,
   mountOpenApiJson,
   mountRedoc,
   mountSwaggerUi,
+  resolveRedocBundle,
 } from "@/api/docs";
 export {
   type HealthCheck,

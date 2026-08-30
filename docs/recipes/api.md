@@ -180,14 +180,81 @@ Opções do bloco `openapi` (`CreateAppOpenApi`):
 | `jsonPath` | `/openapi.json` | Rota do JSON. |
 | `swaggerPath` | `/docs` | Mount do Swagger; `false` desliga. |
 | `redocPath` | `/redoc` | Mount do Redoc; `false` desliga. |
-| `swagger` | — | `{ title? }` da página do Swagger. |
-| `redoc` | — | `{ title?, scriptUrl? }` da página do Redoc. |
+| `swagger` | — | `{ title?, favicon? }` da página do Swagger. |
+| `redoc` | — | `{ title?, favicon?, bundle?, bundlePath?, scriptUrl? }` da página do Redoc. |
 
-!!! info "Swagger é 100% offline; Redoc usa CDN"
-    Os assets do Swagger UI vêm do pacote `swagger-ui-dist` e são servidos
-    localmente em `${swaggerPath}/assets` — nenhuma chamada externa. O Redoc
-    carrega o bundle (~1 MB) da CDN jsDelivr por padrão; para self-hostar, passe
-    `redoc: { scriptUrl: "/vendor/redoc.standalone.js" }`.
+### Favicon: as duas páginas já trazem um
+
+Sem `<link rel="icon">`, o browser pede `/favicon.ico` **na raiz da origem**. Num
+serviço que só serve API, essa raiz não tem favicon: o pedido dá 404, ou 401 se
+estiver atrás do middleware de auth, ou cai numa rota SPA. Resultado — um erro
+vermelho no console em toda visita a `/docs`:
+
+```
+[ERROR] Failed to load resource: the server responded with a status of 401
+        (Unauthorized) @ http://127.0.0.1:3111/favicon.ico
+```
+
+As duas páginas declaram um ícone SVG inline (`data:` URI), então o pedido nunca
+sai. Para trocar pelo seu:
+
+```ts
+const app = await createApp({
+  openapi: {
+    registry,
+    info: { title: "Minha API", version: "1.0.0" },
+    swagger: { favicon: "/static/icon.svg" },
+    redoc: { favicon: "/static/icon.svg" },
+  },
+});
+```
+
+`favicon: false` omite a tag — aí o browser volta a pedir `/favicon.ico`, que é o
+que você quer se a raiz **tem** um favicon de verdade para servir.
+
+### Redoc offline: instale o `redoc` ao lado do serviço
+
+O Swagger UI é offline por construção — os assets vêm do `swagger-ui-dist`,
+servidos em `${swaggerPath}/assets`. O renderer do Redoc tem ~1 MB e **não** é
+embutido: o pacote `redoc` traz 22 dependências e peers em `react`, `react-dom`,
+`styled-components`, `mobx` e `core-js`, bounds que nenhum serviço backend
+deveria herdar só para renderizar uma página de referência.
+
+Ele é **peer dependency opcional**. Instale e a página passa a servir o bundle
+do próprio serviço, sem tocar em CDN:
+
+```bash
+npm install redoc
+```
+
+| `bundle` | O que faz |
+| --- | --- |
+| `"auto"` (default) | Serve o bundle do `redoc` quando ele está instalado; cai para a CDN quando não está. |
+| `"local"` | Serve do disco e **lança no mount** se o `redoc` não estiver instalado. |
+| `"cdn"` | Sempre carrega da jsDelivr. |
+
+```ts
+redoc: { bundle: "local" }                              // falha alto, nunca degrada
+redoc: { bundlePath: "/opt/app/redoc.standalone.js" }   // cópia sua, servida pelo SDK
+redoc: { scriptUrl: "/vendor/redoc.standalone.js" }     // URL que você já serve
+```
+
+!!! warning "Rede fechada: `"local"`, não `"auto"`"
+    Em deploy air-gapped ou com CSP restritiva, `"auto"` cai silenciosamente
+    para a CDN se alguém esquecer de instalar o `redoc` — e a página falha **em
+    branco**, porque o `<script>` não carrega e o `Redoc.init` nunca roda.
+    `"local"` transforma esse esquecimento num erro no boot.
+
+!!! note "Quando o bundle não carrega, a página explica"
+    Em vez da tela branca, ela mostra qual URL falhou, confirma que o
+    `/openapi.json` continua de pé e diz como resolver. Vale para a CDN
+    bloqueada e para um `scriptUrl` errado.
+
+!!! info "O Redoc ainda busca a marca d'água dele"
+    Mesmo com o bundle local, o Redoc pede
+    `https://cdn.redoc.ly/redoc/logo-mini.svg` — é o logo "API docs by Redocly"
+    embutido no bundle deles, fora do controle do SDK. Sem rede, some a
+    imagenzinha; a página renderiza normal.
 
 !!! check "Sem barra final também funciona"
     A partir da v0.20.1 os assets do Swagger usam caminho **absoluto**
@@ -237,5 +304,7 @@ arquivo, versioná-lo ou servi-lo de onde quiser.
 - Registre routers dentro de `configure`; **não** registre o error handler à mão.
 - Documentação em 3 passos: `createOpenApiRegistry()` → `register`/`registerPath`
   → passe o registry em `openapi`. Ganha `/openapi.json`, `/docs` e `/redoc`.
-- Swagger é offline; Redoc usa CDN (self-hostável via `scriptUrl`).
+- Swagger é offline; o Redoc também, uma vez instalado o `redoc`
+  (`bundle: "local"` para recusar o fallback de CDN). As duas páginas trazem
+  favicon, então nenhum pedido a `/favicon.ico` bate na raiz da sua API.
 - `/docs` e `/docs/` funcionam igual — assets em caminho absoluto. 🚀

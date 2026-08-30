@@ -47,7 +47,7 @@ with `npm ls zod`: a single line, marked `deduped`.
 | **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus, GPU), `makeMetricsRouter`, `getClientIp` |
 | **integrations** | `MessagingProvider` contract; `WhatsAppProvider` (zap-api), `TelegramProvider` (Bot API), `TwilioSmsProvider` (SMS), `EmailProvider`, `MessagingHub` + `broadcastText`, webhook receivers |
 | **admin** | `AdminSite` + `makeAdminRouter` — JSON admin with auto-derived CRUD + introspection |
-| **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc`, `makeHealthRouter` |
+| **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi`, `mountRedoc` (both ship a favicon; Redoc serves its bundle locally when the optional `redoc` peer is installed), `makeHealthRouter` |
 | **api/middlewares** | `rateLimitMiddleware` (memory/Redis stores, IP/header/JWT keys), `bodySizeLimitMiddleware`, `csrfMiddleware`, `idempotencyMiddleware` (memory/Redis), `GracefulShutdown`, `requestTracingMiddleware`, `prometheusMiddleware` / `HttpMetrics` |
 | **api/oauth** | `GoogleOAuthClient`, `GitHubOAuthClient`, `OIDCProvider`, `generateOAuthState`; `WebhookSignatureVerifier`; `makeToolSpecRouter` |
 | **testing** | `createTestDatabase`, `withTestDatabase` — in-memory SQLite engine with tables reflected from your models |
