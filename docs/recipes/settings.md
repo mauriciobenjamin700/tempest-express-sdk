@@ -105,8 +105,7 @@ Variável de ambiente é sempre **string**. Dois cuidados que o SDK já resolve:
 
 `z.coerce.boolean()` do Zod trata **qualquer** string não-vazia como `true` — ou
 seja, `"false"` viraria `true`. Os campos booleanos dos fragmentos usam
-`envBoolean`, que lê os tokens usuais (`true`/`1`/`yes`/`on`) e trata o resto
-como `false`:
+`envBoolean`, que lê os tokens dos dois lados e **recusa** o que não reconhece:
 
 ```ts
 import { envBoolean, z } from "tempest-express-sdk";
@@ -115,8 +114,25 @@ const schema = z.object({ FEATURE_X: envBoolean(false) });
 
 schema.parse({ FEATURE_X: "false" }).FEATURE_X; // false ✅
 schema.parse({ FEATURE_X: "1" }).FEATURE_X;     // true
+schema.parse({ FEATURE_X: "" }).FEATURE_X;      // false (vazio = ausente → default)
 schema.parse({}).FEATURE_X;                      // false (default)
+schema.parse({ FEATURE_X: "talvez" });           // ❌ ZodError
 ```
+
+| Vira `true` | Vira `false` |
+| --- | --- |
+| `true` `1` `yes` `on` `y` `enabled` | `false` `0` `no` `off` `n` `disabled` |
+
+!!! warning "Token desconhecido derruba o boot — de propósito"
+    `FEATURE_X=talvez` levanta `ZodError` em vez de virar `false`. Config de
+    ambiente errada tem que falhar alto: um typo que degrada para "usou o
+    default" some no log e só aparece em produção, no dia errado.
+
+!!! info "É o mesmo helper do `looseBoolean`"
+    `envBoolean` é o `looseBoolean` de
+    [Campos validados](fields.md#looseboolean-o-booleano-que-chega-como-texto)
+    sob o nome do domínio de settings — uma implementação só, compartilhada com
+    os filtros de query, para as duas nunca divergirem.
 
 ### `envList` — CSV vira `string[]`
 
@@ -181,5 +197,6 @@ const jwt = new JWTUtils(settings.JWT_SECRET, {
   e congelada no boot.
 - Componha fragmentos por domínio com `...spread`; cada um usa os nomes de env e
   defaults do `tempest-fastapi-sdk`.
-- `envBoolean` corrige o parse de booleanos; `envList` transforma CSV em lista.
+- `envBoolean` (o mesmo helper que o `looseBoolean`) corrige o parse de
+  booleanos e recusa token desconhecido; `envList` transforma CSV em lista.
 - Um valor inválido falha **no boot**, não em produção. 🚀

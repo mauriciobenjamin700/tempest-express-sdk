@@ -9,6 +9,7 @@
  */
 
 import { type ToDictOptions, toDict, z } from "@/schemas/base";
+import { looseBoolean } from "@/schemas/fields";
 
 /**
  * Filter schema for offset-paginated list endpoints. Subclass via `.extend`
@@ -31,10 +32,9 @@ export const paginationFilterSchema = z.object({
     .string()
     .optional()
     .openapi({ description: "Column to order by; defaults to repository default." }),
-  ascending: z.coerce
-    .boolean()
-    .default(true)
-    .openapi({ description: "Whether to order results ascending." }),
+  ascending: looseBoolean(true).openapi({
+    description: "Whether to order results ascending.",
+  }),
 });
 
 /** The parsed shape of {@link paginationFilterSchema}. */
@@ -113,10 +113,9 @@ export const cursorPaginationFilterSchema = z.object({
     .default(20)
     .openapi({ description: "Maximum number of items to return." }),
   orderBy: z.string().default("createdAt").openapi({ description: "Column to sort by." }),
-  ascending: z.coerce
-    .boolean()
-    .default(false)
-    .openapi({ description: "Whether to sort ascending (default newest first)." }),
+  ascending: looseBoolean(false).openapi({
+    description: "Whether to sort ascending (default newest first).",
+  }),
 });
 
 /** The parsed shape of {@link cursorPaginationFilterSchema}. */

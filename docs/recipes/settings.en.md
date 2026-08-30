@@ -106,8 +106,7 @@ An environment variable is always a **string**. Two gotchas the SDK handles:
 
 Zod's `z.coerce.boolean()` treats **any** non-empty string as `true` — so
 `"false"` would become `true`. The fragments' boolean fields use `envBoolean`,
-which reads the usual tokens (`true`/`1`/`yes`/`on`) and treats the rest as
-`false`:
+which reads the tokens on both sides and **rejects** what it does not recognise:
 
 ```ts
 import { envBoolean, z } from "tempest-express-sdk";
@@ -116,8 +115,26 @@ const schema = z.object({ FEATURE_X: envBoolean(false) });
 
 schema.parse({ FEATURE_X: "false" }).FEATURE_X; // false ✅
 schema.parse({ FEATURE_X: "1" }).FEATURE_X;     // true
+schema.parse({ FEATURE_X: "" }).FEATURE_X;      // false (empty = absent → default)
 schema.parse({}).FEATURE_X;                      // false (default)
+schema.parse({ FEATURE_X: "maybe" });            // ❌ ZodError
 ```
+
+| Becomes `true` | Becomes `false` |
+| --- | --- |
+| `true` `1` `yes` `on` `y` `enabled` | `false` `0` `no` `off` `n` `disabled` |
+
+!!! warning "An unknown token brings the boot down — on purpose"
+    `FEATURE_X=maybe` raises a `ZodError` instead of becoming `false`. Wrong
+    environment config has to fail loudly: a typo that degrades into "used the
+    default" disappears from the log and shows up in production, on the wrong
+    day.
+
+!!! info "It is the same helper as `looseBoolean`"
+    `envBoolean` is the `looseBoolean` from
+    [Validated fields](fields.md#looseboolean-the-boolean-that-arrives-as-text)
+    under the settings domain's name — one implementation, shared with the query
+    filters, so the two can never drift apart.
 
 ### `envList` — CSV becomes `string[]`
 
@@ -183,5 +200,6 @@ const jwt = new JWTUtils(settings.JWT_SECRET, {
   frozen configuration at boot.
 - Compose domain fragments with `...spread`; each uses the `tempest-fastapi-sdk`
   env names and defaults.
-- `envBoolean` fixes boolean parsing; `envList` turns CSV into a list.
+- `envBoolean` (the same helper as `looseBoolean`) fixes boolean parsing and
+  rejects an unknown token; `envList` turns CSV into a list.
 - An invalid value fails **at boot**, not in production. 🚀

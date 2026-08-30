@@ -24,6 +24,7 @@ export {
   hexColorField,
   latitudeField,
   longitudeField,
+  looseBoolean,
   nonEmptyStrField,
   nonNegativeFloatField,
   nonNegativeIntField,

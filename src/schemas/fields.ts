@@ -64,3 +64,44 @@ export const priceField = z
   .regex(/^\d+(?:\.\d{1,2})?$/, {
     message: 'Must be a decimal money string, e.g. "19.90".',
   });
+
+// --- Booleans ---------------------------------------------------------------
+
+/** Message shown when a value is neither a boolean nor a boolean-ish token. */
+const LOOSE_BOOLEAN_ERROR =
+  'Must be a boolean value such as "true", "false", "1", "0", "yes" or "no".';
+
+/**
+ * A boolean read from a **textual** source — a query string or an environment
+ * variable, where every value arrives as a string.
+ *
+ * `z.coerce.boolean()` is the wrong tool for those: it is `Boolean(input)`, so
+ * every non-empty string is `true` — `"false"` and `"0"` included — and there is
+ * no way to ask for `false` over the wire. This reads the usual textual tokens
+ * in both directions (`true`/`1`/`yes`/`on`/`y`/`enabled` and
+ * `false`/`0`/`no`/`off`/`n`/`disabled`, case-insensitive, surrounding
+ * whitespace trimmed) and **rejects** anything else, so a typo surfaces as a
+ * validation error instead of silently becoming `false`.
+ *
+ * An absent value — and an empty or whitespace-only string, which is how an
+ * unset `.env` entry (`DEBUG=`) reaches the schema — falls back to
+ * `defaultValue`. Real booleans pass through untouched, so a schema built for
+ * `process.env` still parses a synthetic object in tests.
+ *
+ * The OpenAPI metadata is pinned to `type: boolean` (with the default) so the
+ * document describes the field the client actually sends, not the union used to
+ * parse it.
+ *
+ * @param defaultValue - The value used when the field is absent or empty.
+ * @returns A zod schema producing a `boolean`.
+ */
+export function looseBoolean(defaultValue: boolean) {
+  return z
+    .preprocess(
+      (value) => (typeof value === "string" ? value.trim() || undefined : value),
+      z
+        .union([z.boolean(), z.stringbool()], { error: LOOSE_BOOLEAN_ERROR })
+        .default(defaultValue),
+    )
+    .openapi({ type: "boolean", default: defaultValue });
+}

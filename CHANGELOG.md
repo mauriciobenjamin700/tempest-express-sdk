@@ -4,6 +4,54 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.22.0] — 2026-08-30
+
+### Fixed
+
+- **BREAKING (behaviour) — schemas**: `?ascending=false` now actually sorts
+  descending. `paginationFilterSchema.ascending`,
+  `cursorPaginationFilterSchema.ascending` and `syncFilterSchema.includeDeleted`
+  were built on `z.coerce.boolean()`, which is `Boolean(input)` — every non-empty
+  string is `true`, `"false"` and `"0"` included — so there was **no way to send
+  `false` over the wire**. They now use the new `looseBoolean`. Closes #4.
+
+- **BREAKING (behaviour) — settings**: `DEBUG=false` now disables debug. The
+  `DEBUG` field of `serverSettingsShape` had the same `z.coerce.boolean()`
+  defect, so any non-empty value — `"false"` included — turned debug on.
+
+### Added
+
+- **schemas**: `looseBoolean(defaultValue)` — the boolean field for values that
+  arrive as text (query strings, environment variables). Reads
+  `true`/`1`/`yes`/`on`/`y`/`enabled` and `false`/`0`/`no`/`off`/`n`/`disabled`,
+  case-insensitively and trimmed; treats an empty or whitespace-only value as
+  absent (so an unset `.env` entry falls back to the default); passes real
+  booleans through; and **rejects** anything else, so a typo surfaces as a
+  validation error instead of silently becoming `false`. Built on zod 4's
+  `z.stringbool()`. Its OpenAPI metadata is pinned to `type: boolean` with the
+  default, so the document describes what the client sends rather than the union
+  used to parse it.
+
+### Changed
+
+- **BREAKING (behaviour) — settings**: `envBoolean` is now `looseBoolean` under
+  the settings-facing name — one implementation shared with the query filters,
+  instead of two token lists that drift. Same signature, and every previously
+  accepted token still parses the same way. Two behaviours change: an
+  **unrecognised token is now a `ZodError`** rather than a silent `false`, and an
+  **empty variable** (`SMTP_USE_TLS=`) now falls back to the field default
+  instead of being read as `false`. Both make wrong environment config fail at
+  boot rather than degrade quietly. Affects every boolean settings field:
+  `LOG_JSON`, `SMTP_USE_TLS`, `SMTP_USE_SSL`, `MINIO_SECURE`, `SESSION_*`,
+  `AUTH_*`.
+
+### Docs
+
+- New section **`looseBoolean` — the boolean that arrives as text** in the
+  validated-fields recipe (bilingual), with the token table and the OpenAPI note.
+- The settings recipe's `envBoolean` section documents the rejection of unknown
+  tokens and the empty-variable rule, and links to `looseBoolean`.
+
 ## [0.21.0] — 2026-08-30
 
 ### Changed

@@ -7,6 +7,7 @@
  */
 
 import { z } from "@/schemas/base";
+import { looseBoolean } from "@/schemas/fields";
 
 /**
  * Filter schema for a delta-sync pull. Extend with `.extend` to add domain
@@ -32,10 +33,9 @@ export const syncFilterSchema = z.object({
     .max(1000)
     .default(100)
     .openapi({ description: "Maximum number of items to return." }),
-  includeDeleted: z.coerce
-    .boolean()
-    .default(false)
-    .openapi({ description: "Whether soft-deleted rows are included in the delta." }),
+  includeDeleted: looseBoolean(false).openapi({
+    description: "Whether soft-deleted rows are included in the delta.",
+  }),
 });
 
 /** The parsed shape of {@link syncFilterSchema}. */
