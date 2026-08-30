@@ -76,6 +76,7 @@ plugins:
             "Seu primeiro app": "Your first app"
             "Glossário": "Glossary"
             Instalação: Installation
+            "Migração para zod 4": "Migrating to zod 4"
             Tutorial: Tutorial
             "Projeto guiado": "Guided project"
             "Lista de Tarefas": "Task list API"
@@ -113,6 +114,7 @@ nav:
       - "Seu primeiro app": getting-started/first-app.md
       - "Glossário": getting-started/glossary.md
   - Instalação: installation.md
+  - "Migração para zod 4": migration/zod-4.md
   - Tutorial: tutorial.md
   - Projeto guiado:
       - "Lista de Tarefas": learn/index.md

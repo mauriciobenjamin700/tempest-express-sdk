@@ -8,8 +8,15 @@
  * the CLI writes to disk.
  */
 
-/** SDK version the generated project depends on (kept in sync at release). */
-const SDK_VERSION = "^0.20.0";
+import { VERSION } from "@/version";
+
+/**
+ * Caret range for the SDK the generated project depends on. Derived from
+ * {@link VERSION} so a release bump can never leave the scaffold pinned to an
+ * older major/minor — a stale pin here would install a different SDK (and, with
+ * it, a different `zod` peer range) than the CLI that wrote the project.
+ */
+const SDK_VERSION = `^${VERSION}`;
 
 /**
  * Build the file map for a new service named `name`.
@@ -35,7 +42,7 @@ export function projectFiles(name: string): Record<string, string> {
           express: "^5.1.0",
           "tempest-db-js": "^0.4.0",
           "tempest-express-sdk": SDK_VERSION,
-          zod: "^3.24.1",
+          zod: "^4.0.0",
         },
         devDependencies: {
           "@types/express": "^5.0.0",

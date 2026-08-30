@@ -85,7 +85,7 @@ export function getPaginationConditions(filter: PaginationFilter): {
  * @param item - The zod schema for a single item.
  * @returns A zod object schema `{ items, total, page, pageSize, pages }`.
  */
-export function paginationSchema<T extends z.ZodTypeAny>(item: T) {
+export function paginationSchema<T extends z.ZodType>(item: T) {
   return z.object({
     items: z.array(item).openapi({ description: "The items on the current page." }),
     total: z
@@ -128,7 +128,7 @@ export type CursorPaginationFilter = z.infer<typeof cursorPaginationFilterSchema
  * @param item - The zod schema for a single item.
  * @returns A zod object schema `{ items, nextCursor, hasMore, limit }`.
  */
-export function cursorPaginationSchema<T extends z.ZodTypeAny>(item: T) {
+export function cursorPaginationSchema<T extends z.ZodType>(item: T) {
   return z.object({
     items: z.array(item).openapi({ description: "The items on the current page." }),
     nextCursor: z

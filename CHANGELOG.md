@@ -4,6 +4,47 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.21.0] — 2026-08-30
+
+### Changed
+
+- **BREAKING — deps**: `zod` moved from a direct **dependency** to a required
+  **peer dependency** at `^4.0.0`, and `@asteasolutions/zod-to-openapi` was
+  bumped `^7.3.0` → `^9.1.0`. Install `zod@^4` alongside the SDK
+  (`npm install zod@^4`). See the [zod 4 migration guide](https://mauriciobenjamin700.github.io/tempest-express-sdk/migration/zod-4/).
+
+  Why: as a direct dependency the SDK shipped its own copy of zod. A project on
+  zod 4 ended up with **two instances** in `node_modules`, and since
+  `zod-to-openapi` works by patching the `ZodType` prototype, it patched the
+  SDK's zod 3 — not the project's zod 4. Registering a project schema then failed
+  with `TypeError: zodSchema.openapi is not a function`, and patching the project
+  instance by hand only moved the failure to
+  `UnknownZodTypeError: Unknown zod object type`. As a peer dependency there is
+  exactly one instance, shared by the SDK and the consumer, so `instanceof
+  ZodType` and the prototype patch both cross the boundary. Closes #2.
+
+- **schemas**: internal schemas migrated to zod 4 idioms — `z.uuid()`,
+  `z.email()`, `z.url()` (the `z.string().uuid()` chain is deprecated in zod 4),
+  `z.record(z.string(), z.unknown())` (the key type is now required) and
+  `.loose()` in place of the deprecated `.passthrough()`. `z.ZodTypeAny` in the
+  public generic signatures of `paginationSchema`, `cursorPaginationSchema`,
+  `syncPaginationSchema`, `loadSettings` and `AdminResource` is now `z.ZodType`.
+  The zod 3 spellings still parse, so consumer schemas keep working.
+
+- **cli**: the scaffold template now pins `zod@^4.0.0`.
+
+### Added
+
+- **tests**: `tests/zod-instance.test.ts` — a regression guard proving the SDK's
+  `z` **is** the consumer's `zod` instance, that `.openapi()` is present on it,
+  and that a document generates from schemas built with a bare `import { z } from
+  "zod"`.
+
+### Docs
+
+- New page **Migração para zod 4** (bilingual) — the breaking change, the
+  before/after install, the API renames and the "two instances" diagnostic.
+
 ## [0.20.1] — 2026-07-09
 
 ### Changed

@@ -14,13 +14,18 @@ A schema does three things at once:
    Swagger/Redoc (see [API: app, OpenAPI and docs](api.md)).
 
 !!! info "Where `z` comes from"
-    `z` is Zod **already augmented** with `.openapi()`, re-exported by the SDK.
-    Always import it from `tempest-express-sdk`, never from `zod` directly —
-    otherwise `.openapi()` won't exist on your `z`.
+    `z` is **your** Zod, already augmented with `.openapi()` and re-exported by
+    the SDK. Since v0.21.0 `zod` is a peer dependency (`^4.0.0`), so the SDK and
+    your project share a single instance — `import { z } from "zod"` gives you
+    the exact same object.
 
     ```ts
     import { z } from "tempest-express-sdk";
     ```
+
+    Still prefer the SDK import: it is what triggers the `.openapi()` patch.
+    Importing from `"zod"` directly makes you depend on some SDK import having
+    run first. Details in [Migrating to zod 4](../migration/zod-4.md).
 
 ---
 
@@ -63,7 +68,7 @@ import { baseResponseSchema, z } from "tempest-express-sdk";
 
 const userResponseSchema = baseResponseSchema.extend({
   name: z.string().openapi({ description: "The user's display name." }),
-  email: z.string().email().openapi({ description: "The user's email." }),
+  email: z.email().openapi({ description: "The user's email." }),
 });
 
 type UserResponse = z.infer<typeof userResponseSchema>;
@@ -97,7 +102,7 @@ import { baseResponseSchema, z } from "tempest-express-sdk";
 // create input — no id/timestamps (the DB generates them)
 export const userCreateSchema = z.object({
   name: z.string().min(1),
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
 });
 
@@ -107,7 +112,7 @@ export const userUpdateSchema = userCreateSchema.partial();
 // output — base + public fields, NO password
 export const userResponseSchema = baseResponseSchema.extend({
   name: z.string(),
-  email: z.string().email(),
+  email: z.email(),
 });
 
 export type UserCreate = z.infer<typeof userCreateSchema>;
@@ -240,7 +245,8 @@ For the **delta-sync** mode (offline-first, `since`/`serverTime`) see
 
 ## Recap
 
-- The SDK's `z` ships `.openapi()` — import it from the SDK, not from `zod`.
+- The SDK's `z` is your own zod 4 with `.openapi()` — import it from the SDK,
+  which is the import that guarantees the patch.
 - `toDict` drops nullish, excludes and merges — like Pydantic's `to_dict`.
 - `baseResponseSchema.extend({...})` = `id`/`isActive`/`createdAt`/`updatedAt` +
   your fields.

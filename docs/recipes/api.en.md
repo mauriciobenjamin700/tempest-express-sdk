@@ -131,7 +131,7 @@ const registry = createOpenApiRegistry();
 const Item = registry.register(
   "Item",
   z.object({
-    id: z.string().uuid().openapi({ description: "The item id." }),
+    id: z.uuid().openapi({ description: "The item id." }),
     name: z.string().openapi({ description: "The item name." }),
   }),
 );
@@ -140,7 +140,7 @@ registry.registerPath({
   method: "get",
   path: "/api/items/{id}",
   summary: "Fetch an item",
-  request: { params: z.object({ id: z.string().uuid() }) },
+  request: { params: z.object({ id: z.uuid() }) },
   responses: {
     200: { description: "ok", content: { "application/json": { schema: Item } } },
   },

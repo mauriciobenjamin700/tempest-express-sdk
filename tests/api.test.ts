@@ -14,15 +14,12 @@ let base: string;
 
 beforeAll(async () => {
   const registry = createOpenApiRegistry();
-  const Item = registry.register(
-    "Item",
-    z.object({ id: z.string().uuid(), name: z.string() }),
-  );
+  const Item = registry.register("Item", z.object({ id: z.uuid(), name: z.string() }));
   registry.registerPath({
     method: "get",
     path: "/api/items/{id}",
     summary: "Fetch an item",
-    request: { params: z.object({ id: z.string().uuid() }) },
+    request: { params: z.object({ id: z.uuid() }) },
     responses: {
       200: { description: "ok", content: { "application/json": { schema: Item } } },
     },

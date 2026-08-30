@@ -1,6 +1,6 @@
 {
   "name": "tempest-express-sdk",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "description": "Shared Express/Zod/tempest-db-js building blocks: base schemas, repository, exceptions, pagination, settings and native Swagger + Redoc — the conventions used across Tempest projects, ported from tempest-fastapi-sdk.",
   "type": "module",
   "license": "MIT",
@@ -54,10 +54,9 @@
     "docs:build": "mkdocs build --strict"
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.0",
+    "@asteasolutions/zod-to-openapi": "^9.1.0",
     "express": "^5.1.0",
-    "swagger-ui-dist": "^5.18.2",
-    "zod": "^3.24.1"
+    "swagger-ui-dist": "^5.18.2"
   },
   "peerDependencies": {
     "amqplib": "^0.10.0",
@@ -67,7 +66,8 @@
     "nodemailer": "^6.9.0",
     "tempest-db-js": ">=0.4.0",
     "web-push": "^3.6.0",
-    "ws": "^8.0.0"
+    "ws": "^8.0.0",
+    "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "amqplib": {
@@ -99,8 +99,8 @@
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.0",
-    "@types/swagger-ui-dist": "^3.30.6",
     "@types/nodemailer": "^6.4.16",
+    "@types/swagger-ui-dist": "^3.30.6",
     "@types/web-push": "^3.6.4",
     "@types/ws": "^8.5.12",
     "amqplib": "^0.10.4",
@@ -109,10 +109,11 @@
     "nodemailer": "^6.9.16",
     "tempest-db-js": "^0.4.0",
     "tsup": "^8.3.0",
-    "ws": "^8.18.0",
-    "web-push": "^3.6.7",
     "tsx": "^4.19.2",
     "typescript": "^5.7.0",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "web-push": "^3.6.7",
+    "ws": "^8.18.0",
+    "zod": "^4.5.4"
   }
 }

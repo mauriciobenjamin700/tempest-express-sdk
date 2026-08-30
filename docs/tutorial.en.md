@@ -53,13 +53,13 @@ const registry = createOpenApiRegistry();
 const itemSchema = registry.register(
   "Item",
   z.object({
-    id: z.string().uuid().openapi({ description: "The item identifier." }),
+    id: z.uuid().openapi({ description: "The item identifier." }),
     name: z.string().openapi({ description: "The item name." }),
   }),
 );
 ```
 
-`z.object({...})` says "an object with these fields"; `z.string().uuid()` says "a
+`z.object({...})` says "an object with these fields"; `z.uuid()` says "a
 string that is a UUID". The `.openapi({ description })` attaches the description
 that shows up in the docs.
 

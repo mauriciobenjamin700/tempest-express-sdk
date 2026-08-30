@@ -2,7 +2,7 @@
  * `logEntrySchema` — the shape of one structured log record, mirroring
  * `schemas.logs.LogEntrySchema`.
  *
- * Matches the JSON `JSONLogger` emits. It is intentionally open (`.passthrough()`)
+ * Matches the JSON `JSONLogger` emits. It is intentionally open (`.loose()`)
  * so arbitrary `extra` keys (`path`, `requestId`, `http_500`, …) survive instead
  * of being dropped — useful when a logs endpoint parses and returns records.
  */
@@ -31,7 +31,7 @@ export const logEntrySchema = z
         description: "Formatted stack trace, when the record carries an error.",
       }),
   })
-  .passthrough();
+  .loose();
 
 /** The parsed shape of {@link logEntrySchema} (plus any extra keys). */
 export type LogEntry = z.infer<typeof logEntrySchema>;

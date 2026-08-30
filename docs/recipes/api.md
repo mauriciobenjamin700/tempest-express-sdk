@@ -130,7 +130,7 @@ reutilizável; `registry.registerPath({...})` descreve uma rota.
 const Item = registry.register(
   "Item",
   z.object({
-    id: z.string().uuid().openapi({ description: "ID do item." }),
+    id: z.uuid().openapi({ description: "ID do item." }),
     name: z.string().openapi({ description: "Nome do item." }),
   }),
 );
@@ -139,7 +139,7 @@ registry.registerPath({
   method: "get",
   path: "/api/items/{id}",
   summary: "Busca um item",
-  request: { params: z.object({ id: z.string().uuid() }) },
+  request: { params: z.object({ id: z.uuid() }) },
   responses: {
     200: { description: "ok", content: { "application/json": { schema: Item } } },
   },

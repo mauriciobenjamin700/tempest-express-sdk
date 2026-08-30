@@ -36,7 +36,7 @@ Now open `package.json` and add the line `"type": "module"`. It tells Node to us
 Install the packages the app needs in production:
 
 ```bash
-npm install tempest-express-sdk tempest-db-js express zod
+npm install tempest-express-sdk tempest-db-js express zod@^4
 ```
 
 And the development tools (used only on your machine, to run TypeScript):
@@ -50,7 +50,7 @@ What each one is:
 - **`tempest-express-sdk`** — the SDK: it provides the layers (model, repository, server) you'll assemble.
 - **`tempest-db-js`** — the database layer underneath the SDK.
 - **`express`** — the HTTP server that handles the requests.
-- **`zod`** — data validation (you'll use it more in the next chapters).
+- **`zod`** — data validation, version 4 (you'll use it more in the next chapters).
 - **`tsx`** — runs TypeScript files directly, with no build step.
 - **`typescript`** + **`@types/node`** + **`@types/express`** — the compiler and the types, so your editor can help you with autocomplete and errors.
 

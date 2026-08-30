@@ -48,7 +48,7 @@ export type SyncFilter = z.infer<typeof syncFilterSchema>;
  * @param item - The zod schema for a single item.
  * @returns A zod object `{ items, nextCursor, hasMore, limit, serverTime }`.
  */
-export function syncPaginationSchema<T extends z.ZodTypeAny>(item: T) {
+export function syncPaginationSchema<T extends z.ZodType>(item: T) {
   return z.object({
     items: z.array(item).openapi({ description: "Changed rows in this page." }),
     nextCursor: z
