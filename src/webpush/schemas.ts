@@ -13,7 +13,7 @@ export const webPushKeysSchema = z
 /** A browser push subscription. */
 export const webPushSubscriptionSchema = z
   .object({
-    endpoint: z.string().url().openapi({ description: "Push service endpoint URL." }),
+    endpoint: z.url().openapi({ description: "Push service endpoint URL." }),
     keys: webPushKeysSchema,
   })
   .openapi("WebPushSubscription");
@@ -24,7 +24,10 @@ export const webPushPayloadSchema = z
     title: z.string().openapi({ description: "Notification title." }),
     body: z.string().optional().openapi({ description: "Notification body." }),
     url: z.string().optional().openapi({ description: "URL opened on click." }),
-    data: z.record(z.unknown()).optional().openapi({ description: "Extra data." }),
+    data: z
+      .record(z.string(), z.unknown())
+      .optional()
+      .openapi({ description: "Extra data." }),
   })
   .openapi("WebPushPayload");
 

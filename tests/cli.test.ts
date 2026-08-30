@@ -2,7 +2,8 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { main } from "@/cli/index";
-import { PasswordUtils } from "@/index";
+import { projectFiles } from "@/cli/template";
+import { PasswordUtils, VERSION } from "@/index";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let out = "";
@@ -74,5 +75,16 @@ describe("cli help/version", () => {
     expect(out).toContain("tempest-express");
     expect(out).toContain("config");
     expect(out).toContain("user");
+  });
+});
+
+describe("cli scaffold", () => {
+  it("pins the SDK to the running version and zod to the supported major", () => {
+    const files = projectFiles("demo");
+    const pkg = JSON.parse(files["package.json"] as string) as {
+      dependencies: Record<string, string>;
+    };
+    expect(pkg.dependencies["tempest-express-sdk"]).toBe(`^${VERSION}`);
+    expect(pkg.dependencies.zod).toBe("^4.0.0");
   });
 });

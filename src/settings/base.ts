@@ -64,7 +64,7 @@ export type BaseAppSettings = z.infer<typeof baseAppSettingsSchema>;
  * @returns The validated, frozen settings object.
  * @throws {z.ZodError} When required env vars are missing or malformed.
  */
-export function loadSettings<S extends z.ZodTypeAny>(
+export function loadSettings<S extends z.ZodType>(
   schema: S,
   env: NodeJS.ProcessEnv = process.env,
 ): Readonly<z.infer<S>> {

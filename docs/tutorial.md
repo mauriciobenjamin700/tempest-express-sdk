@@ -54,13 +54,13 @@ const registry = createOpenApiRegistry();
 const itemSchema = registry.register(
   "Item",
   z.object({
-    id: z.string().uuid().openapi({ description: "Identificador do item." }),
+    id: z.uuid().openapi({ description: "Identificador do item." }),
     name: z.string().openapi({ description: "Nome do item." }),
   }),
 );
 ```
 
-`z.object({...})` diz "um objeto com estes campos"; `z.string().uuid()` diz "uma
+`z.object({...})` diz "um objeto com estes campos"; `z.uuid()` diz "uma
 string que é um UUID". O `.openapi({ description })` anexa a descrição que aparece
 na documentação.
 

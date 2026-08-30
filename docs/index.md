@@ -29,7 +29,7 @@ import { createApp, createOpenApiRegistry, runServer, z } from "tempest-express-
 const registry = createOpenApiRegistry();
 const Item = registry.register(
   "Item",
-  z.object({ id: z.string().uuid(), name: z.string() }),
+  z.object({ id: z.uuid(), name: z.string() }),
 );
 
 const app = await createApp({

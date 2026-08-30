@@ -52,7 +52,7 @@ export function toDict(
  * `baseResponseSchema.extend({ ... })` to build concrete `*ResponseSchema`s.
  */
 export const baseResponseSchema = z.object({
-  id: z.string().uuid().openapi({ description: "The unique identifier of the record." }),
+  id: z.uuid().openapi({ description: "The unique identifier of the record." }),
   isActive: z
     .boolean()
     .openapi({ description: "Whether the record is active (soft-delete flag)." }),

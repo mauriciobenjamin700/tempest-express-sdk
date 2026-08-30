@@ -53,13 +53,13 @@ Open `package.json` and add the line `"type": "module"`. It turns on the
 ## 3. Install the SDK and dependencies
 
 ```bash
-npm install tempest-express-sdk tempest-db-js express zod
+npm install tempest-express-sdk tempest-db-js express zod@^4
 ```
 
 - **tempest-express-sdk** — the SDK (what this guide teaches).
 - **tempest-db-js** — the database layer (a required dependency of the SDK).
 - **express** — the underlying HTTP server.
-- **zod** — data validation.
+- **zod** — data validation (the SDK requires version 4).
 
 Now the tools to run TypeScript directly, with no build step:
 
@@ -89,7 +89,7 @@ const registry = createOpenApiRegistry();
 const itemSchema = registry.register(
   "Item",
   z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string(),
   }),
 );

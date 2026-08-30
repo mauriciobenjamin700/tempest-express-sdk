@@ -16,10 +16,17 @@ router → controller → service → repository → model stack built on
 ## Install
 
 ```bash
-npm install tempest-express-sdk tempest-db-js express zod
+npm install tempest-express-sdk tempest-db-js express zod@^4
 ```
 
-`tempest-db-js` is a required peer dependency.
+`tempest-db-js` and `zod@^4` are required peer dependencies. `zod` is a **peer**
+so the SDK and your project share **one** instance — that is what makes
+`.openapi()` and `instanceof ZodType` work across the package boundary. Check it
+with `npm ls zod`: a single line, marked `deduped`.
+
+> ⚠️ **v0.21.0 requires zod 4.** Coming from 0.20.x on zod 3? See the
+> [zod 4 migration guide](https://mauriciobenjamin700.github.io/tempest-express-sdk/migration/zod-4/)
+> ([EN](https://mauriciobenjamin700.github.io/tempest-express-sdk/en/migration/zod-4/)).
 
 ## What's inside
 
@@ -51,7 +58,7 @@ npm install tempest-express-sdk tempest-db-js express zod
 import { createApp, createOpenApiRegistry, runServer, z } from "tempest-express-sdk";
 
 const registry = createOpenApiRegistry();
-const Item = registry.register("Item", z.object({ id: z.string().uuid(), name: z.string() }));
+const Item = registry.register("Item", z.object({ id: z.uuid(), name: z.string() }));
 
 const app = await createApp({
   corsOrigins: "*",

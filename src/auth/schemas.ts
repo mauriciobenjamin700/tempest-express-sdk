@@ -11,7 +11,7 @@ import { z } from "@/schemas/base";
 /** Request body for `POST /auth/signup`. */
 export const signupSchema = z
   .object({
-    email: z.string().email().openapi({ description: "Login identifier (email)." }),
+    email: z.email().openapi({ description: "Login identifier (email)." }),
     password: z
       .string()
       .min(1)
@@ -27,7 +27,7 @@ export const signupSchema = z
 /** Request body for `POST /auth/login`. */
 export const loginSchema = z
   .object({
-    email: z.string().email().openapi({ description: "Login identifier (email)." }),
+    email: z.email().openapi({ description: "Login identifier (email)." }),
     password: z.string().min(1).openapi({ description: "Plaintext password." }),
   })
   .openapi("Login");
@@ -56,7 +56,7 @@ export const tokenPairSchema = z
 export const userPublicSchema = z
   .object({
     id: z.string().openapi({ description: "User id." }),
-    email: z.string().email().openapi({ description: "User email." }),
+    email: z.email().openapi({ description: "User email." }),
     name: z.string().nullable().openapi({ description: "Display name, or null." }),
     isActive: z.boolean().openapi({ description: "Whether the account is active." }),
     roles: z.array(z.string()).openapi({ description: "Assigned role names." }),
@@ -99,7 +99,7 @@ export const activationSchema = z
 
 /** Password-reset request body (`POST /auth/password-reset/request`). */
 export const passwordResetRequestSchema = z
-  .object({ email: z.string().email().openapi({ description: "Account email." }) })
+  .object({ email: z.email().openapi({ description: "Account email." }) })
   .openapi("PasswordResetRequest");
 
 /** Password-reset confirm body (`POST /auth/password-reset/confirm`). */

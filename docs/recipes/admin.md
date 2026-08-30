@@ -20,8 +20,8 @@ site.register({
     { name: "id", type: "string", readOnly: true },
     { name: "email", type: "string", required: true },
   ],
-  createSchema: z.object({ email: z.string().email() }),
-  updateSchema: z.object({ email: z.string().email() }),
+  createSchema: z.object({ email: z.email() }),
+  updateSchema: z.object({ email: z.email() }),
   async list({ page, pageSize, filters }) {
     const data = await userService.paginate({ page, pageSize, filters });
     return data; // { items, total, page, pageSize, pages }

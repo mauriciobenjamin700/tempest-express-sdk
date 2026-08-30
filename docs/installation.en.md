@@ -4,12 +4,22 @@
 
 - **Node.js >= 20**
 - **TypeScript >= 5.7** (recommended)
+- **zod >= 4** — a required peer dependency (see below)
 
 ## Install
 
 ```bash
-npm install tempest-express-sdk tempest-db-js express zod
+npm install tempest-express-sdk tempest-db-js express zod@^4
 ```
+
+!!! warning "`zod` must be **your** zod, on version 4"
+    Since v0.21.0 `zod` is a peer dependency (`^4.0.0`), not a dependency of the
+    SDK — so there is **exactly one instance**, shared by you and by it. That is
+    what makes `.openapi()` and `instanceof ZodType` work across the package
+    boundary. Check with `npm ls zod`: a single line, marked `deduped`.
+
+    Coming from 0.20.x on zod 3? Read
+    [Migrating to zod 4](migration/zod-4.md).
 
 !!! info "Peer dependencies"
     `tempest-db-js` is a **required** peer dependency (the database layer).

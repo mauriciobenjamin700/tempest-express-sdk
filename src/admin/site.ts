@@ -59,9 +59,9 @@ export interface AdminResource<T = unknown> {
   /** Delete a record by id. */
   remove?(id: string): Promise<void>;
   /** Zod schema validating the create body. */
-  createSchema?: z.ZodTypeAny;
+  createSchema?: z.ZodType;
   /** Zod schema validating the update body. */
-  updateSchema?: z.ZodTypeAny;
+  updateSchema?: z.ZodType;
 }
 
 /** A registry of admin resources. */
