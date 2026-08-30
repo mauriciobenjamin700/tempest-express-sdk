@@ -34,6 +34,21 @@ to [SemVer](https://semver.org/).
   reference page. Consumers who want offline Redoc opt in with
   `npm install redoc`; everyone else pays nothing.
 
+- **api**: `SwaggerOptions.ui` — a passthrough merged into the `SwaggerUIBundle`
+  constructor, so any Swagger UI option JSON can carry is reachable without the
+  SDK modelling each one. Three defaults now differ from Swagger UI's own:
+  `layout` is `"BaseLayout"` instead of `"StandaloneLayout"` (the standalone
+  layout renders the **Explore** topbar, an editable URL field that loads any
+  spec from any origin — the point of the Swagger editor, the wrong surface for
+  a page documenting one service), and `deepLinking` and `persistAuthorization`
+  are `true` (a linkable operation, and credentials that survive a reload).
+  `ui: { layout: "StandaloneLayout" }` restores the old page, standalone preset
+  script included. `supportedSubmitMethods` keeps Swagger UI's default, so
+  **Try it out** still executes every verb until a caller narrows it — which is
+  now possible for an API whose calls are irreversible. A function passed in
+  `ui` throws at mount time instead of being dropped silently by the JSON
+  serialization. Closes #8.
+
 - **api**: new exports `DEFAULT_DOCS_FAVICON`, `REDOC_CDN_URL`,
   `resolveRedocBundle` and the `RedocBundleSource` type.
 
@@ -51,7 +66,8 @@ to [SemVer](https://semver.org/).
 
 ### Docs
 
-- The API recipe gains **Favicon** and **Offline Redoc** sections (bilingual),
+- The API recipe gains **Favicon**, **Configuring Swagger UI** and **Offline
+  Redoc** sections (bilingual),
   with the `bundle` table, the air-gapped warning and an honest note that Redoc
   still fetches its own `cdn.redoc.ly` watermark from inside its bundle.
 

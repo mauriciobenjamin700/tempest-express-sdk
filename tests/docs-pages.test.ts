@@ -123,3 +123,74 @@ describe("redoc bundle source", () => {
     expect(html).toContain("The API reference could not load");
   });
 });
+
+describe("swagger ui options", () => {
+  it("documents one service: BaseLayout, no Explore topbar, no standalone preset", async () => {
+    const app = express();
+    mountSwaggerUi(app, "/docs", "/openapi.json");
+    const base = await serve(app);
+
+    const html = await (await fetch(`${base}/docs`)).text();
+    expect(html).toContain('"layout":"BaseLayout"');
+    expect(html).toContain("options.presets = [SwaggerUIBundle.presets.apis];");
+    expect(html).not.toContain("swagger-ui-standalone-preset.js");
+    expect(html).not.toContain("StandaloneLayout");
+  });
+
+  it("turns on deepLinking and persistAuthorization by default", async () => {
+    const app = express();
+    mountSwaggerUi(app, "/docs", "/openapi.json");
+    const base = await serve(app);
+
+    const html = await (await fetch(`${base}/docs`)).text();
+    expect(html).toContain('"deepLinking":true');
+    expect(html).toContain('"persistAuthorization":true');
+  });
+
+  it("merges caller options over the defaults", async () => {
+    const app = express();
+    mountSwaggerUi(app, "/docs", "/openapi.json", {
+      ui: { supportedSubmitMethods: ["get"], persistAuthorization: false },
+    });
+    const base = await serve(app);
+
+    const html = await (await fetch(`${base}/docs`)).text();
+    expect(html).toContain('"supportedSubmitMethods":["get"]');
+    expect(html).toContain('"persistAuthorization":false');
+  });
+
+  it("restores the standalone preset script when the layout asks for it", async () => {
+    const app = express();
+    mountSwaggerUi(app, "/docs", "/openapi.json", {
+      ui: { layout: "StandaloneLayout" },
+    });
+    const base = await serve(app);
+
+    const html = await (await fetch(`${base}/docs`)).text();
+    expect(html).toContain("swagger-ui-standalone-preset.js");
+    expect(html).toContain(
+      "options.presets = [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset];",
+    );
+  });
+
+  it("refuses a function instead of letting JSON drop it", () => {
+    const app = express();
+    expect(() =>
+      mountSwaggerUi(app, "/docs", "/openapi.json", {
+        ui: { requestInterceptor: (request: unknown) => request },
+      }),
+    ).toThrow(/`ui.requestInterceptor` is a function/);
+  });
+
+  it("escapes a closing script tag hidden in a ui value", async () => {
+    const app = express();
+    mountSwaggerUi(app, "/docs", "/openapi.json", {
+      ui: { validatorUrl: "</script><script>alert(1)</script>" },
+    });
+    const base = await serve(app);
+
+    const html = await (await fetch(`${base}/docs`)).text();
+    expect(html).not.toContain("</script><script>alert(1)");
+    expect(html).toContain("\\u003c/script>");
+  });
+});
