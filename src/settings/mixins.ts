@@ -21,24 +21,16 @@
  */
 
 import { z } from "@/schemas/base";
+import { looseBoolean } from "@/schemas/fields";
 
 /**
- * Parse an environment string into a boolean. Unlike `z.coerce.boolean()`
- * (which treats every non-empty string — including `"false"` — as `true`), this
- * reads the usual truthy tokens and treats everything else as `false`.
- *
- * @param defaultValue - The value when the variable is absent.
- * @returns A zod schema coercing `"true"`/`"1"`/`"yes"`/`"on"` to `true`.
+ * Parse an environment string into a boolean — the settings-facing name for
+ * {@link looseBoolean}, which is the single implementation shared with the
+ * query-string filters. Keeping one implementation is the point: two token
+ * lists drift, and a boolean that parses one way in a filter and another way in
+ * a settings field is the kind of divergence nothing catches.
  */
-export function envBoolean(defaultValue: boolean) {
-  return z
-    .union([z.boolean(), z.string()])
-    .default(defaultValue)
-    .transform((value) => {
-      if (typeof value === "boolean") return value;
-      return ["true", "1", "yes", "on"].includes(value.trim().toLowerCase());
-    });
-}
+export { looseBoolean as envBoolean };
 
 /**
  * Parse a comma-separated environment string into a trimmed, non-empty list.
@@ -61,7 +53,7 @@ export function envList(defaultValue = "") {
 /** Structured logging configuration. */
 export const logSettingsShape = {
   LOG_LEVEL: z.enum(["DEBUG", "INFO", "WARNING", "ERROR"]).default("INFO"),
-  LOG_JSON: envBoolean(true),
+  LOG_JSON: looseBoolean(true),
   LOG_DIR: z.string().default("logs"),
 } as const;
 
@@ -101,8 +93,8 @@ export const emailSettingsShape = {
   SMTP_USERNAME: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM_ADDR: z.string().default("noreply@example.com"),
-  SMTP_USE_TLS: envBoolean(true),
-  SMTP_USE_SSL: envBoolean(false),
+  SMTP_USE_TLS: looseBoolean(true),
+  SMTP_USE_SSL: looseBoolean(false),
   SMTP_TIMEOUT_SECONDS: z.coerce.number().min(0).default(30),
 } as const;
 
@@ -123,7 +115,7 @@ export const minioSettingsShape = {
   MINIO_ENDPOINT: z.string().default("localhost:9000"),
   MINIO_ACCESS_KEY: z.string().default("minioadmin"),
   MINIO_SECRET_KEY: z.string().default("minioadmin"),
-  MINIO_SECURE: envBoolean(false),
+  MINIO_SECURE: looseBoolean(false),
   MINIO_REGION: z.string().default("us-east-1"),
   MINIO_DEFAULT_BUCKET: z.string().default("uploads"),
   MINIO_PUBLIC_ENDPOINT: z.string().optional(),
@@ -150,14 +142,14 @@ export const webPushSettingsShape = {
 /** Server-side session settings (cookie + TTL). */
 export const sessionSettingsShape = {
   SESSION_TTL_SECONDS: z.coerce.number().int().min(1).default(86400),
-  SESSION_SLIDING: envBoolean(true),
+  SESSION_SLIDING: looseBoolean(true),
   SESSION_COOKIE_NAME: z.string().default("tempest_session"),
   SESSION_COOKIE_DOMAIN: z.string().optional(),
   SESSION_COOKIE_PATH: z.string().default("/"),
-  SESSION_COOKIE_SECURE: envBoolean(true),
-  SESSION_COOKIE_HTTPONLY: envBoolean(true),
+  SESSION_COOKIE_SECURE: looseBoolean(true),
+  SESSION_COOKIE_HTTPONLY: looseBoolean(true),
   SESSION_COOKIE_SAMESITE: z.enum(["lax", "strict", "none"]).default("lax"),
-  SESSION_ROTATE_ON_LOGIN: envBoolean(true),
+  SESSION_ROTATE_ON_LOGIN: looseBoolean(true),
 } as const;
 
 /** WebSocket hub tuning. */
@@ -179,8 +171,8 @@ export const webSocketSettingsShape = {
  * decoupled frontend.
  */
 export const authSettingsShape = {
-  AUTH_AUTO_ACTIVATE: envBoolean(false),
-  AUTH_RETURN_TOKEN_IN_RESPONSE: envBoolean(false),
+  AUTH_AUTO_ACTIVATE: looseBoolean(false),
+  AUTH_RETURN_TOKEN_IN_RESPONSE: looseBoolean(false),
   AUTH_ACTIVATION_TTL_SECONDS: z.coerce
     .number()
     .int()
@@ -194,15 +186,15 @@ export const authSettingsShape = {
     .string()
     .default("http://localhost:3000/reset-password?token={token}"),
   AUTH_PASSWORD_MIN_LENGTH: z.coerce.number().int().min(1).default(12),
-  AUTH_PASSWORD_REQUIRE_COMPLEXITY: envBoolean(false),
+  AUTH_PASSWORD_REQUIRE_COMPLEXITY: looseBoolean(false),
   AUTH_DEFAULT_LOCALE: z.string().default("pt-BR"),
-  AUTH_MFA_ENABLED: envBoolean(false),
+  AUTH_MFA_ENABLED: looseBoolean(false),
   AUTH_MFA_ISSUER: z.string().default("Tempest"),
   AUTH_MFA_RECOVERY_CODES_COUNT: z.coerce.number().int().min(0).default(10),
   AUTH_MFA_TOKEN_TTL_SECONDS: z.coerce.number().int().min(1).default(300),
   AUTH_MFA_VERIFY_WINDOW: z.coerce.number().int().min(0).default(1),
   AUTH_TOKEN_DELIVERY: z.enum(["bearer", "cookie", "both"]).default("bearer"),
-  AUTH_COOKIE_SECURE: envBoolean(true),
+  AUTH_COOKIE_SECURE: looseBoolean(true),
   AUTH_COOKIE_SAMESITE: z.enum(["lax", "strict", "none"]).default("lax"),
   AUTH_COOKIE_DOMAIN: z.string().optional(),
   AUTH_ACCESS_COOKIE_NAME: z.string().default("access_token"),

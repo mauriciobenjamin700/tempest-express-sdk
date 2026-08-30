@@ -1,10 +1,15 @@
 import {
   buildPaginationLinkHeader,
   centsField,
+  createOpenApiRegistry,
+  cursorPaginationFilterSchema,
+  generateOpenApiDocument,
   hexColorField,
   latitudeField,
   logEntrySchema,
+  looseBoolean,
   nonEmptyStrField,
+  paginationFilterSchema,
   percentField,
   priceField,
   slugField,
@@ -108,5 +113,78 @@ describe("logEntrySchema", () => {
     });
     expect(entry.level).toBe("INFO");
     expect((entry as Record<string, unknown>).path).toBe("/x");
+  });
+});
+
+describe("looseBoolean", () => {
+  it("reads false out of a query string instead of coercing it to true", () => {
+    const flag = z.object({ flag: looseBoolean(true) });
+    expect(flag.parse({ flag: "false" }).flag).toBe(false);
+    expect(flag.parse({ flag: "0" }).flag).toBe(false);
+    expect(flag.parse({ flag: "no" }).flag).toBe(false);
+    expect(flag.parse({ flag: "off" }).flag).toBe(false);
+    expect(flag.parse({ flag: "disabled" }).flag).toBe(false);
+  });
+
+  it("reads the truthy tokens, case-insensitively and trimmed", () => {
+    const flag = z.object({ flag: looseBoolean(false) });
+    for (const value of ["true", "1", "YES", " on ", "y", "Enabled"]) {
+      expect(flag.parse({ flag: value }).flag).toBe(true);
+    }
+  });
+
+  it("falls back to the default when absent or empty", () => {
+    expect(z.object({ flag: looseBoolean(true) }).parse({}).flag).toBe(true);
+    expect(z.object({ flag: looseBoolean(false) }).parse({}).flag).toBe(false);
+    expect(z.object({ flag: looseBoolean(true) }).parse({ flag: "" }).flag).toBe(true);
+    expect(z.object({ flag: looseBoolean(true) }).parse({ flag: "  " }).flag).toBe(true);
+  });
+
+  it("passes real booleans through", () => {
+    const flag = z.object({ flag: looseBoolean(true) });
+    expect(flag.parse({ flag: false }).flag).toBe(false);
+    expect(flag.parse({ flag: true }).flag).toBe(true);
+  });
+
+  it("rejects a token it cannot read instead of silently returning false", () => {
+    const result = z.object({ flag: looseBoolean(true) }).safeParse({ flag: "maybe" });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["flag"]);
+  });
+});
+
+describe("pagination filter booleans", () => {
+  it("honours ?ascending=false on offset pagination", () => {
+    expect(paginationFilterSchema.parse({ ascending: "false" }).ascending).toBe(false);
+    expect(paginationFilterSchema.parse({}).ascending).toBe(true);
+  });
+
+  it("honours ?ascending=true on cursor pagination", () => {
+    expect(cursorPaginationFilterSchema.parse({ ascending: "true" }).ascending).toBe(
+      true,
+    );
+    expect(cursorPaginationFilterSchema.parse({}).ascending).toBe(false);
+  });
+
+  it("honours ?includeDeleted=false on delta sync", () => {
+    expect(syncFilterSchema.parse({ includeDeleted: "true" }).includeDeleted).toBe(true);
+    expect(syncFilterSchema.parse({ includeDeleted: "false" }).includeDeleted).toBe(
+      false,
+    );
+  });
+
+  it("documents the flags as plain booleans in OpenAPI", () => {
+    const registry = createOpenApiRegistry();
+    registry.register("PageFilter", paginationFilterSchema);
+    const doc = generateOpenApiDocument(registry, {
+      info: { title: "t", version: "1.0.0" },
+    });
+    const components = doc.components as {
+      schemas: { PageFilter: { properties: Record<string, Record<string, unknown>> } };
+    };
+    expect(components.schemas.PageFilter.properties.ascending).toMatchObject({
+      type: "boolean",
+      default: true,
+    });
   });
 });

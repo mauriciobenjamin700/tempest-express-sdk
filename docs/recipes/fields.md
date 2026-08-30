@@ -44,6 +44,45 @@ Disponíveis:
 
 ---
 
+### `looseBoolean` — o booleano que chega como texto
+
+Query string e variável de ambiente entregam **string**, e aí `z.coerce.boolean()`
+é uma armadilha: ele é `Boolean(input)`, então `"false"` e `"0"` viram `true` e
+não existe forma de pedir `false` pela URL.
+
+`looseBoolean(default)` lê os tokens dos dois lados e **recusa** o que não
+reconhece, para um typo virar 422 em vez de um `false` silencioso:
+
+```ts
+import { looseBoolean, z } from "tempest-express-sdk";
+
+const filterSchema = z.object({ onlyActive: looseBoolean(true) });
+
+filterSchema.parse({ onlyActive: "false" }).onlyActive; // false ✅
+filterSchema.parse({ onlyActive: " YES " }).onlyActive; // true  (trim + case-insensitive)
+filterSchema.parse({ onlyActive: "" }).onlyActive;      // true  (vazio = ausente → default)
+filterSchema.parse({}).onlyActive;                      // true  (default)
+filterSchema.parse({ onlyActive: "talvez" });           // ❌ ZodError
+```
+
+| Vira `true` | Vira `false` |
+| --- | --- |
+| `true` `1` `yes` `on` `y` `enabled` | `false` `0` `no` `off` `n` `disabled` |
+
+!!! info "É o mesmo helper do `envBoolean`"
+    `envBoolean` dos settings é este mesmo `looseBoolean` sob outro nome — uma
+    implementação só, para o booleano do filtro e o da variável de ambiente
+    nunca divergirem. Detalhes em
+    [Configuração (settings tipados)](settings.md#3-booleans-e-listas-do-ambiente).
+
+!!! tip "Já vem aplicado nos filtros do SDK"
+    `paginationFilterSchema.ascending`, `cursorPaginationFilterSchema.ascending`
+    e `syncFilterSchema.includeDeleted` usam `looseBoolean`, então
+    `?ascending=false` faz o que diz. No OpenAPI o campo aparece como
+    `type: boolean` com o `default`, não como a união usada para parsear.
+
+---
+
 ## 2. Paginação delta-sync (offline-first)
 
 Para clientes que puxam "tudo que mudou desde o último sync". O cliente devolve o
@@ -126,6 +165,8 @@ const entry = logEntrySchema.parse(JSON.parse(line));
 
 - Tipos de campo (`centsField`, `priceField`, `slugField`, …) — restrições Zod
   reaproveitáveis.
+- `looseBoolean` — o booleano que chega como texto: `"false"` é `false`, token
+  desconhecido é erro. Já aplicado nos filtros de paginação e sync.
 - `syncFilterSchema` / `syncPaginationSchema` — delta-sync offline-first.
 - `buildPaginationLinkHeader` — `Link` header RFC-5988.
 - `logEntrySchema` — o shape de um registro de log. ✅

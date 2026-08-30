@@ -9,12 +9,13 @@
  */
 
 import { z } from "@/schemas/base";
+import { looseBoolean } from "@/schemas/fields";
 
 /** Server bind/runtime settings. Defaults bind to localhost. */
 export const serverSettingsShape = {
   HOST: z.string().default("127.0.0.1"),
   PORT: z.coerce.number().int().min(0).max(65535).default(8000),
-  DEBUG: z.coerce.boolean().default(false),
+  DEBUG: looseBoolean(false),
 } as const;
 
 /** Database connection settings. */

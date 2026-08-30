@@ -68,6 +68,27 @@ describe("envBoolean", () => {
     expect(z.object({ FLAG: envBoolean(true) }).parse({}).FLAG).toBe(true);
     expect(z.object({ FLAG: envBoolean(false) }).parse({}).FLAG).toBe(false);
   });
+
+  it("treats an empty variable as unset rather than as false", () => {
+    expect(z.object({ FLAG: envBoolean(true) }).parse({ FLAG: "" }).FLAG).toBe(true);
+  });
+
+  it("refuses a token it cannot read, so a typo cannot become a silent false", () => {
+    expect(
+      z.object({ FLAG: envBoolean(true) }).safeParse({ FLAG: "maybe" }).success,
+    ).toBe(false);
+  });
+});
+
+describe("DEBUG", () => {
+  it("reads DEBUG=false as false", () => {
+    const schema = z.object(baseAppSettingsShape);
+    expect(loadSettings(schema, { DEBUG: "false" } as NodeJS.ProcessEnv).DEBUG).toBe(
+      false,
+    );
+    expect(loadSettings(schema, { DEBUG: "true" } as NodeJS.ProcessEnv).DEBUG).toBe(true);
+    expect(loadSettings(schema, {} as NodeJS.ProcessEnv).DEBUG).toBe(false);
+  });
 });
 
 describe("envList", () => {

@@ -34,7 +34,7 @@ with `npm ls zod`: a single line, marked `deduped`.
 | --- | --- |
 | **core** | `JSONLogger`, `configureLogging`, request-id context (`getRequestId`, `runWithRequestContext`), `defineEnum` |
 | **exceptions** | `AppException` + `ConflictException` / `NotFoundException` / `UnauthorizedException` / `ForbiddenException` / `ValidationException` / `TooManyRequestsException` / `InvalidTokenException` / `ExpiredTokenException`, `MessageCatalog` (i18n) |
-| **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor + delta-sync pagination, `buildPaginationLinkHeader`, validated field types (`centsField`/`priceField`/`slugField`/…), `logEntrySchema` |
+| **schemas** | `z` (OpenAPI-augmented), `baseResponseSchema`, `toDict`, `paginationFilterSchema` / `paginationSchema`, cursor + delta-sync pagination, `buildPaginationLinkHeader`, validated field types (`centsField`/`priceField`/`slugField`/…), `looseBoolean` (textual booleans from query strings and env), `logEntrySchema` |
 | **settings** | `loadSettings`, `baseAppSettingsShape` (server / database / CORS) + domain fragments (`jwtSettingsShape`, `authSettingsShape`, `emailSettingsShape`, `redisSettingsShape`, `sessionSettingsShape`, `uploadSettingsShape`, `minioSettingsShape`, …), `envBoolean` / `envList` |
 | **db** | re-exports `tempest-db-js` + `BaseModel`, `tableNameFor`, soft-delete / audit column helpers; `TenantScopedRepository`, `BaseOutboxModel` + `OutboxRelay`, `BaseAuditLogModel` + `snapshot`/`diffSnapshots`, `BaseUserModel` / `BaseUserTokenModel` / `BaseUserRefreshTokenModel`, `wrapWithSlowQueryLog`, `backupDatabase` |
 | **services / controllers** | `BaseService`, `BaseController` over a typed repository |

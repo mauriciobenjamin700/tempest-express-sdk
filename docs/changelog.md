@@ -9,6 +9,55 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.22.0] — 2026-08-30
+
+### Corrigido
+
+- **BREAKING (comportamento) — schemas**: `?ascending=false` agora realmente
+  ordena descendente. `paginationFilterSchema.ascending`,
+  `cursorPaginationFilterSchema.ascending` e `syncFilterSchema.includeDeleted`
+  eram construídos com `z.coerce.boolean()`, que é `Boolean(input)` — toda string
+  não-vazia vira `true`, `"false"` e `"0"` inclusive — então **não havia como
+  mandar `false` pela URL**. Passaram a usar o novo `looseBoolean`. Closes #4.
+
+- **BREAKING (comportamento) — settings**: `DEBUG=false` agora desliga o debug. O
+  campo `DEBUG` do `serverSettingsShape` tinha o mesmo defeito de
+  `z.coerce.boolean()`, então qualquer valor não-vazio — `"false"` incluído —
+  ligava o debug.
+
+### Adicionado
+
+- **schemas**: `looseBoolean(defaultValue)` — o campo booleano para valores que
+  chegam como texto (query string, variável de ambiente). Lê
+  `true`/`1`/`yes`/`on`/`y`/`enabled` e `false`/`0`/`no`/`off`/`n`/`disabled`,
+  sem diferenciar maiúsculas e com trim; trata valor vazio ou só com espaço como
+  ausente (então entrada não preenchida no `.env` cai no default); repassa
+  booleanos de verdade; e **recusa** qualquer outra coisa, para um typo virar
+  erro de validação em vez de um `false` silencioso. Construído sobre o
+  `z.stringbool()` do zod 4. A metadata OpenAPI é fixada em `type: boolean` com o
+  default, então o documento descreve o que o cliente manda, e não a união usada
+  para parsear.
+
+### Alterado
+
+- **BREAKING (comportamento) — settings**: `envBoolean` passa a ser o
+  `looseBoolean` sob o nome do domínio de settings — uma implementação só,
+  compartilhada com os filtros de query, em vez de duas listas de token que
+  divergem. Mesma assinatura, e todo token aceito antes continua parseando igual.
+  Duas coisas mudam: **token não reconhecido agora é `ZodError`** em vez de um
+  `false` silencioso, e **variável vazia** (`SMTP_USE_TLS=`) agora cai no default
+  do campo em vez de ser lida como `false`. As duas fazem config de ambiente
+  errada falhar no boot em vez de degradar em silêncio. Afeta todo campo booleano
+  de settings: `LOG_JSON`, `SMTP_USE_TLS`, `SMTP_USE_SSL`, `MINIO_SECURE`,
+  `SESSION_*`, `AUTH_*`.
+
+### Docs
+
+- Seção nova **`looseBoolean` — o booleano que chega como texto** na receita de
+  campos validados (bilíngue), com a tabela de tokens e a nota de OpenAPI.
+- A seção `envBoolean` da receita de configuração documenta a recusa de token
+  desconhecido e a regra da variável vazia, e linka o `looseBoolean`.
+
 ## [0.21.0] — 2026-08-30
 
 ### Alterado

@@ -44,6 +44,45 @@ Available:
 
 ---
 
+### `looseBoolean` — the boolean that arrives as text
+
+Query strings and environment variables hand you a **string**, and there
+`z.coerce.boolean()` is a trap: it is `Boolean(input)`, so `"false"` and `"0"`
+become `true` and there is no way to ask for `false` over the URL.
+
+`looseBoolean(default)` reads the tokens on both sides and **rejects** what it
+does not recognise, so a typo becomes a 422 instead of a silent `false`:
+
+```ts
+import { looseBoolean, z } from "tempest-express-sdk";
+
+const filterSchema = z.object({ onlyActive: looseBoolean(true) });
+
+filterSchema.parse({ onlyActive: "false" }).onlyActive; // false ✅
+filterSchema.parse({ onlyActive: " YES " }).onlyActive; // true  (trimmed, case-insensitive)
+filterSchema.parse({ onlyActive: "" }).onlyActive;      // true  (empty = absent → default)
+filterSchema.parse({}).onlyActive;                      // true  (default)
+filterSchema.parse({ onlyActive: "maybe" });            // ❌ ZodError
+```
+
+| Becomes `true` | Becomes `false` |
+| --- | --- |
+| `true` `1` `yes` `on` `y` `enabled` | `false` `0` `no` `off` `n` `disabled` |
+
+!!! info "It is the same helper as `envBoolean`"
+    The settings' `envBoolean` is this very `looseBoolean` under another name —
+    one implementation, so the boolean in a filter and the one in an environment
+    variable can never drift apart. Details in
+    [Configuration (typed settings)](settings.md#3-booleans-and-lists-from-the-environment).
+
+!!! tip "Already applied to the SDK's filters"
+    `paginationFilterSchema.ascending`, `cursorPaginationFilterSchema.ascending`
+    and `syncFilterSchema.includeDeleted` use `looseBoolean`, so
+    `?ascending=false` does what it says. In OpenAPI the field shows up as
+    `type: boolean` with its `default`, not as the union used to parse it.
+
+---
+
 ## 2. Delta-sync pagination (offline-first)
 
 For clients that pull "everything changed since my last sync". The client sends
@@ -126,6 +165,8 @@ const entry = logEntrySchema.parse(JSON.parse(line));
 
 - Field types (`centsField`, `priceField`, `slugField`, …) — reusable Zod
   constraints.
+- `looseBoolean` — the boolean that arrives as text: `"false"` is `false`, an
+  unknown token is an error. Already applied to the pagination and sync filters.
 - `syncFilterSchema` / `syncPaginationSchema` — offline-first delta sync.
 - `buildPaginationLinkHeader` — an RFC-5988 `Link` header.
 - `logEntrySchema` — the shape of a log record. ✅
