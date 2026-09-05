@@ -517,6 +517,95 @@ the lens ordering holds until the operator clicks a column header. The **All**
 tab returns to the unfiltered list, and `lens` travels through the pagination,
 sorting and export links.
 
+## 13. File and image uploads
+
+A String column holding a file path/key can render as an **upload input**. List
+it in `uploadFields` and pass an `uploadStorage` — the backends the SDK already
+ships will do:
+
+```ts
+import { AdminModel, LocalUploadStorage } from "tempest-express-sdk";
+
+site.register(
+  new AdminModel({
+    model: DocumentModel,
+    uploadFields: ["attachment"],
+    uploadStorage: new LocalUploadStorage({ root: "media/", baseUrl: "/media" }),
+  }),
+);
+```
+
+- The form becomes `multipart/form-data` on its own when an upload field exists.
+- **Create**: a file is required only when the column is `NOT NULL` with no default.
+- **Edit**: no new file keeps the current one (the form shows `Current: …`); a
+  new file replaces it.
+- The column stores the storage **key** (`<slug>/<field>/<uuid>.<ext>`); use the
+  `uploadStorage` to serve or download it later.
+
+!!! info "`busboy` is an optional peer"
+    Express does not parse multipart. The panel uses `busboy` — an **optional**
+    peer, needed only by projects that configure `uploadFields` or `canImport`,
+    with an error naming the install command. `npm install busboy`. A wire-format
+    parser has a long tail of correctness (boundaries, transfer encodings,
+    filename escaping): the case for depending rather than reimplementing.
+
+!!! danger "Upload cap"
+    `makeAdminRouter(site, { maxUploadBytes })` bounds what is accepted (default
+    10 MB). A file over the cap comes back as a form error with nothing written.
+    Files are buffered in memory — which is what a panel needs (an operator
+    attaching a document), not a streaming ingest path.
+
+!!! warning "`uploadFields` requires `uploadStorage`"
+    Registering one without the other throws when the `AdminModel` is built:
+    with no storage there is nowhere to write, and failing at boot beats failing
+    on the first production upload.
+
+## 14. CSV import
+
+`canImport: true` (alongside `canCreate`) exposes an import page that bulk-creates
+rows from an uploaded file:
+
+```ts
+site.register(new AdminModel({ model: OrderModel, canImport: true }));
+```
+
+The file is UTF-8 with a header row; unknown columns are ignored and the
+recognised ones are the same the form edits. Every row goes through the same
+coercion and validation as the form, and the ones that fail come back in a table
+with the **spreadsheet row number** (starting at 2, since row 1 is the header)
+and the reason. The ones that pass are created — a partial import is a normal
+outcome, not an error.
+
+!!! tip "The parser follows RFC 4180"
+    A quoted field may contain commas, newlines and doubled quotes, and the BOM
+    Excel writes is stripped — without that the first column name would never
+    match. An import that mangles exactly the rows someone took the trouble to
+    quote is worse than no import.
+
+## 15. Foreign-key autocomplete
+
+A foreign key whose target table is too large for a `<select>` becomes a search
+box:
+
+```ts
+site.register(
+  new AdminModel({
+    model: OrderModel,
+    autocompleteFields: ["userId"],
+  }),
+);
+```
+
+The field then searches `GET {prefix}/m/{slug}/autocomplete/{field}?q=`, which
+queries the **referenced** admin's `searchFields` and returns up to 20 options.
+On edit the box opens showing the current row's label, not its UUID.
+
+!!! info "No CDN"
+    The Python SDK reaches for HTMX from a CDN here. This panel uses ~30 lines of
+    plain DOM instead, because a third-party script on an operator console is an
+    external request an air-gapped deployment cannot make and a strict CSP has to
+    whitelist — and what is needed is one fetch and one list.
+
 ## Recap
 
 1. `BaseUserModel` plus one seeded `isAdmin` row gives you the login.

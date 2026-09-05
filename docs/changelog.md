@@ -9,6 +9,51 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.27.0] — 2026-09-05
+
+### Adicionado
+
+- **admin**: **upload de arquivo e imagem**. `AdminModel({ uploadFields,
+  uploadStorage })` renderiza essas colunas String como input de arquivo, muda o
+  formulário para `multipart/form-data`, grava o arquivo pelo backend de storage
+  e guarda a chave devolvida (`<slug>/<campo>/<uuid>.<ext>`). No create o arquivo
+  só é obrigatório para coluna `NOT NULL` sem default; no edit, não enviar
+  arquivo mantém o atual em vez de limpar a coluna. Registrar `uploadFields` sem
+  `uploadStorage` levanta erro na construção, porque falhar no boot é melhor que
+  falhar no primeiro upload de produção. `makeAdminRouter({ maxUploadBytes })`
+  limita o tamanho (default 10 MB).
+
+- **admin**: **import CSV**. `AdminModel({ canImport: true })` expõe
+  `GET/POST {prefix}/m/{slug}/import`, que cria linhas em massa a partir de um
+  CSV UTF-8 enviado. Cada linha passa pela mesma coerção e validação do
+  formulário; as que falham voltam numa tabela numerada como a planilha numera
+  (começando em 2, já que a linha 1 é o header) com o motivo, e as que passaram
+  são criadas — import parcial é resultado normal, não erro. O `parseCsv`
+  exportado segue a RFC 4180 (vírgula entre aspas, quebra de linha embutida,
+  aspas duplicadas) e remove o BOM que o Excel escreve.
+
+- **admin**: **autocomplete de chave estrangeira**.
+  `AdminModel({ autocompleteFields })` transforma a FK numa caixa de busca
+  servida por `GET {prefix}/m/{slug}/autocomplete/{campo}?q=`, que consulta os
+  `searchFields` do admin referenciado e devolve até 20 opções — dispensando o
+  pré-carregamento de 1000 linhas que um `<select>` exige. Na edição, a caixa
+  abre com o rótulo da linha atual, não com o id. Onde o SDK Python puxa HTMX de
+  CDN, aqui vão ~30 linhas de DOM puro: script de terceiro num console de
+  operador é requisição que deploy fechado não faz e CSP estrita precisa liberar.
+
+- **deps**: `busboy` entra como **peer opcional**, exigido só por quem configura
+  `uploadFields` ou `canImport`; o erro diz o comando de instalação. O Express
+  não faz parse de multipart, e parser de formato de fio é o caso de depender em
+  vez de reimplementar. `parseMultipart` / `isMultipart` / `MultipartLimitError`
+  são exportados para quem precisa do mesmo tratamento.
+
+### Corrigido
+
+- **admin**: `createdBy` / `updatedBy` não são mais oferecidos como campo de
+  formulário. O painel os carimba sozinho, então valor digitado ali era
+  descartado em silêncio no submit — campo que não faz nada é pior que campo
+  nenhum.
+
 ## [0.26.0] — 2026-09-05
 
 ### Adicionado
