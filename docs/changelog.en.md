@@ -9,6 +9,36 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.30.0] — 2026-09-05
+
+### Added
+
+- **tasks**: `TaskManager.register` takes an optional `{ description, schedule }`
+  and `TaskManager.inventory()` reports what this process would run, ordered by
+  name. The schedule is recorded and displayed, never interpreted — the manager
+  consumes a queue, it does not schedule.
+
+- **tasks**: `BaseJobModel` and `JobStore` — a persisted row per unit of long
+  work, so the questions a broker cannot answer (did last night's export finish,
+  why did that import fail, what is running now) have somewhere to live. Every
+  transition is a method rather than a raw update, so "finished" always moves the
+  same columns together, and `cancel` refuses a run already in a terminal state
+  instead of rewriting it under the operator. The store is deliberately not wired
+  into `TaskManager`: not every enqueued message deserves a durable row, and a
+  worker writing one usually wants domain fields the envelope never carried.
+
+- **admin**: the **tasks page**. `makeAdminRouter({ tasks })` serves
+  `{prefix}/tasks` with both halves — the declared inventory and the recorded
+  runs, filtered by status and name — plus a per-run screen showing payload,
+  result, error and attempts, with a Cancel button while the run is not terminal.
+  Either half may be omitted, and a section with no source is left out rather
+  than rendered empty. What the page deliberately does not show is live queue
+  depth: no broker exposes it, and a number that looked like that answer would be
+  worse than none.
+
+- **admin**: the bundled stylesheet gains job-status badge colours, kept in their
+  own constant so the ported base stays a verbatim copy that can be re-synced.
+
 ## [0.29.0] — 2026-09-05
 
 ### Added

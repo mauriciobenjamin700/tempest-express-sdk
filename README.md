@@ -40,13 +40,13 @@ with `npm ls zod`: a single line, marked `deduped`.
 | **services / controllers** | `BaseService`, `BaseController` over a typed repository |
 | **utils** | CPF/CNPJ/CEP/phone/UF + cities, `PasswordUtils`, `JWTUtils`, opaque tokens, `AttemptThrottle`, `sendFileDownload`/`sendBytesDownload` (Range), `configureFileLogging` (per-level + `500.log`) |
 | **auth** | `UserAuthService`, JWT middleware + role guards, `makeAuthRouter`; MFA (`MfaService`), email activation, password reset; optional HTML pages (`renderAuthResultPage`, `renderPasswordResetFormPage`) |
-| **cache / queue / tasks** | `CacheManager` (+`cached`), `BrokerManager` (memory/RabbitMQ), `TaskManager` |
+| **cache / queue / tasks** | `CacheManager` (+`cached`), `BrokerManager` (memory/RabbitMQ), `TaskManager` (+ `inventory`), `BaseJobModel` + `JobStore` (persisted runs) |
 | **sse / websockets** | `SSEBroker`/`sseResponse` (+ `RedisSSEBroker`), transport-agnostic `WebSocketHub` + `attachWebSocketHub` |
 | **flags / storage** | `FeatureFlags` (+ guard), `UploadStorage`/`LocalUploadStorage`/`S3UploadStorage` (MinIO/S3) |
 | **webpush / email** | `WebPushDispatcher` (VAPID), `EmailUtils` (SMTP) |
 | **server utils** | `TOTPHelper` (MFA), `HTTPClient` (retry + circuit breaker), `MetricsUtils` (+ Prometheus, GPU), `makeMetricsRouter`, `getClientIp` |
 | **integrations** | `MessagingProvider` contract; `WhatsAppProvider` (zap-api), `TelegramProvider` (Bot API), `TwilioSmsProvider` (SMS), `EmailProvider`, `MessagingHub` + `broadcastText`, webhook receivers |
-| **admin** | `AdminSite` + `AdminModel` + `makeAdminRouter` — a server-rendered Django-style panel (login + MFA, dashboard, search/filter/sort list views, auto-derived CRUD forms, bulk + custom actions, CSV/JSON export, FK selects, RBAC, audit trail, metric cards, lenses, uploads, CSV import, FK autocomplete, inlines, logs page, policy-gated SQL console, typed theming); `AdminJsonSite` + `makeAdminJsonRouter` for the headless JSON admin |
+| **admin** | `AdminSite` + `AdminModel` + `makeAdminRouter` — a server-rendered Django-style panel (login + MFA, dashboard, search/filter/sort list views, auto-derived CRUD forms, bulk + custom actions, CSV/JSON export, FK selects, RBAC, audit trail, metric cards, lenses, uploads, CSV import, FK autocomplete, inlines, logs page, policy-gated SQL console, tasks page, typed theming); `AdminJsonSite` + `makeAdminJsonRouter` for the headless JSON admin |
 | **api** | `createApp`, `runServer`, `registerExceptionHandlers`, `createOpenApiRegistry`, `generateOpenApiDocument`, `mountSwaggerUi` (configurable via `ui`), `mountRedoc` (both ship a favicon; Redoc serves its bundle locally when the optional `redoc` peer is installed), `makeHealthRouter` |
 | **api/middlewares** | `rateLimitMiddleware` (memory/Redis stores, IP/header/JWT keys), `bodySizeLimitMiddleware`, `csrfMiddleware`, `idempotencyMiddleware` (memory/Redis), `GracefulShutdown`, `requestTracingMiddleware`, `prometheusMiddleware` / `HttpMetrics` |
 | **api/oauth** | `GoogleOAuthClient`, `GitHubOAuthClient`, `OIDCProvider`, `generateOAuthState`; `WebhookSignatureVerifier`; `makeToolSpecRouter` |

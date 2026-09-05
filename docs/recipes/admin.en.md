@@ -755,6 +755,79 @@ operator, the verdict, the reason, the duration and the row count. A hook that
 throws is logged and swallowed: an audit trail that can break the thing it audits
 gets turned off.
 
+## 19. Tasks (declared + history)
+
+The panel shows both halves of background work — **what this process declares**
+and **what its workers recorded**:
+
+```ts
+import { BaseJobModel, JobStore, TaskManager } from "tempest-express-sdk";
+
+export class JobModel extends BaseJobModel {
+  static override tablename = "job";
+}
+
+const tasks = new TaskManager();
+tasks.register("nightly-export", exportOrders, {
+  description: "Ships yesterday's orders to the warehouse",
+  schedule: "0 3 * * *",
+});
+
+makeAdminRouter(site, {
+  engine,
+  authBackend,
+  secretKey,
+  tasks: {
+    manager: tasks,
+    jobs: (session) => new JobStore(JobModel, session),
+  },
+});
+```
+
+**Declared** comes from the `TaskManager` registry: the name, `schedule` and
+`description` you passed to `register`. The schedule is **recorded and
+displayed, never interpreted** — the manager consumes a queue, it does not
+schedule.
+
+**Runs** comes from the `JobStore`: one row per unit of long work, written by
+the worker itself.
+
+```ts
+const jobs = new JobStore(JobModel, session);
+const job = await jobs.enqueue("nightly-export", { day });
+try {
+  await jobs.start(String(job.id));
+  const rows = await exportOrders(day);
+  await jobs.succeed(String(job.id), { rows });
+} catch (error) {
+  await jobs.fail(String(job.id), error);
+}
+```
+
+Every transition is a method rather than a raw update, so "finished" always
+moves the same columns together — a status without a `finishedAt` is the kind of
+half-written row that makes a history screen lie.
+
+The page lists runs newest first, filters by status and by name, and opens each
+one with its payload, result, error and attempts. A run that has not finished
+gets a **Cancel** button; `JobStore.cancel` **refuses** to touch a run already in
+a terminal state and returns `false`, so an operator clicking cancel on a run
+that just finished sees the truth instead of a row rewritten under them.
+
+Either half may be missing: with only `manager` the page shows the declared side,
+with only `jobs` the history. A section with no source is **omitted**, not
+rendered empty — an empty table implies there is nothing to see.
+
+!!! warning "Queue depth is not shown"
+    The page answers "what is declared" and "what was persisted", never "how many
+    messages are sitting in the broker right now". Brokers do not expose that,
+    and a number that looked like that answer would be worse than none.
+
+!!! info "The store is not wired into the manager"
+    Not every enqueued message deserves a durable row, and a worker that writes
+    one usually wants to record domain fields the envelope never carried. So
+    `JobStore` is called by the worker, not by `TaskManager`.
+
 ## Recap
 
 1. `BaseUserModel` plus one seeded `isAdmin` row gives you the login.

@@ -753,6 +753,78 @@ operador, o veredito, o motivo, a duração e a contagem de linhas. Hook que
 levanta é logado e engolido: trilha de auditoria que derruba o que audita acaba
 desligada.
 
+## 19. Tasks (declarado + histórico)
+
+O painel mostra as duas metades do trabalho em background — **o que este
+processo declara** e **o que os workers registraram**:
+
+```ts
+import { BaseJobModel, JobStore, TaskManager } from "tempest-express-sdk";
+
+export class JobModel extends BaseJobModel {
+  static override tablename = "job";
+}
+
+const tasks = new TaskManager();
+tasks.register("nightly-export", exportOrders, {
+  description: "Envia os pedidos de ontem para o armazém",
+  schedule: "0 3 * * *",
+});
+
+makeAdminRouter(site, {
+  engine,
+  authBackend,
+  secretKey,
+  tasks: {
+    manager: tasks,
+    jobs: (session) => new JobStore(JobModel, session),
+  },
+});
+```
+
+**Declarado** vem do registro do `TaskManager`: nome, `schedule` e
+`description` que você passou no `register`. O schedule é **registrado e
+exibido, nunca interpretado** — o manager consome fila, ele não agenda.
+
+**Runs** vem do `JobStore`: uma linha por unidade de trabalho longo, que o
+próprio worker escreve.
+
+```ts
+const jobs = new JobStore(JobModel, session);
+const job = await jobs.enqueue("nightly-export", { day });
+try {
+  await jobs.start(String(job.id));
+  const rows = await exportOrders(day);
+  await jobs.succeed(String(job.id), { rows });
+} catch (error) {
+  await jobs.fail(String(job.id), error);
+}
+```
+
+Cada transição é um método, não um update cru, então "terminou" sempre move as
+mesmas colunas juntas — status sem `finishedAt` é o tipo de linha meio escrita
+que faz uma tela de histórico mentir.
+
+A página lista os runs mais recentes primeiro, filtra por status e por nome, e
+abre cada um com payload, resultado, erro e tentativas. Run que ainda não
+terminou tem botão **Cancel**; `JobStore.cancel` **recusa** mexer em run que já
+está num estado terminal e devolve `false`, então o operador que clica em cancel
+num run que acabou de terminar vê a verdade em vez de uma linha reescrita.
+
+Qualquer uma das metades pode faltar: só `manager` mostra o declarado, só `jobs`
+mostra o histórico. Seção sem fonte é **omitida**, não renderizada vazia —
+tabela vazia sugere que não há nada para ver.
+
+!!! warning "Profundidade de fila não é mostrada"
+    A página responde "o que está declarado" e "o que foi persistido", nunca
+    "quantas mensagens estão no broker agora". Broker não expõe isso, e um
+    número que parecesse essa resposta seria pior que nenhum.
+
+!!! info "O store não é acoplado ao manager"
+    Nem toda mensagem enfileirada merece linha durável, e o worker que escreve
+    uma normalmente quer gravar campos de domínio que o envelope nunca carregou.
+    Por isso `JobStore` é chamado pelo worker, não pelo `TaskManager`.
+
 ## Recapitulando
 
 1. `BaseUserModel` + uma linha `isAdmin` semeada dá o login.
