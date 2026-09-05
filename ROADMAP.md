@@ -69,6 +69,9 @@
   read-only or as an in-place editable formset.
 - **0.29.0** — admin operations screens: the application-logs page with
   markdown/JSON export, and the policy-gated SQL console.
+- **0.30.0** — task primitives (`TaskManager.inventory`, `BaseJobModel` +
+  `JobStore`) and the admin tasks page. **Parity with the `tempest-fastapi-sdk`
+  admin panel is complete.**
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
