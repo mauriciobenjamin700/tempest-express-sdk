@@ -176,6 +176,16 @@ export function filterForColumn(column: Column<unknown>): {
 }
 
 /**
+ * Return the table a column points at, when it carries a foreign key.
+ *
+ * @param column - The column to inspect.
+ * @returns The referenced table name, or `null` for a plain column.
+ */
+export function foreignKeyTable(column: Column<unknown>): string | null {
+  return column.reference?.table ?? null;
+}
+
+/**
  * Whether a column holds free text a `LIKE '%…%'` search can match.
  *
  * @param column - The column to inspect.
