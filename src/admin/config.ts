@@ -10,6 +10,7 @@
 
 import type { AdminAction } from "@/admin/actions";
 import { adminColumns, humanizeField } from "@/admin/columns";
+import type { AdminInline } from "@/admin/inlines";
 import type { AdminLens } from "@/admin/lenses";
 import {
   type AsyncSession,
@@ -114,6 +115,11 @@ export interface AdminModelOptions<C extends ModelClass> {
    * of every related row — for target tables too large to pre-load.
    */
   autocompleteFields?: readonly string[];
+  /**
+   * Related child models listed on this model's detail view. Each shows the
+   * rows pointing back through its `fkField`.
+   */
+  inlines?: readonly AdminInline[];
 }
 
 /**
@@ -165,6 +171,8 @@ export class AdminModel<C extends ModelClass = ModelClass> {
   readonly canImport: boolean;
   /** Foreign-key columns rendered as a typed search box. */
   readonly autocompleteFields: string[];
+  /** Related child models listed on the detail view. */
+  readonly inlines: AdminInline[];
 
   private readonly actions = new Map<string, AdminAction>();
   private readonly slugOverride: string | null;
@@ -200,6 +208,7 @@ export class AdminModel<C extends ModelClass = ModelClass> {
     this.uploadStorage = options.uploadStorage ?? null;
     this.canImport = options.canImport ?? false;
     this.autocompleteFields = [...(options.autocompleteFields ?? [])];
+    this.inlines = [...(options.inlines ?? [])];
 
     if (this.uploadFields.length > 0 && this.uploadStorage === null) {
       throw new Error(

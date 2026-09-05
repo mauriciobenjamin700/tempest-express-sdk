@@ -21,6 +21,11 @@ export {
   trendPercent,
 } from "@/admin/dashboard";
 export {
+  type AdminInline,
+  type AdminInlineOptions,
+  adminInline,
+} from "@/admin/inlines";
+export {
   type AdminLens,
   type AdminLensOptions,
   adminLens,
@@ -105,6 +110,8 @@ export {
   type AdminFilterView,
   type AdminFormView,
   type AdminImportView,
+  type AdminInlineRowView,
+  type AdminInlineView,
   type AdminListView,
   type AdminMessage,
   type AdminNavEntry,
@@ -128,6 +135,7 @@ export {
 } from "@/admin/theme";
 export {
   type AdminRouterOptions,
+  groupInlineSubmission,
   makeAdminRouter,
   parseCsv,
 } from "@/admin/router";
