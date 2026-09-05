@@ -57,6 +57,9 @@
   signed-cookie sessions with CSRF, typed `AdminTheme`, and column-derived
   widgets/filters. The JSON admin moved to `AdminJsonSite` +
   `makeAdminJsonRouter`.
+- **0.25.0** — admin operations: bulk actions (activate / deactivate / delete),
+  custom actions via `adminAction`, CSV/JSON export honouring the current query,
+  and foreign-key selects in forms and list filters.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
