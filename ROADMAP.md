@@ -52,6 +52,11 @@
 - **0.20.0** — `wrapWithSlowQueryLog` (driver-level slow-query logging),
   `backupDatabase` (`pg_dump`/SQLite copy), and optional auth HTML pages
   (`renderAuthResultPage` / `renderPasswordResetFormPage`). Parity reached.
+- **0.24.0** — server-rendered admin panel: `AdminSite` + `AdminModel` (+
+  `automap`), `makeAdminRouter`, `UserModelAuthBackend` (+ optional TOTP),
+  signed-cookie sessions with CSRF, typed `AdminTheme`, and column-derived
+  widgets/filters. The JSON admin moved to `AdminJsonSite` +
+  `makeAdminJsonRouter`.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
@@ -72,7 +77,9 @@ settles in real use.
 ### Out of scope
 
 - `vision` (ort-vision) — belongs to `ort-vision-sdk`, not this SDK.
-- The server-rendered (jinja) HTML admin — superseded by the JSON `admin` API +
-  a decoupled frontend. (The optional `renderAuthResultPage` /
-  `renderPasswordResetFormPage` helpers cover only email-link landings, not a
-  full server-rendered admin.)
+
+The server-rendered HTML admin was listed here until 0.24.0, on the reasoning
+that a JSON API plus a decoupled frontend superseded it. That reasoning did not
+survive contact with use: every project that wanted an operator screen had to
+build the frontend first, which is exactly the work the Python SDK's panel
+removes. The panel now ships — see `docs/recipes/admin.md`.

@@ -80,7 +80,11 @@ abaixo fecham as lacunas restantes.
 ### Fora de escopo
 
 - `vision` (ort-vision) — pertence ao `ort-vision-sdk`, não a este SDK.
-- Admin HTML server-rendered (jinja) — substituído pela API `admin` JSON +
-  frontend desacoplado.
+
+O admin HTML server-rendered ficou nesta lista até a 0.24.0, sob o argumento de
+que a API JSON + frontend desacoplado o substituía. O argumento não sobreviveu
+ao uso: todo projeto que queria uma tela de operador precisava construir o
+frontend antes — exatamente o trabalho que o painel do SDK Python elimina. O
+painel agora existe; veja [Painel admin](recipes/admin.md).
 
 A `1.0.0` sai quando esses itens fecharem e a API estabilizar no uso real.
