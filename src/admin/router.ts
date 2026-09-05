@@ -63,6 +63,13 @@ import {
 } from "@/admin/forms";
 import type { AdminInline } from "@/admin/inlines";
 import {
+  type AdminLogEntry,
+  filterLogEntries,
+  renderLogEntriesJson,
+  renderLogEntriesMarkdown,
+  toLogEntry,
+} from "@/admin/logs";
+import {
   MultipartLimitError,
   type UploadedFile,
   isMultipart,
@@ -71,6 +78,15 @@ import {
 import { type AdminAccessPolicy, AdminPermission } from "@/admin/permissions";
 import { type AdminSession, AdminSessionStore, csrfTokenMatches } from "@/admin/session";
 import type { AdminSite } from "@/admin/site";
+import {
+  type SqlAuditEntry,
+  type SqlAuditHook,
+  SqlCapability,
+  type SqlConsolePolicy,
+  analyzeSql,
+  checkSqlPolicy,
+  loadSqlParser,
+} from "@/admin/sqlConsole";
 import { ADMIN_CSS } from "@/admin/styles";
 import {
   type AdminDashboardCard,
@@ -88,7 +104,9 @@ import {
   renderImportPage,
   renderListPage,
   renderLoginPage,
+  renderLogsPage,
   renderMfaPage,
+  renderSqlPage,
 } from "@/admin/templates";
 import type {
   AdminAuditEntryView,
@@ -96,6 +114,7 @@ import type {
   AdminBusinessCardView,
 } from "@/admin/templates";
 import { resolveAdminTheme } from "@/admin/theme";
+import { type LogSource, readLogEntries } from "@/api/logs";
 import { JSONLogger } from "@/core";
 import { BaseRepository } from "@/db";
 import type { AsyncEngine, AsyncSession, Column, Condition, WhereInput } from "@/db";
@@ -104,6 +123,15 @@ import { MetricsUtils } from "@/utils";
 import express, { type Request, type Response, type Router } from "express";
 
 const logger = new JSONLogger("tempest_express_sdk.admin.router");
+
+/** Log source selectors the page offers. */
+const LOG_SOURCES = ["all", "debug", "info", "warning", "error", "500"] as const;
+
+/** Records per page on the logs page. */
+const LOG_PAGE_SIZE = 50;
+
+/** Cap on records a log export writes. */
+const LOG_EXPORT_MAX = 500;
 
 /** Cap on child rows an inline block renders. */
 const INLINE_ROW_LIMIT = 50;
@@ -158,6 +186,34 @@ export interface AdminRouterOptions {
   accessPolicy?: AdminAccessPolicy;
   /** Largest upload the panel accepts, in bytes. Default `10485760` (10 MB). */
   maxUploadBytes?: number;
+  /**
+   * Expose the application-logs page, reading the JSON files
+   * `configureFileLogging` writes to this directory. Omitted keeps the page
+   * off: the payload carries tracebacks and request metadata.
+   */
+  logDir?: string;
+  /**
+   * Expose the SQL console. Omitted keeps it off. Read the guard rails in
+   * `@/admin/sqlConsole` before enabling it: the policy is defence in depth,
+   * and the boundary that holds is the database user behind `run`.
+   */
+  sqlConsole?: AdminSqlConsoleOptions;
+}
+
+/** Configuration for the optional SQL console. */
+export interface AdminSqlConsoleOptions {
+  /** The rules enforced before anything runs. Defaults to read-only. */
+  policy?: SqlConsolePolicy;
+  /**
+   * Executes an approved statement. Omitted runs it on the request's own
+   * session — point this at a restricted database role instead whenever the
+   * console can do more than read.
+   */
+  run?: (sql: string, session: AsyncSession) => Promise<Record<string, unknown>[]>;
+  /** Parser dialect. Default `"postgresql"`. */
+  dialect?: string;
+  /** Called for every attempt, allowed or refused. */
+  onAudit?: SqlAuditHook;
 }
 
 /** A request's resolved search, filters and ordering, shared by list + export. */
@@ -248,6 +304,13 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   const theme = resolveAdminTheme(site.theme);
   const showMetrics = options.showMetrics ?? true;
   const exportMaxRows = options.exportMaxRows ?? 5000;
+  const systemNav: { label: string; url: string }[] = [];
+  if (options.logDir !== undefined) {
+    systemNav.push({ label: "Logs", url: `${prefix}/logs` });
+  }
+  if (options.sqlConsole !== undefined) {
+    systemNav.push({ label: "SQL console", url: `${prefix}/sql` });
+  }
   const maxUploadBytes = options.maxUploadBytes ?? 10 * 1024 * 1024;
   const sessions = new AdminSessionStore({
     secret: options.secretKey,
@@ -284,6 +347,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       label: admin.verboseNamePlural(),
       url: `${prefix}/m/${admin.slug()}`,
     })),
+    navSystem: systemNav,
     messages: flashFor(req),
   });
 
@@ -597,6 +661,221 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       );
     }),
   );
+
+  if (options.logDir !== undefined) {
+    const logDir = options.logDir;
+
+    router.get(
+      `${prefix}/logs`,
+      guarded(async (req, res) => {
+        const state = await authenticate(req, res);
+        if (state === null) return;
+        const { entries, source, search } = await readLogs(req, logDir);
+        const page = Math.max(1, Number.parseInt(queryString(req.query.page), 10) || 1);
+        const start = (page - 1) * LOG_PAGE_SIZE;
+        const pages = Math.max(1, Math.ceil(entries.length / LOG_PAGE_SIZE));
+        const exportUrl = (format: string): string =>
+          `${prefix}/logs/export?${buildQuery({ source, q: search, format })}`;
+        const pageUrl = (target: number): string =>
+          `?${buildQuery({ source, q: search, page: target })}`;
+
+        html(
+          res,
+          renderLogsPage(context(req, state.session, state.visible), {
+            sources: LOG_SOURCES.map((value) => ({
+              value,
+              label: value === "500" ? "HTTP 500" : humanizeField(value),
+              selected: value === source,
+            })),
+            query: search,
+            rows: entries.slice(start, start + LOG_PAGE_SIZE).map((entry) => ({
+              level: entry.level,
+              timestamp: entry.timestamp,
+              logger: entry.logger,
+              message: entry.message,
+              stack: entry.stack,
+              context: Object.entries(entry.context).map(([key, value]) => ({
+                key,
+                value: typeof value === "string" ? value : JSON.stringify(value),
+              })),
+            })),
+            total: entries.length,
+            page,
+            pages,
+            prevUrl: page > 1 ? pageUrl(page - 1) : null,
+            nextUrl: page < pages ? pageUrl(page + 1) : null,
+            exportMarkdownUrl: exportUrl("md"),
+            exportJsonUrl: exportUrl("json"),
+            exportMax: LOG_EXPORT_MAX,
+          }),
+        );
+      }),
+    );
+
+    router.get(
+      `${prefix}/logs/export`,
+      guarded(async (req, res) => {
+        const state = await authenticate(req, res);
+        if (state === null) return;
+        const format = queryString(req.query.format) === "json" ? "json" : "md";
+        const { entries, source, search } = await readLogs(req, logDir);
+        const window = entries.slice(0, LOG_EXPORT_MAX);
+
+        const payload =
+          format === "json"
+            ? renderLogEntriesJson(window)
+            : renderLogEntriesMarkdown(window, {
+                source,
+                query: search,
+                total: entries.length,
+              });
+        res
+          .status(200)
+          .type(format === "json" ? "application/json" : "text/markdown; charset=utf-8")
+          .set("content-disposition", `attachment; filename="logs.${format}"`)
+          .send(payload);
+      }),
+    );
+  }
+
+  if (options.sqlConsole !== undefined) {
+    const console_ = options.sqlConsole;
+    const policy = console_.policy ?? {};
+    const dialect = console_.dialect ?? "postgresql";
+    const capabilities = policy.capabilities ?? [SqlCapability.READ];
+    const maxRows = policy.maxRows ?? 200;
+
+    router.get(
+      `${prefix}/sql`,
+      guarded(async (req, res) => {
+        const state = await authenticate(req, res);
+        if (state === null) return;
+        html(
+          res,
+          renderSqlPage(context(req, state.session, state.visible), {
+            sql: "",
+            capabilities: [...capabilities],
+            error: null,
+            columns: [],
+            rows: [],
+            rowCount: null,
+            truncated: false,
+            durationMs: null,
+          }),
+        );
+      }),
+    );
+
+    router.post(
+      `${prefix}/sql`,
+      guarded(async (req, res) => {
+        const state = await authenticate(req, res);
+        if (state === null) return;
+        if (!checkCsrf(req, res, state)) return;
+
+        const body = req.body as Record<string, unknown>;
+        const sql = typeof body.sql === "string" ? body.sql : "";
+        const principal = backend.displayName(state.principal as never);
+
+        const render = (view: {
+          error: string | null;
+          columns: string[];
+          rows: string[][];
+          rowCount: number | null;
+          truncated: boolean;
+          durationMs: number | null;
+        }): void => {
+          html(
+            res,
+            renderSqlPage(context(req, state.session, state.visible), {
+              sql,
+              capabilities: [...capabilities],
+              ...view,
+            }),
+            view.error === null ? 200 : 400,
+          );
+        };
+
+        const parser = await loadSqlParser();
+        const analysis = analyzeSql(sql, dialect, parser);
+        const verdict = checkSqlPolicy(analysis, policy);
+
+        if (!verdict.allowed) {
+          await audit(console_.onAudit, {
+            sql,
+            principal,
+            allowed: false,
+            reason: verdict.reason,
+            analysis,
+            durationMs: null,
+            rowCount: null,
+          });
+          render({
+            error: verdict.reason,
+            columns: [],
+            rows: [],
+            rowCount: null,
+            truncated: false,
+            durationMs: null,
+          });
+          return;
+        }
+
+        const started = Date.now();
+        let rows: Record<string, unknown>[];
+        try {
+          rows =
+            console_.run === undefined
+              ? await state.dbSession.raw(sql).all()
+              : await console_.run(sql, state.dbSession);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          await audit(console_.onAudit, {
+            sql,
+            principal,
+            allowed: true,
+            reason: message,
+            analysis,
+            durationMs: Date.now() - started,
+            rowCount: null,
+          });
+          render({
+            error: message,
+            columns: [],
+            rows: [],
+            rowCount: null,
+            truncated: false,
+            durationMs: null,
+          });
+          return;
+        }
+
+        const durationMs = Date.now() - started;
+        await audit(console_.onAudit, {
+          sql,
+          principal,
+          allowed: true,
+          reason: null,
+          analysis,
+          durationMs,
+          rowCount: rows.length,
+        });
+
+        const window = rows.slice(0, maxRows);
+        const columns = window.length === 0 ? [] : Object.keys(window[0] ?? {});
+        render({
+          error: null,
+          columns,
+          rows: window.map((row) =>
+            columns.map((column) => formatCellValue(row[column])),
+          ),
+          rowCount: rows.length,
+          truncated: rows.length > window.length,
+          durationMs,
+        });
+      }),
+    );
+  }
 
   router.get(
     `${prefix}/m/:slug`,
@@ -1510,6 +1789,31 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   }
 
   /**
+   * Read, normalize, filter and reverse the log records a request selects.
+   *
+   * Shared by the page and the export so the two can never disagree about what
+   * the current selection contains.
+   *
+   * @param req - The inbound request.
+   * @param dir - The log directory.
+   * @returns The matching entries newest-first, plus the resolved selectors.
+   */
+  async function readLogs(
+    req: Request,
+    dir: string,
+  ): Promise<{ entries: AdminLogEntry[]; source: LogSource; search: string }> {
+    const requested = queryString(req.query.source);
+    const source = (LOG_SOURCES as readonly string[]).includes(requested)
+      ? (requested as LogSource)
+      : "all";
+    const search = queryString(req.query.q);
+    const raw = await readLogEntries(dir, source);
+    const entries = filterLogEntries(raw.map(toLogEntry), search);
+    entries.reverse();
+    return { entries, source, search };
+  }
+
+  /**
    * Render the CSV import page for a model.
    *
    * @param req - The inbound request.
@@ -2048,6 +2352,30 @@ function inlineFields(
   return buildFormFields(childAdmin, { values, errors })
     .filter((field) => names.includes(field.name))
     .map((field) => ({ ...field, name: `row.${key}.${field.name}` }));
+}
+
+/**
+ * Hand one console attempt to the audit hook, never letting the hook's own
+ * failure take the request down.
+ *
+ * An audit trail that can break the thing it audits gets turned off, so a
+ * throwing hook is logged and swallowed.
+ *
+ * @param hook - The configured hook, or `undefined`.
+ * @param entry - The attempt to record.
+ */
+async function audit(
+  hook: SqlAuditHook | undefined,
+  entry: SqlAuditEntry,
+): Promise<void> {
+  if (hook === undefined) return;
+  try {
+    await hook(entry);
+  } catch (error) {
+    logger.error("Admin SQL audit hook failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 /**
