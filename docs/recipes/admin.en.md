@@ -660,6 +660,101 @@ single submit that creates, edits and deletes at once.
     parent with more than that wants the child's own list view with a filter,
     not a giant formset on the parent's page.
 
+## 17. Logs page
+
+Pass the **same** directory you gave `configureFileLogging` and the panel gains
+a logs page:
+
+```ts
+makeAdminRouter(site, { engine, authBackend, secretKey, logDir: settings.LOG_DIR });
+```
+
+It reads the structured JSON files, filters by source
+(`all`/`debug`/`info`/`warning`/`error`/`500`) and by search term, and paginates
+— newest first, with a colour-coded level badge. A record carrying a traceback
+becomes a `<details>`: the message is the trigger, and the trace plus the
+correlation fields (`requestId`, `path`, `method`, `status_code`) sit inside,
+collapsed.
+
+Search matches the message, the logger **and the traceback** — someone hunting a
+500 usually has a fragment of the trace, not of the message.
+
+`GET {prefix}/logs/export?format=md|json` downloads the **filtered** selection,
+at most 500 records:
+
+- **`md`** — each traceback in a fenced block, so it survives a paste into an
+  issue with its indentation intact. The header declares the source, the search,
+  how many records were exported and how many matched in total — a partial
+  export never reads as a complete one.
+- **`json`** — the records verbatim, with every field the application logged.
+
+!!! danger "Opt-in for a reason"
+    Without `logDir` the page does not exist (404). The payload exposes
+    tracebacks and request metadata: only enable it behind the admin login, and
+    remember the export inherits exactly the same gate.
+
+## 18. SQL console
+
+The console is **off** by default. Turn it on by passing `sqlConsole`:
+
+```ts
+import { SqlCapability } from "tempest-express-sdk";
+
+makeAdminRouter(site, {
+  engine,
+  authBackend,
+  secretKey,
+  sqlConsole: {
+    dialect: "postgresql",
+    policy: {
+      capabilities: [SqlCapability.READ],
+      allowTables: ["orders", "customers", "invoices"],
+      maxRows: 200,
+    },
+    onAudit: (entry) => auditLogger.info("admin sql", { ...entry }),
+  },
+});
+```
+
+!!! danger "Read this before enabling it"
+    **A SQL filter in the application is defence in depth, not a security
+    boundary.** The analyser here actually *parses* (via `node-sql-parser`)
+    rather than matching strings, and that stops the ordinary mistake: a `DROP`
+    typed by someone who only meant to `SELECT`, an `UPDATE` with no `WHERE`, a
+    query against a table holding card data. It will **not** stop a determined
+    operator with time: SQL has CTEs, subqueries, functions, dialect extensions
+    and comment tricks, and any parser-based allowlist is a game of coverage.
+
+    The boundary that **actually** holds is the **database user**. A role granted
+    only `SELECT` on three tables drops nothing, whatever reaches it:
+
+    ```sql
+    CREATE ROLE admin_console LOGIN PASSWORD '…';
+    GRANT CONNECT ON DATABASE app TO admin_console;
+    GRANT SELECT ON orders, customers, invoices TO admin_console;
+    ```
+
+    Point the console's `run` at **that** connection and use the policy to narrow
+    further and to produce a readable refusal instead of a database error. Used
+    that way the two layers complement each other. Used alone, the policy is a
+    speed bump.
+
+**Capabilities** split risk the way an operator thinks about it, not the way SQL
+groups keywords: `read`, `insert`, `update`, `delete`, `ddl`, `drop` (`DROP` and
+`TRUNCATE` — the one nobody undoes) and `admin` (`GRANT`/`REVOKE`/`SET`). A
+statement the parser **cannot** understand lands in `admin` on purpose: a
+construct nobody anticipated needs the most privileged capability, not the least.
+
+Other guards: `requireWhereOnWrites` (default `true`) refuses an `UPDATE`/`DELETE`
+with no `WHERE`; `allowTables`/`denyTables` restrict the tables — with an allow
+list, a statement naming no table at all is refused too, so `allowTables` fails
+closed; `maxRows` (default 200) bounds what comes back to the browser.
+
+**Every attempt** — allowed or refused — reaches `onAudit` with the SQL, the
+operator, the verdict, the reason, the duration and the row count. A hook that
+throws is logged and swallowed: an audit trail that can break the thing it audits
+gets turned off.
+
 ## Recap
 
 1. `BaseUserModel` plus one seeded `isAdmin` row gives you the login.

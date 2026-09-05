@@ -658,6 +658,101 @@ salvo num submit só que faz criação, edição e exclusão de uma vez.
     com mais filhos que isso quer a listagem do próprio filho com filtro, não
     um formset gigante na página do pai.
 
+## 17. Página de logs
+
+Passe o **mesmo** diretório que você deu ao `configureFileLogging` e o painel
+ganha uma página de logs:
+
+```ts
+makeAdminRouter(site, { engine, authBackend, secretKey, logDir: settings.LOG_DIR });
+```
+
+Ela lê os arquivos JSON estruturados, filtra por fonte
+(`all`/`debug`/`info`/`warning`/`error`/`500`) e por busca, e pagina — mais
+recente primeiro, com badge colorido por nível. Registro que carrega traceback
+vira um `<details>`: a mensagem é o gatilho, o trace e os campos de correlação
+(`requestId`, `path`, `method`, `status_code`) ficam dentro, recolhidos.
+
+A busca casa mensagem, logger **e traceback** — quem caça um 500 costuma ter um
+pedaço do trace, não da mensagem.
+
+`GET {prefix}/logs/export?format=md|json` baixa a seleção **filtrada**, no
+máximo 500 registros:
+
+- **`md`** — cada traceback num bloco cercado, então sobrevive a um colar em
+  issue com a indentação intacta. O cabeçalho declara fonte, busca, quantos
+  registros saíram e quantos casavam no total — export parcial nunca se passa
+  por completo.
+- **`json`** — os registros verbatim, com todo campo que a aplicação logou.
+
+!!! danger "Opt-in por um motivo"
+    Sem `logDir` a página não existe (404). O payload expõe traceback e
+    metadado de request: só habilite atrás do login do admin, e lembre que o
+    export herda exatamente o mesmo gate.
+
+## 18. SQL console
+
+O console fica **desligado** por padrão. Ligue passando `sqlConsole`:
+
+```ts
+import { SqlCapability } from "tempest-express-sdk";
+
+makeAdminRouter(site, {
+  engine,
+  authBackend,
+  secretKey,
+  sqlConsole: {
+    dialect: "postgresql",
+    policy: {
+      capabilities: [SqlCapability.READ],
+      allowTables: ["orders", "customers", "invoices"],
+      maxRows: 200,
+    },
+    onAudit: (entry) => auditLogger.info("admin sql", { ...entry }),
+  },
+});
+```
+
+!!! danger "Leia isto antes de habilitar"
+    **Um filtro de SQL na aplicação é defesa em profundidade, não fronteira de
+    segurança.** O analisador aqui faz *parse* de verdade (via
+    `node-sql-parser`), não match de string, e isso pega o erro comum: um `DROP`
+    digitado por quem só queria `SELECT`, um `UPDATE` sem `WHERE`, uma consulta
+    a uma tabela que guarda dado de cartão. Ele **não** para um operador
+    determinado com tempo: SQL tem CTE, subquery, função, extensão de dialeto e
+    truque de comentário, e toda allowlist baseada em parser é um jogo de
+    cobertura.
+
+    A fronteira que **realmente** segura é o **usuário do banco**. Um papel com
+    apenas `SELECT` em três tabelas não derruba nada, chegue o que chegar:
+
+    ```sql
+    CREATE ROLE admin_console LOGIN PASSWORD '…';
+    GRANT CONNECT ON DATABASE app TO admin_console;
+    GRANT SELECT ON orders, customers, invoices TO admin_console;
+    ```
+
+    Aponte o `run` do console para **essa** conexão e use a política para
+    estreitar mais e para produzir uma recusa legível em vez de um erro de
+    banco. Usadas assim, as duas camadas se complementam. Usada sozinha, a
+    política é um quebra-molas.
+
+**Capabilities** dividem o risco como o operador pensa nele, não como o SQL
+agrupa palavra-chave: `read`, `insert`, `update`, `delete`, `ddl`, `drop`
+(`DROP` e `TRUNCATE` — o que ninguém desfaz) e `admin` (`GRANT`/`REVOKE`/`SET`).
+Statement que o parser **não entende** cai em `admin` de propósito: construção
+que ninguém antecipou exige a capability mais privilegiada, não a menos.
+
+Outras guardas: `requireWhereOnWrites` (default `true`) recusa `UPDATE`/`DELETE`
+sem `WHERE`; `allowTables`/`denyTables` restringem as tabelas — com allowlist,
+statement que não nomeia tabela nenhuma também é recusado, para `allowTables`
+falhar fechado; `maxRows` (default 200) limita o que volta para o navegador.
+
+**Toda tentativa** — permitida ou recusada — vai para `onAudit`, com o SQL, o
+operador, o veredito, o motivo, a duração e a contagem de linhas. Hook que
+levanta é logado e engolido: trilha de auditoria que derruba o que audita acaba
+desligada.
+
 ## Recapitulando
 
 1. `BaseUserModel` + uma linha `isAdmin` semeada dá o login.
