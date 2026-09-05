@@ -449,6 +449,8 @@ export interface AdminListView {
   sort: Record<string, AdminSortView>;
   /** URL of the create form, or `null` when creation is disabled. */
   newUrl: string | null;
+  /** URL of the CSV import page, or `null` when import is disabled. */
+  importUrl: string | null;
   /** Bulk actions offered above the table. Empty hides the whole bulk UI. */
   bulkActions: BulkActionOption[];
   /** URL the bulk form posts to. */
@@ -567,6 +569,7 @@ export function renderListPage(context: AdminRenderContext, view: AdminListView)
     </form>
     <div class="tempest-admin-list__actions">
       ${view.newUrl !== null ? `<a class="tempest-admin-list__new" href="${escapeHtml(view.newUrl)}">+ New</a>` : ""}
+      ${view.importUrl !== null ? `<a href="${escapeHtml(view.importUrl)}">Import CSV</a>` : ""}
       <a href="${escapeHtml(view.exportCsvUrl)}">Export CSV</a>
       <a href="${escapeHtml(view.exportJsonUrl)}">Export JSON</a>
     </div>
@@ -795,6 +798,22 @@ function renderFormField(field: AdminFormField): string {
       control = `<label><span>${label}${field.required ? " *" : ""}</span><select name="${name}"${required}>${blank}${options}</select></label>`;
       break;
     }
+    case "file":
+      control = `<label><span>${label}${field.required ? " *" : ""}</span><input type="file" name="${name}"${required}></label>${
+        field.value === ""
+          ? ""
+          : `<small class="tempest-admin-form__hint">Current: ${value} — choose a file to replace it.</small>`
+      }`;
+      break;
+    case "autocomplete":
+      control = `<label><span>${label}${field.required ? " *" : ""}</span>
+        <div class="tempest-admin-ac" data-ac data-ac-url="${escapeHtml(field.autocompleteUrl)}">
+          <input type="text" class="tempest-admin-ac__search" value="${escapeHtml(field.displayLabel)}" placeholder="Search…" autocomplete="off" data-ac-search>
+          <input type="hidden" name="${name}" value="${value}"${required} data-ac-value>
+          <ul class="tempest-admin-ac__results" data-ac-results hidden></ul>
+        </div>
+      </label>`;
+      break;
     case "number":
       control = `<label><span>${label}${field.required ? " *" : ""}</span><input type="number" name="${name}" value="${value}"${field.step !== null ? ` step="${escapeHtml(field.step)}"` : ""}${required}></label>`;
       break;
@@ -835,7 +854,11 @@ export function renderFormPage(context: AdminRenderContext, view: AdminFormView)
     <a href="${escapeHtml(view.backUrl)}">← Back</a>
   </header>
   ${view.error !== null ? `<p class="tempest-admin-form__error">${escapeHtml(view.error)}</p>` : ""}
-  <form method="post" action="${escapeHtml(view.actionUrl)}" class="tempest-admin-form__form">
+  <form method="post" action="${escapeHtml(view.actionUrl)}" class="tempest-admin-form__form"${
+    view.fields.some((field) => field.widget === "file")
+      ? ' enctype="multipart/form-data"'
+      : ""
+  }>
     <input type="hidden" name="csrf_token" value="${escapeHtml(context.session.csrfToken)}">
     ${view.fields.map(renderFormField).join("")}
     <div class="tempest-admin-form__actions">
@@ -843,6 +866,147 @@ export function renderFormPage(context: AdminRenderContext, view: AdminFormView)
       <a href="${escapeHtml(view.backUrl)}" class="tempest-admin-form__cancel">Cancel</a>
     </div>
   </form>
+  ${view.fields.some((field) => field.widget === "autocomplete") ? AUTOCOMPLETE_SCRIPT : ""}
 </section>`;
   return renderLayout(context, `${heading} · ${context.site.title}`, body);
 }
+
+/** The outcome of a CSV import, as the page renders it. */
+export interface AdminImportView {
+  /** Plural display name of the model being imported into. */
+  title: string;
+  /** URL the upload form posts to. */
+  actionUrl: string;
+  /** URL of the list view. */
+  backUrl: string;
+  /** The column headers the CSV is expected to carry. */
+  columns: string[];
+  /** A form-level error, or `null`. */
+  error: string | null;
+  /** How many rows were created, or `null` before the first submission. */
+  created: number | null;
+  /** Per-row failures, numbered as the spreadsheet numbers them. */
+  rowErrors: { row: number; message: string }[];
+}
+
+/**
+ * Render the CSV import page.
+ *
+ * Row numbers start at 2 because row 1 is the header, so the numbers line up
+ * with what the operator sees in their spreadsheet.
+ *
+ * @param context - The shared chrome data (with an active session).
+ * @param view - The prepared import view model.
+ * @returns The full page.
+ * @throws Error When called without a session, since the form needs a CSRF token.
+ */
+export function renderImportPage(
+  context: AdminRenderContext,
+  view: AdminImportView,
+): string {
+  if (context.session === null) throw new Error("The import page requires a session");
+
+  const summary =
+    view.created === null
+      ? ""
+      : `<p class="tempest-admin-import__summary">Created ${escapeHtml(view.created)} record${view.created === 1 ? "" : "s"}.</p>`;
+
+  const failures =
+    view.rowErrors.length > 0
+      ? `<table class="tempest-admin-import__errors"><thead><tr><th>Row</th><th>Problem</th></tr></thead><tbody>${view.rowErrors
+          .map(
+            (failure) =>
+              `<tr><td>${escapeHtml(failure.row)}</td><td>${escapeHtml(failure.message)}</td></tr>`,
+          )
+          .join("")}</tbody></table>`
+      : "";
+
+  const body = `<section class="tempest-admin-import">
+  <header class="tempest-admin-detail__header">
+    <h1>Import ${escapeHtml(view.title)}</h1>
+    <a href="${escapeHtml(view.backUrl)}">← Back</a>
+  </header>
+  ${view.error !== null ? `<p class="tempest-admin-form__error">${escapeHtml(view.error)}</p>` : ""}
+  ${summary}
+  ${failures}
+  <form method="post" action="${escapeHtml(view.actionUrl)}" class="tempest-admin-form__form" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="${escapeHtml(context.session.csrfToken)}">
+    <div class="tempest-admin-form__field">
+      <label>
+        <span>CSV file *</span>
+        <input type="file" name="file" accept=".csv,text/csv" required>
+      </label>
+      <small class="tempest-admin-form__hint">
+        UTF-8, comma-separated, with a header row. Recognised columns:
+        <code>${escapeHtml(view.columns.join(", "))}</code>. Unknown columns are ignored.
+      </small>
+    </div>
+    <div class="tempest-admin-form__actions">
+      <button type="submit">Import</button>
+      <a href="${escapeHtml(view.backUrl)}" class="tempest-admin-form__cancel">Cancel</a>
+    </div>
+  </form>
+</section>`;
+  return renderLayout(context, `Import ${view.title} · ${context.site.title}`, body);
+}
+
+/**
+ * The only page script the panel ships beyond the bulk select-all: a debounced
+ * search box for foreign keys whose target table is too large to pre-load.
+ *
+ * The FastAPI SDK reaches for HTMX from a CDN here. This is ~30 lines of
+ * vanilla DOM instead, because a CDN script is a third-party request on an
+ * operator console — one an air-gapped deployment cannot make and a strict CSP
+ * has to whitelist — and the behaviour needed is one fetch and one list.
+ */
+const AUTOCOMPLETE_SCRIPT = `<script>
+(function () {
+  document.querySelectorAll("[data-ac]").forEach(function (box) {
+    var search = box.querySelector("[data-ac-search]");
+    var value = box.querySelector("[data-ac-value]");
+    var results = box.querySelector("[data-ac-results]");
+    var url = box.getAttribute("data-ac-url");
+    var timer = null;
+
+    function close() {
+      results.hidden = true;
+      results.innerHTML = "";
+    }
+
+    function pick(option) {
+      value.value = option.value;
+      search.value = option.label;
+      close();
+    }
+
+    function run() {
+      var term = search.value.trim();
+      fetch(url + "?q=" + encodeURIComponent(term), { credentials: "same-origin" })
+        .then(function (response) { return response.ok ? response.json() : { options: [] }; })
+        .then(function (payload) {
+          results.innerHTML = "";
+          (payload.options || []).forEach(function (option) {
+            var item = document.createElement("li");
+            item.textContent = option.label;
+            item.setAttribute("role", "option");
+            item.addEventListener("mousedown", function (event) {
+              event.preventDefault();
+              pick(option);
+            });
+            results.appendChild(item);
+          });
+          results.hidden = results.children.length === 0;
+        })
+        .catch(close);
+    }
+
+    search.addEventListener("input", function () {
+      value.value = "";
+      window.clearTimeout(timer);
+      timer = window.setTimeout(run, 250);
+    });
+    search.addEventListener("focus", run);
+    search.addEventListener("blur", function () { window.setTimeout(close, 150); });
+  });
+})();
+</script>`;

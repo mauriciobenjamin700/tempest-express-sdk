@@ -28,6 +28,7 @@
  * with `403` when it does not match.
  */
 
+import { randomUUID } from "node:crypto";
 import type {
   AdminAction,
   AdminActionContext,
@@ -41,6 +42,7 @@ import {
   filterForColumn,
   foreignKeyTable,
   humanizeField,
+  isColumnOptional,
   isSearchableColumn,
 } from "@/admin/columns";
 import type { AdminModel } from "@/admin/config";
@@ -58,6 +60,12 @@ import {
   formatCellValue,
   parseFormBody,
 } from "@/admin/forms";
+import {
+  MultipartLimitError,
+  type UploadedFile,
+  isMultipart,
+  parseMultipart,
+} from "@/admin/multipart";
 import { type AdminAccessPolicy, AdminPermission } from "@/admin/permissions";
 import { type AdminSession, AdminSessionStore, csrfTokenMatches } from "@/admin/session";
 import type { AdminSite } from "@/admin/site";
@@ -73,6 +81,7 @@ import {
   renderDashboardPage,
   renderDetailPage,
   renderFormPage,
+  renderImportPage,
   renderListPage,
   renderLoginPage,
   renderMfaPage,
@@ -91,6 +100,9 @@ import { MetricsUtils } from "@/utils";
 import express, { type Request, type Response, type Router } from "express";
 
 const logger = new JSONLogger("tempest_express_sdk.admin.router");
+
+/** Cap on options an autocomplete search returns. */
+const AUTOCOMPLETE_LIMIT = 20;
 
 /** Cap on audit-history entries rendered on the detail view. */
 const AUDIT_HISTORY_LIMIT = 50;
@@ -137,6 +149,8 @@ export interface AdminRouterOptions {
    * lets every signed-in operator do whatever those flags allow.
    */
   accessPolicy?: AdminAccessPolicy;
+  /** Largest upload the panel accepts, in bytes. Default `10485760` (10 MB). */
+  maxUploadBytes?: number;
 }
 
 /** A request's resolved search, filters and ordering, shared by list + export. */
@@ -227,6 +241,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   const theme = resolveAdminTheme(site.theme);
   const showMetrics = options.showMetrics ?? true;
   const exportMaxRows = options.exportMaxRows ?? 5000;
+  const maxUploadBytes = options.maxUploadBytes ?? 10 * 1024 * 1024;
   const sessions = new AdminSessionStore({
     secret: options.secretKey,
     ...(options.cookieName === undefined ? {} : { cookieName: options.cookieName }),
@@ -605,6 +620,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
           title: admin.verboseName(),
           fields: buildFormFields(admin, {
             foreignKeyOptions: await foreignKeyOptionsFor(admin, state.dbSession),
+            autocompleteUrls: autocompleteUrlsFor(admin),
           }),
           actionUrl: `${prefix}/m/${admin.slug()}/new`,
           backUrl: `${prefix}/m/${admin.slug()}`,
@@ -625,11 +641,28 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
-      if (!checkCsrf(req, res, state)) return;
-
-      const body = req.body as Record<string, unknown>;
+      let uploadError: string | null = null;
+      let submission: { fields: Record<string, unknown>; files: UploadedFile[] };
+      try {
+        submission = await readSubmission(req);
+      } catch (error) {
+        if (!(error instanceof MultipartLimitError)) throw error;
+        submission = { fields: {}, files: [] };
+        uploadError = error.message;
+      }
+      const body = submission.fields;
+      if (uploadError === null && !csrfTokenMatches(state.session, body.csrf_token)) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 403);
+        return;
+      }
       const parsed = parseFormBody(admin, body);
+      await applyUploads(admin, parsed.data, parsed.errors, submission.files, true);
       const foreignKeyOptions = await foreignKeyOptionsFor(admin, state.dbSession);
+      const autocompleteLabels = await autocompleteLabelsFor(
+        admin,
+        body,
+        state.dbSession,
+      );
       const rerender = (error: string | null, status: number): void => {
         html(
           res,
@@ -640,6 +673,8 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
               values: body,
               errors: parsed.errors,
               foreignKeyOptions,
+              autocompleteUrls: autocompleteUrlsFor(admin),
+              autocompleteLabels: autocompleteLabels,
             }),
             actionUrl: `${prefix}/m/${admin.slug()}/new`,
             backUrl: `${prefix}/m/${admin.slug()}`,
@@ -649,6 +684,10 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         );
       };
 
+      if (uploadError !== null) {
+        rerender(uploadError, 400);
+        return;
+      }
       if (Object.keys(parsed.errors).length > 0) {
         rerender("Please fix the highlighted fields.", 400);
         return;
@@ -788,6 +827,152 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   );
 
   router.get(
+    `${prefix}/m/:slug/import`,
+    guarded(async (req, res) => {
+      const state = await authenticate(req, res);
+      if (state === null) return;
+      const admin = await resolveAdmin(req, res, state, AdminPermission.CREATE);
+      if (admin === null) return;
+      if (!admin.canImport) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
+        return;
+      }
+      html(res, renderImport(req, state, admin, null, null, []));
+    }),
+  );
+
+  router.post(
+    `${prefix}/m/:slug/import`,
+    guarded(async (req, res) => {
+      const state = await authenticate(req, res);
+      if (state === null) return;
+      const admin = await resolveAdmin(req, res, state, AdminPermission.CREATE);
+      if (admin === null) return;
+      if (!admin.canImport) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
+        return;
+      }
+
+      let submission: { fields: Record<string, unknown>; files: UploadedFile[] };
+      try {
+        submission = await readSubmission(req);
+      } catch (error) {
+        if (!(error instanceof MultipartLimitError)) throw error;
+        html(res, renderImport(req, state, admin, error.message, null, []), 400);
+        return;
+      }
+      if (!csrfTokenMatches(state.session, submission.fields.csrf_token)) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 403);
+        return;
+      }
+
+      const file = submission.files[0];
+      if (file === undefined) {
+        html(
+          res,
+          renderImport(req, state, admin, "Choose a CSV file to import.", null, []),
+          400,
+        );
+        return;
+      }
+
+      let rows: Record<string, string>[];
+      try {
+        rows = parseCsv(file.data.toString("utf8"));
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Could not read the file as UTF-8 CSV.";
+        html(res, renderImport(req, state, admin, message, null, []), 400);
+        return;
+      }
+
+      const repository = admin.repository(state.dbSession);
+      const actorId = backend.principalId(state.principal as never);
+      const rowErrors: { row: number; message: string }[] = [];
+      let created = 0;
+
+      for (const [index, row] of rows.entries()) {
+        const parsed = parseFormBody(admin, row, { uploadsAsText: true });
+        const failures = Object.entries(parsed.errors);
+        if (failures.length > 0) {
+          rowErrors.push({
+            row: index + 2,
+            message: failures.map(([field, error]) => `${field}: ${error}`).join("; "),
+          });
+          continue;
+        }
+        stampActor(admin, parsed.data, actorId, true);
+        try {
+          await repository.create(parsed.data as never);
+          created += 1;
+        } catch (error) {
+          rowErrors.push({
+            row: index + 2,
+            message: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+
+      html(res, renderImport(req, state, admin, null, created, rowErrors));
+    }),
+  );
+
+  router.get(
+    `${prefix}/m/:slug/autocomplete/:field`,
+    guarded(async (req, res) => {
+      if (sessions.load(req) === null) {
+        res.status(401).json({ options: [] });
+        return;
+      }
+      const state = await authenticate(req, res);
+      if (state === null) return;
+      const admin = site.get(String(req.params.slug));
+      const field = String(req.params.field);
+      if (
+        admin === null ||
+        !admin.autocompleteFields.includes(field) ||
+        !(await allows(state.principal, admin, AdminPermission.VIEW))
+      ) {
+        res.status(404).json({ options: [] });
+        return;
+      }
+
+      const column = adminColumns(admin.model)[field];
+      const table = column === undefined ? null : foreignKeyTable(column);
+      const referenced = table === null ? null : site.get(table);
+      if (referenced === null) {
+        res.json({ options: [] });
+        return;
+      }
+
+      const term = queryString(req.query.q);
+      const searchable = referenced.searchFields.filter((name) => {
+        const target = adminColumns(referenced.model)[name];
+        return target !== undefined && isSearchableColumn(target);
+      });
+      const filters =
+        term === "" || searchable.length === 0
+          ? undefined
+          : or(...searchable.map((name) => ({ [name]: { ilike: `%${term}%` } })));
+
+      const page = await referenced.repository(state.dbSession).paginate({
+        page: 1,
+        pageSize: AUTOCOMPLETE_LIMIT,
+        ...(filters === undefined ? {} : { filters: filters as never }),
+      });
+
+      res.json({
+        options: (page.items as Record<string, unknown>[]).map((row) => ({
+          value: String(row[referenced.identityField]),
+          label: foreignKeyLabel(referenced, row),
+        })),
+      });
+    }),
+  );
+
+  router.get(
     `${prefix}/m/:slug/:identity`,
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
@@ -842,6 +1027,8 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
           fields: buildFormFields(admin, {
             values: row,
             foreignKeyOptions: await foreignKeyOptionsFor(admin, state.dbSession),
+            autocompleteUrls: autocompleteUrlsFor(admin),
+            autocompleteLabels: await autocompleteLabelsFor(admin, row, state.dbSession),
           }),
           actionUrl: `${prefix}/m/${admin.slug()}/${identity}/edit`,
           backUrl: `${prefix}/m/${admin.slug()}/${identity}`,
@@ -863,11 +1050,28 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
-      if (!checkCsrf(req, res, state)) return;
-
-      const body = req.body as Record<string, unknown>;
+      let uploadError: string | null = null;
+      let submission: { fields: Record<string, unknown>; files: UploadedFile[] };
+      try {
+        submission = await readSubmission(req);
+      } catch (error) {
+        if (!(error instanceof MultipartLimitError)) throw error;
+        submission = { fields: {}, files: [] };
+        uploadError = error.message;
+      }
+      const body = submission.fields;
+      if (uploadError === null && !csrfTokenMatches(state.session, body.csrf_token)) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 403);
+        return;
+      }
       const parsed = parseFormBody(admin, body);
+      await applyUploads(admin, parsed.data, parsed.errors, submission.files, false);
       const foreignKeyOptions = await foreignKeyOptionsFor(admin, state.dbSession);
+      const autocompleteLabels = await autocompleteLabelsFor(
+        admin,
+        body,
+        state.dbSession,
+      );
       const rerender = (error: string | null, status: number): void => {
         html(
           res,
@@ -878,6 +1082,8 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
               values: body,
               errors: parsed.errors,
               foreignKeyOptions,
+              autocompleteUrls: autocompleteUrlsFor(admin),
+              autocompleteLabels: autocompleteLabels,
             }),
             actionUrl: `${prefix}/m/${admin.slug()}/${identity}/edit`,
             backUrl: `${prefix}/m/${admin.slug()}/${identity}`,
@@ -887,6 +1093,10 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         );
       };
 
+      if (uploadError !== null) {
+        rerender(uploadError, 400);
+        return;
+      }
       if (Object.keys(parsed.errors).length > 0) {
         rerender("Please fix the highlighted fields.", 400);
         return;
@@ -1027,6 +1237,100 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   }
 
   /**
+   * Render the CSV import page for a model.
+   *
+   * @param req - The inbound request.
+   * @param state - The authenticated request state.
+   * @param admin - The model configuration.
+   * @param error - A form-level error, or `null`.
+   * @param created - How many rows were created, or `null` before a submission.
+   * @param rowErrors - Per-row failures.
+   * @returns The full page.
+   */
+  function renderImport(
+    req: Request,
+    state: AdminRequestState,
+    admin: AdminModel,
+    error: string | null,
+    created: number | null,
+    rowErrors: { row: number; message: string }[],
+  ): string {
+    return renderImportPage(context(req, state.session, state.visible), {
+      title: admin.verboseNamePlural(),
+      actionUrl: `${prefix}/m/${admin.slug()}/import`,
+      backUrl: `${prefix}/m/${admin.slug()}`,
+      columns: admin.editableFieldNames(),
+      error,
+      created,
+      rowErrors,
+    });
+  }
+
+  /**
+   * Read a submitted form, whether it arrived urlencoded or multipart.
+   *
+   * Express parses the urlencoded case on its own; a form carrying a file needs
+   * the multipart parser, so this is the one place a handler asks for "the
+   * fields and the files" and stops caring which encoding produced them.
+   *
+   * @param req - The inbound request.
+   * @returns The text fields and any uploaded files.
+   * @throws MultipartLimitError When a size or count limit is exceeded.
+   */
+  async function readSubmission(
+    req: Request,
+  ): Promise<{ fields: Record<string, unknown>; files: UploadedFile[] }> {
+    if (!isMultipart(req)) {
+      return { fields: (req.body ?? {}) as Record<string, unknown>, files: [] };
+    }
+    const parsed = await parseMultipart(req, { maxFileBytes: maxUploadBytes });
+    return { fields: parsed.fields, files: parsed.files };
+  }
+
+  /**
+   * Persist uploaded files and write their storage keys into the payload.
+   *
+   * On create a required upload column with no file is a field error; on edit
+   * an absent file leaves the column out of the update entirely, so "no new
+   * file" keeps the current one rather than clearing it.
+   *
+   * @param admin - The model configuration being written.
+   * @param data - The coerced payload, mutated in place.
+   * @param errors - Per-field errors, added to in place.
+   * @param files - The uploaded files from this submission.
+   * @param creating - Whether this is a create.
+   */
+  async function applyUploads(
+    admin: AdminModel,
+    data: Record<string, unknown>,
+    errors: Record<string, string>,
+    files: UploadedFile[],
+    creating: boolean,
+  ): Promise<void> {
+    if (admin.uploadFields.length === 0) return;
+    const storage = admin.uploadStorage;
+    if (storage === null) return;
+    const columns = adminColumns(admin.model);
+
+    for (const field of admin.uploadFields) {
+      const file = files.find((candidate) => candidate.field === field);
+      if (file === undefined) {
+        const column = columns[field];
+        if (creating && column !== undefined && !isColumnOptional(column)) {
+          errors[field] = "This field is required.";
+        }
+        continue;
+      }
+      const extension = file.filename.includes(".")
+        ? `.${file.filename.split(".").pop()}`
+        : "";
+      const key = `${admin.slug()}/${field}/${randomUUID()}${extension}`;
+      const saved = await storage.save(key, file.data, { contentType: file.contentType });
+      data[field] = saved.key;
+    }
+  }
+
+  /**
    * Filter the bulk-action dropdown down to what this principal may run.
    *
    * Offering an action the policy will refuse trains operators to ignore
@@ -1125,6 +1429,10 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       newUrl: (await allows(state.principal, admin, AdminPermission.CREATE))
         ? `${prefix}/m/${admin.slug()}/new`
         : null,
+      importUrl:
+        admin.canImport && (await allows(state.principal, admin, AdminPermission.CREATE))
+          ? `${prefix}/m/${admin.slug()}/import`
+          : null,
       bulkActions: await permittedBulkActions(admin, state.principal),
       bulkUrl: `${prefix}/m/${admin.slug()}/bulk`,
       exportCsvUrl: exportUrl("csv"),
@@ -1316,12 +1624,62 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     const columns = adminColumns(admin.model);
     const options: Record<string, AdminSelectOption[]> = {};
     for (const field of Object.keys(foreignKeyFields(admin))) {
+      if (admin.autocompleteFields.includes(field)) continue;
       const column = columns[field];
       if (column === undefined) continue;
       const related = await relatedOptions(column, dbSession);
       if (related !== null) options[field] = related;
     }
     return options;
+  }
+
+  /**
+   * Return the search endpoint for each autocomplete column.
+   *
+   * @param admin - The model configuration.
+   * @returns Endpoint URLs keyed by column.
+   */
+  function autocompleteUrlsFor(admin: AdminModel): Record<string, string> {
+    const urls: Record<string, string> = {};
+    for (const field of admin.autocompleteFields) {
+      urls[field] = `${prefix}/m/${admin.slug()}/autocomplete/${field}`;
+    }
+    return urls;
+  }
+
+  /**
+   * Resolve the current label for each autocomplete column of a row, so an
+   * edit form opens showing the related row's name rather than its id.
+   *
+   * @param admin - The model configuration.
+   * @param row - The record being edited, or `null` on create.
+   * @param dbSession - The request's DB session.
+   * @returns Labels keyed by column.
+   */
+  async function autocompleteLabelsFor(
+    admin: AdminModel,
+    row: Record<string, unknown> | null,
+    dbSession: AsyncSession,
+  ): Promise<Record<string, string>> {
+    const labels: Record<string, string> = {};
+    if (row === null) return labels;
+    const columns = adminColumns(admin.model);
+    for (const field of admin.autocompleteFields) {
+      const value = row[field];
+      if (value === null || value === undefined || value === "") continue;
+      const column = columns[field];
+      const table = column === undefined ? null : foreignKeyTable(column);
+      const referenced = table === null ? null : site.get(table);
+      if (referenced === null) continue;
+      const related = (await referenced
+        .repository(dbSession)
+        .first({ [referenced.identityField]: value } as never)) as Record<
+        string,
+        unknown
+      > | null;
+      if (related !== null) labels[field] = foreignKeyLabel(referenced, related);
+    }
+    return labels;
   }
 
   return router;
@@ -1482,6 +1840,74 @@ function bulkActionsFor(admin: AdminModel): BulkActionOption[] {
     });
   }
   return actions;
+}
+
+/**
+ * Parse a CSV document into one record per row, keyed by the header.
+ *
+ * Implements RFC 4180 quoting rather than splitting on commas: a quoted field
+ * may contain commas, newlines and doubled quotes, and an import that mangles
+ * those silently corrupts exactly the rows a human took the trouble to quote.
+ * The leading UTF-8 BOM Excel writes is stripped, because otherwise the first
+ * header name never matches a column.
+ *
+ * @param text - The CSV document.
+ * @returns One record per data row; `[]` when the file has only a header.
+ * @throws Error When the document has no header row.
+ */
+export function parseCsv(text: string): Record<string, string>[] {
+  const source = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let quoted = false;
+
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    if (quoted) {
+      if (char === '"') {
+        if (source[index + 1] === '"') {
+          field += '"';
+          index += 1;
+        } else {
+          quoted = false;
+        }
+      } else {
+        field += char;
+      }
+      continue;
+    }
+    if (char === '"') {
+      quoted = true;
+    } else if (char === ",") {
+      row.push(field);
+      field = "";
+    } else if (char === "\n" || char === "\r") {
+      if (char === "\r" && source[index + 1] === "\n") index += 1;
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += char;
+    }
+  }
+  if (field !== "" || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+
+  const header = rows.shift();
+  if (header === undefined || header.length === 0) {
+    throw new Error("The file has no header row.");
+  }
+  const keys = header.map((name) => name.trim());
+
+  return rows
+    .filter((entry) => entry.some((value) => value.trim() !== ""))
+    .map((entry) =>
+      Object.fromEntries(keys.map((key, position) => [key, entry[position] ?? ""])),
+    );
 }
 
 /**

@@ -291,6 +291,13 @@ describe("audit trail", () => {
     expect(row?.updatedBy).toBe(rootId);
   });
 
+  it("never offers the stamped audit columns as form fields", () => {
+    const admin = new AdminModel({ model: TicketModel });
+    expect(admin.editableFieldNames()).not.toContain("createdBy");
+    expect(admin.editableFieldNames()).not.toContain("updatedBy");
+    expect(admin.editableFieldNames()).toContain("subject");
+  });
+
   it("shows timestamps and the resolved actor in the audit panel", async () => {
     const row = await ticketBy("Stamped");
     const html = await (await call(`/admin/m/ticket/${row?.id}`)).text();

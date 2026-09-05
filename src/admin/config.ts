@@ -17,12 +17,21 @@ import {
   type InferModel,
   type ModelClass,
 } from "@/db";
+import type { UploadStorage } from "@/storage";
 
-/** Column keys the generic form never edits, whatever the model declares. */
+/**
+ * Column keys the generic form never edits, whatever the model declares.
+ *
+ * The audit columns are here because the panel stamps them itself: offering
+ * `createdBy` as an input gives the operator a field whose value is discarded
+ * on submit, which is worse than not showing it at all.
+ */
 const NEVER_EDITABLE: readonly string[] = [
   "id",
   "createdAt",
   "updatedAt",
+  "createdBy",
+  "updatedBy",
   "hashedPassword",
 ];
 
@@ -87,6 +96,24 @@ export interface AdminModelOptions<C extends ModelClass> {
    * its filters and ordering through `?lens=<slug>`.
    */
   lenses?: readonly AdminLens[];
+  /**
+   * String columns rendered as file inputs. The uploaded file is written
+   * through `uploadStorage` and the returned storage key goes in the column.
+   */
+  uploadFields?: readonly string[];
+  /** Backend persisting uploaded files. Required when `uploadFields` is set. */
+  uploadStorage?: UploadStorage;
+  /**
+   * Expose the CSV import page (`GET/POST {prefix}/m/{slug}/import`), which
+   * bulk-creates rows from an uploaded file. Default `false`; also requires
+   * `canCreate`.
+   */
+  canImport?: boolean;
+  /**
+   * Foreign-key columns rendered as a typed search box instead of a `<select>`
+   * of every related row — for target tables too large to pre-load.
+   */
+  autocompleteFields?: readonly string[];
 }
 
 /**
@@ -130,6 +157,14 @@ export class AdminModel<C extends ModelClass = ModelClass> {
   readonly auditModel: ModelClass | null;
   /** Saved list-view presets, in declaration order. */
   readonly lenses: AdminLens[];
+  /** Columns rendered as file inputs. */
+  readonly uploadFields: string[];
+  /** Backend persisting uploaded files, or `null`. */
+  readonly uploadStorage: UploadStorage | null;
+  /** Whether the CSV import page is exposed. */
+  readonly canImport: boolean;
+  /** Foreign-key columns rendered as a typed search box. */
+  readonly autocompleteFields: string[];
 
   private readonly actions = new Map<string, AdminAction>();
   private readonly slugOverride: string | null;
@@ -161,6 +196,16 @@ export class AdminModel<C extends ModelClass = ModelClass> {
 
     this.auditModel = options.auditModel ?? null;
     this.lenses = [...(options.lenses ?? [])];
+    this.uploadFields = [...(options.uploadFields ?? [])];
+    this.uploadStorage = options.uploadStorage ?? null;
+    this.canImport = options.canImport ?? false;
+    this.autocompleteFields = [...(options.autocompleteFields ?? [])];
+
+    if (this.uploadFields.length > 0 && this.uploadStorage === null) {
+      throw new Error(
+        `AdminModel(${this.model.tablename}).uploadFields requires an uploadStorage (e.g. LocalUploadStorage / S3UploadStorage) — without one there is nowhere to write the file.`,
+      );
+    }
 
     for (const action of options.actions ?? []) {
       if (this.actions.has(action.name)) {
@@ -178,6 +223,8 @@ export class AdminModel<C extends ModelClass = ModelClass> {
       ["searchFields", this.searchFields],
       ["readonlyFields", this.readonlyFields],
       ["identityField", [this.identityField]],
+      ["uploadFields", this.uploadFields],
+      ["autocompleteFields", this.autocompleteFields],
     ] as const) {
       for (const name of names) {
         if (!known.has(name)) {
