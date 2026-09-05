@@ -604,6 +604,60 @@ editar, a caixa abre já com o rótulo da linha atual, não com o UUID.
     que deploy fechado não faz e CSP estrita precisa liberar — e o que se
     precisa é um fetch e uma lista.
 
+## 16. Inlines (filhos na tela do pai)
+
+Um `Inline` mostra na tela do pai as linhas filhas que apontam para ele — os
+itens de um pedido, as chaves de API de um usuário — sem viagem para outra tela:
+
+```ts
+import { AdminModel, adminInline } from "tempest-express-sdk";
+
+site.register(
+  new AdminModel({
+    model: OrderModel,
+    inlines: [
+      adminInline({
+        model: OrderItemModel,
+        fkField: "orderId",
+        label: "Itens do pedido",
+        editable: true,
+        canDelete: true,
+      }),
+      adminInline({ model: OrderNoteModel, fkField: "orderId" }),
+    ],
+  }),
+);
+```
+
+Sem `editable`, o bloco é uma **tabela somente leitura** com link para o admin
+do filho e um botão **Add**. Com `editable`, vira um **formset in-place**: uma
+linha de inputs por filho, mais uma linha em branco para adicionar outro, tudo
+salvo num submit só que faz criação, edição e exclusão de uma vez.
+
+- Formset editável exige o model filho **registrado no mesmo site** e com
+  `canEdit`; `canDelete` (no inline **e** no admin do filho) adiciona o checkbox
+  de exclusão por linha.
+- A linha em branco com todos os campos vazios é ignorada — submeter o formset
+  sem preencher o extra não cria filho vazio.
+- Linha que falha na validação volta com o que o operador digitou e o erro por
+  campo; as outras linhas do mesmo submit são gravadas.
+
+!!! danger "A FK do pai fica fora do formset"
+    A coluna que aponta para o pai não é oferecida como campo: o pai daquela
+    linha é a página em que ela está. Oferecê-la deixaria o operador mover um
+    filho para outro pai digitando um UUID numa célula.
+
+    Mais forte que isso: **toda linha submetida é checada como pertencente
+    a este pai** antes de ser editada ou excluída. A chave de linha vem do
+    navegador, então uma submissão forjada poderia nomear o filho de outro pai —
+    a checagem de posse é o que impede a página de virar superfície de edição da
+    tabela inteira.
+
+!!! info "Limite de linhas"
+    O bloco renderiza no máximo 50 filhos e diz quantos existem no total. Pai
+    com mais filhos que isso quer a listagem do próprio filho com filtro, não
+    um formset gigante na página do pai.
+
 ## Recapitulando
 
 1. `BaseUserModel` + uma linha `isAdmin` semeada dá o login.

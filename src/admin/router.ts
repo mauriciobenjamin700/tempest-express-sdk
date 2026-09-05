@@ -53,6 +53,7 @@ import {
   trendDirection,
   trendPercent,
 } from "@/admin/dashboard";
+import type { AdminFormField } from "@/admin/forms";
 import {
   buildFormFields,
   foreignKeyFields,
@@ -60,6 +61,7 @@ import {
   formatCellValue,
   parseFormBody,
 } from "@/admin/forms";
+import type { AdminInline } from "@/admin/inlines";
 import {
   MultipartLimitError,
   type UploadedFile,
@@ -74,6 +76,8 @@ import {
   type AdminDashboardCard,
   type AdminDashboardMetrics,
   type AdminFilterView,
+  type AdminInlineRowView,
+  type AdminInlineView,
   type AdminListView,
   type AdminMessage,
   type AdminRenderContext,
@@ -100,6 +104,9 @@ import { MetricsUtils } from "@/utils";
 import express, { type Request, type Response, type Router } from "express";
 
 const logger = new JSONLogger("tempest_express_sdk.admin.router");
+
+/** Cap on child rows an inline block renders. */
+const INLINE_ROW_LIMIT = 50;
 
 /** Cap on options an autocomplete search returns. */
 const AUTOCOMPLETE_LIMIT = 20;
@@ -991,6 +998,8 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
           title: admin.verboseName(),
           identity,
           audit: await buildAuditView(admin, row, state.dbSession),
+          inlines: await buildInlines(admin, row, state, identity),
+          inlineError: null,
           fields: admin
             .detailFieldNames()
             .map((name) => ({ label: name, value: formatCellValue(row[name]) })),
@@ -1124,6 +1133,138 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   );
 
   router.post(
+    `${prefix}/m/:slug/:identity/inlines/:child`,
+    guarded(async (req, res) => {
+      const state = await authenticate(req, res);
+      if (state === null) return;
+      const admin = await resolveAdmin(req, res, state);
+      if (admin === null) return;
+      if (!checkCsrf(req, res, state)) return;
+
+      const childSlug = String(req.params.child);
+      const inline = admin.inlines.find(
+        (entry) => entry.slug === childSlug && entry.editable,
+      );
+      const childAdmin = inline === undefined ? null : site.get(childSlug);
+      if (
+        inline === undefined ||
+        childAdmin === null ||
+        !(await allows(state.principal, childAdmin, AdminPermission.EDIT))
+      ) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
+        return;
+      }
+
+      const identity = String(req.params.identity);
+      const parent = await findRow(admin, state.dbSession, identity);
+      if (parent === null) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
+        return;
+      }
+      const parentId = parent[admin.identityField];
+
+      const { rows: grouped, deletions } = groupInlineSubmission(
+        req.body as Record<string, unknown>,
+      );
+      const names = inlineFieldNames(childAdmin, inline);
+      const childRepo = childAdmin.repository(state.dbSession);
+      const actorId = backend.principalId(state.principal as never);
+      const canDelete =
+        inline.canDelete &&
+        (await allows(state.principal, childAdmin, AdminPermission.DELETE));
+
+      const failed: InlineRowSubmission[] = [];
+      let formError: string | null = null;
+
+      /**
+       * Return the child row for a key when it really belongs to this parent.
+       *
+       * A formset key arrives from the browser, so a crafted submission could
+       * name a child of some other parent. Checking ownership here is what
+       * keeps the page from becoming an edit surface for the whole table.
+       *
+       * @param key - The submitted row key.
+       * @returns The owned row, or `null`.
+       */
+      const owned = async (key: string): Promise<Record<string, unknown> | null> =>
+        (await childRepo.first({
+          [childAdmin.identityField]: key,
+          [inline.fkField]: parentId,
+        } as never)) as Record<string, unknown> | null;
+
+      for (const [key, values] of Object.entries(grouped)) {
+        const isNew = key.startsWith("new");
+
+        if (!isNew && canDelete && deletions.has(key)) {
+          if ((await owned(key)) !== null) {
+            await childRepo.delete({ [childAdmin.identityField]: key } as never);
+          }
+          continue;
+        }
+        if (isNew && Object.values(values).every((value) => value.trim() === "")) {
+          continue;
+        }
+
+        const parsed = parseFormBody(childAdmin, values, { only: names });
+        if (Object.keys(parsed.errors).length > 0) {
+          failed.push({ key, values, errors: parsed.errors });
+          continue;
+        }
+
+        try {
+          if (isNew) {
+            stampActor(childAdmin, parsed.data, actorId, true);
+            await childRepo.create({
+              ...parsed.data,
+              [inline.fkField]: parentId,
+            } as never);
+          } else {
+            if ((await owned(key)) === null) continue;
+            stampActor(childAdmin, parsed.data, actorId, false);
+            await childRepo.update(
+              { [childAdmin.identityField]: key } as never,
+              parsed.data as never,
+            );
+          }
+        } catch (error) {
+          formError = describeWriteFailure(childAdmin, error);
+          failed.push({ key, values, errors: {} });
+        }
+      }
+
+      if (failed.length > 0) {
+        const fresh = (await findRow(admin, state.dbSession, identity)) ?? parent;
+        html(
+          res,
+          renderDetailPage(context(req, state.session, state.visible), {
+            title: admin.verboseName(),
+            identity,
+            audit: await buildAuditView(admin, fresh, state.dbSession),
+            inlines: await buildInlines(admin, fresh, state, identity, {
+              [childSlug]: failed,
+            }),
+            inlineError: formError ?? "Some inline rows could not be saved.",
+            fields: admin
+              .detailFieldNames()
+              .map((name) => ({ label: name, value: formatCellValue(fresh[name]) })),
+            backUrl: `${prefix}/m/${admin.slug()}`,
+            editUrl: (await allows(state.principal, admin, AdminPermission.EDIT))
+              ? `${prefix}/m/${admin.slug()}/${identity}/edit`
+              : null,
+            deleteUrl: (await allows(state.principal, admin, AdminPermission.DELETE))
+              ? `${prefix}/m/${admin.slug()}/${identity}/delete`
+              : null,
+          }),
+          400,
+        );
+        return;
+      }
+
+      res.redirect(`${prefix}/m/${admin.slug()}/${identity}?ok=updated`);
+    }),
+  );
+
+  router.post(
     `${prefix}/m/:slug/:identity/delete`,
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
@@ -1154,6 +1295,138 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     if (actor === null || actor === undefined || actor === "") return "";
     const principal = await backend.loadPrincipal(dbSession, String(actor));
     return principal === null ? String(actor) : backend.displayName(principal);
+  }
+
+  /**
+   * Build the related-child blocks for a parent's detail view.
+   *
+   * A read-only inline packages the children as a table linking into the
+   * child's own admin; an editable one — which needs the child registered,
+   * editable and permitted for this principal — packages them as a formset
+   * whose inputs are named `row.<key>.<column>`.
+   *
+   * @param admin - The parent configuration.
+   * @param parent - The parent row.
+   * @param state - The authenticated request state.
+   * @param identity - The parent's identity, for the formset action URL.
+   * @param overrides - On an error re-render, the submitted values and errors
+   *   keyed by child slug, so the formset shows what the operator typed.
+   * @returns One block per configured inline.
+   */
+  async function buildInlines(
+    admin: AdminModel,
+    parent: Record<string, unknown>,
+    state: AdminRequestState,
+    identity: string,
+    overrides: Record<string, InlineRowSubmission[]> = {},
+  ): Promise<AdminInlineView[]> {
+    const parentId = parent[admin.identityField];
+    const blocks: AdminInlineView[] = [];
+
+    for (const inline of admin.inlines) {
+      const childAdmin = site.get(inline.slug);
+      const repository =
+        childAdmin === null
+          ? new BaseRepository(inline.model, state.dbSession)
+          : childAdmin.repository(state.dbSession);
+      const children = (await repository.list({
+        [inline.fkField]: parentId,
+      } as never)) as Record<string, unknown>[];
+
+      const columns =
+        inline.listDisplay ??
+        childAdmin?.listDisplayNames() ??
+        Object.keys(adminColumns(inline.model));
+      const label =
+        inline.label ?? childAdmin?.verboseNamePlural() ?? humanizeField(inline.slug);
+      const visible = children.slice(0, INLINE_ROW_LIMIT);
+
+      const editable =
+        inline.editable &&
+        childAdmin !== null &&
+        (await allows(state.principal, childAdmin, AdminPermission.EDIT));
+
+      const addUrl =
+        childAdmin !== null &&
+        (await allows(state.principal, childAdmin, AdminPermission.CREATE))
+          ? `${prefix}/m/${inline.slug}/new`
+          : null;
+
+      if (!editable || childAdmin === null) {
+        blocks.push({
+          label,
+          total: children.length,
+          columns,
+          editable: false,
+          canDelete: false,
+          addUrl,
+          formAction: "",
+          rows: visible.map((child) => ({
+            key: String(child[childAdmin?.identityField ?? "id"]),
+            cells: columns.map((column) => formatCellValue(child[column])),
+            fields: [],
+            url:
+              childAdmin === null
+                ? null
+                : `${prefix}/m/${inline.slug}/${String(child[childAdmin.identityField])}`,
+          })),
+          newRow: null,
+          truncated: children.length > visible.length,
+        });
+        continue;
+      }
+
+      const names = inlineFieldNames(childAdmin, inline);
+      const submitted = overrides[inline.slug];
+      const rows: AdminInlineRowView[] = [];
+
+      if (submitted !== undefined) {
+        for (const entry of submitted) {
+          rows.push({
+            key: entry.key,
+            cells: [],
+            fields: inlineFields(
+              childAdmin,
+              names,
+              entry.key,
+              entry.values,
+              entry.errors,
+            ),
+            url: null,
+          });
+        }
+      } else {
+        for (const child of visible) {
+          const key = String(child[childAdmin.identityField]);
+          rows.push({
+            key,
+            cells: [],
+            fields: inlineFields(childAdmin, names, key, child, {}),
+            url: `${prefix}/m/${inline.slug}/${key}`,
+          });
+        }
+      }
+
+      blocks.push({
+        label,
+        total: children.length,
+        columns: names.map(humanizeField),
+        editable: true,
+        canDelete: inline.canDelete && childAdmin.canDelete,
+        addUrl,
+        formAction: `${prefix}/m/${admin.slug()}/${identity}/inlines/${inline.slug}`,
+        rows,
+        newRow: {
+          key: "new1",
+          cells: [],
+          fields: inlineFields(childAdmin, names, "new1", {}, {}),
+          url: null,
+        },
+        truncated: children.length > visible.length,
+      });
+    }
+
+    return blocks;
   }
 
   /**
@@ -1683,6 +1956,98 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   }
 
   return router;
+}
+
+/**
+ * Group a posted formset body by row key.
+ *
+ * Inputs arrive named `row.<key>.<column>`, plus `row.<key>.__delete` for the
+ * per-row delete checkbox. Anything else in the body — the CSRF token — is
+ * ignored here.
+ *
+ * @param body - The parsed request body.
+ * @returns The values keyed by row, and the row keys marked for deletion.
+ */
+export function groupInlineSubmission(body: Record<string, unknown>): {
+  rows: Record<string, Record<string, string>>;
+  deletions: Set<string>;
+} {
+  const rows: Record<string, Record<string, string>> = {};
+  const deletions = new Set<string>();
+
+  for (const [key, raw] of Object.entries(body)) {
+    if (!key.startsWith("row.")) continue;
+    const parts = key.split(".");
+    if (parts.length !== 3) continue;
+    const [, rowKey, field] = parts as [string, string, string];
+    const value = typeof raw === "string" ? raw : "";
+
+    if (field === "__delete") {
+      if (!["", "false", "off", "0", "no"].includes(value.trim().toLowerCase())) {
+        deletions.add(rowKey);
+      }
+      continue;
+    }
+    const row = rows[rowKey] ?? {};
+    row[field] = value;
+    rows[rowKey] = row;
+  }
+
+  return { rows, deletions };
+}
+
+/** One submitted inline row, kept for an error re-render. */
+interface InlineRowSubmission {
+  /** Row key — a child identity, or `new<n>` for an added row. */
+  key: string;
+  /** The raw submitted values, keyed by column. */
+  values: Record<string, string>;
+  /** Per-column errors. */
+  errors: Record<string, string>;
+}
+
+/**
+ * Return the columns an inline formset edits.
+ *
+ * The foreign key pointing back at the parent is held out: the row's parent is
+ * the page it is on, and offering it as an input would let an operator move a
+ * child to another parent by typing a UUID into a table cell.
+ *
+ * @param childAdmin - The child model's configuration.
+ * @param inline - The inline configuration.
+ * @returns The editable column keys.
+ */
+function inlineFieldNames(childAdmin: AdminModel, inline: AdminInline): string[] {
+  return childAdmin
+    .editableFieldNames()
+    .filter(
+      (name) =>
+        name !== inline.fkField &&
+        !childAdmin.uploadFields.includes(name) &&
+        !childAdmin.autocompleteFields.includes(name),
+    );
+}
+
+/**
+ * Build the controls for one inline row, named `row.<key>.<column>`.
+ *
+ * @param childAdmin - The child model's configuration.
+ * @param names - The columns this formset edits.
+ * @param key - The row key.
+ * @param values - Current values, keyed by column.
+ * @param errors - Per-column errors.
+ * @returns The row's fields, renamed for the formset.
+ */
+function inlineFields(
+  childAdmin: AdminModel,
+  names: string[],
+  key: string,
+  values: Record<string, unknown>,
+  errors: Record<string, string>,
+): AdminFormField[] {
+  return buildFormFields(childAdmin, { values, errors })
+    .filter((field) => names.includes(field.name))
+    .map((field) => ({ ...field, name: `row.${key}.${field.name}` }));
 }
 
 /**

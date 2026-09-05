@@ -4,6 +4,29 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.28.0] — 2026-09-05
+
+### Added
+
+- **admin**: **inlines** — related child models surfaced on a parent's detail
+  view. `adminInline({ model, fkField })` entries passed to
+  `AdminModel({ inlines })` render the children pointing back at the record: a
+  read-only table linking into the child's own admin, or — with `editable` — an
+  in-place formset with one input row per child plus a blank add row, saved in a
+  single submit that creates, edits and deletes at once. `canDelete` adds the
+  per-row delete checkbox, gated on the child admin's own flag.
+
+  The column pointing at the parent is held out of the formset, and **every
+  submitted row is verified as belonging to this parent** before it is written
+  or deleted: row keys arrive from the browser, so a crafted submission could
+  otherwise name another parent's child and turn the page into an edit surface
+  for the whole table. A blank add row is skipped, and a row that fails
+  validation comes back with the submitted values and per-field errors while the
+  rest of the submit is saved.
+
+  `groupInlineSubmission` is exported for projects parsing the same
+  `row.<key>.<column>` convention themselves.
+
 ## [0.27.0] — 2026-09-05
 
 ### Added

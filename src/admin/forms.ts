@@ -64,6 +64,11 @@ export interface ParseFormBodyOptions {
    * key already — so it reads them like any other string column.
    */
   uploadsAsText?: boolean;
+  /**
+   * Restrict parsing to these columns. An inline formset uses it to keep the
+   * foreign key pointing at the parent out of the operator's reach.
+   */
+  only?: readonly string[];
 }
 
 /** Options for {@link buildFormFields}. */
@@ -271,7 +276,10 @@ export function parseFormBody(
   const uploads =
     options.uploadsAsText === true ? new Set<string>() : new Set(admin.uploadFields);
 
+  const only = options.only === undefined ? null : new Set(options.only);
+
   for (const name of admin.editableFieldNames()) {
+    if (only !== null && !only.has(name)) continue;
     const column = columns[name];
     if (column === undefined) continue;
     if (uploads.has(name)) continue;

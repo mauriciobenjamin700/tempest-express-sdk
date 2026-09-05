@@ -606,6 +606,60 @@ On edit the box opens showing the current row's label, not its UUID.
     external request an air-gapped deployment cannot make and a strict CSP has to
     whitelist — and what is needed is one fetch and one list.
 
+## 16. Inlines (children on the parent's screen)
+
+An inline shows, on the parent's screen, the child rows that point back at it —
+an order's line items, a user's API keys — with no trip to another screen:
+
+```ts
+import { AdminModel, adminInline } from "tempest-express-sdk";
+
+site.register(
+  new AdminModel({
+    model: OrderModel,
+    inlines: [
+      adminInline({
+        model: OrderItemModel,
+        fkField: "orderId",
+        label: "Order items",
+        editable: true,
+        canDelete: true,
+      }),
+      adminInline({ model: OrderNoteModel, fkField: "orderId" }),
+    ],
+  }),
+);
+```
+
+Without `editable` the block is a **read-only table** linking into the child's
+own admin, with an **Add** button. With `editable` it becomes an **in-place
+formset**: one input row per child plus a blank row to add another, saved in a
+single submit that creates, edits and deletes at once.
+
+- An editable formset needs the child model **registered on the same site** with
+  `canEdit`; `canDelete` (on the inline **and** the child admin) adds the
+  per-row delete checkbox.
+- A blank add row with every field empty is skipped — submitting the formset
+  without filling the extra row does not create an empty child.
+- A row that fails validation comes back with what the operator typed plus the
+  per-field error, while the other rows in the same submit are saved.
+
+!!! danger "The parent foreign key stays out of the formset"
+    The column pointing at the parent is not offered as a field: a row's parent
+    is the page it is on. Offering it would let an operator move a child to
+    another parent by typing a UUID into a table cell.
+
+    Stronger than that: **every submitted row is checked as belonging to this
+    parent** before it is edited or deleted. Row keys arrive from the browser,
+    so a crafted submission could name some other parent's child — the ownership
+    check is what keeps the page from becoming an edit surface for the whole
+    table.
+
+!!! info "Row cap"
+    The block renders at most 50 children and says how many exist in total. A
+    parent with more than that wants the child's own list view with a filter,
+    not a giant formset on the parent's page.
+
 ## Recap
 
 1. `BaseUserModel` plus one seeded `isAdmin` row gives you the login.

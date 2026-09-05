@@ -628,6 +628,42 @@ export interface AdminAuditView {
   history: AdminAuditEntryView[];
 }
 
+/** One row inside an inline block. */
+export interface AdminInlineRowView {
+  /** Row key — the child's identity, or `new<n>` for the blank add row. */
+  key: string;
+  /** Formatted cells, for a read-only inline. */
+  cells: string[];
+  /** Editable controls, for an editable inline. */
+  fields: AdminFormField[];
+  /** Link into the child's own admin, or `null` when it has none. */
+  url: string | null;
+}
+
+/** A related-child block on the detail view. */
+export interface AdminInlineView {
+  /** Section heading. */
+  label: string;
+  /** How many child rows exist in total. */
+  total: number;
+  /** Column headings. */
+  columns: string[];
+  /** Whether the rows render as an editable formset. */
+  editable: boolean;
+  /** Whether an editable row offers a delete checkbox. */
+  canDelete: boolean;
+  /** URL of the child's create form, pre-filled with the parent key. */
+  addUrl: string | null;
+  /** URL the formset posts to. */
+  formAction: string;
+  /** The child rows. */
+  rows: AdminInlineRowView[];
+  /** The blank add row, for an editable inline. */
+  newRow: AdminInlineRowView | null;
+  /** Whether more rows exist than the block renders. */
+  truncated: boolean;
+}
+
 /** The view model the detail page renders. */
 export interface AdminDetailView {
   /** Singular display name. */
@@ -644,6 +680,10 @@ export interface AdminDetailView {
   deleteUrl: string | null;
   /** The audit panel, or `null` when the model carries no audit columns. */
   audit: AdminAuditView | null;
+  /** Related-child blocks rendered below the fields. */
+  inlines: AdminInlineView[];
+  /** A form-level error from an inline submission, or `null`. */
+  inlineError: string | null;
 }
 
 /**
@@ -686,9 +726,156 @@ export function renderDetailPage(
     </div>
   </header>
   <dl class="tempest-admin-detail__fields">${fields}</dl>
+  ${view.inlines.map((inline) => renderInline(inline, context.session?.csrfToken ?? "", view.inlineError)).join("")}
   ${auditPanel}
 </section>`;
   return renderLayout(context, `${view.title} · ${view.identity}`, body);
+}
+
+/**
+ * Render one editable inline cell — the same widgets the full form uses, sized
+ * for a table row.
+ *
+ * @param field - The field view model, already named `row.<key>.<column>`.
+ * @returns The control markup plus its error slot.
+ */
+function renderInlineCell(field: AdminFormField): string {
+  const required = field.required ? " required" : "";
+  const name = escapeHtml(field.name);
+  const value = escapeHtml(field.value);
+
+  let control: string;
+  switch (field.widget) {
+    case "checkbox":
+      control = `<input type="checkbox" name="${name}" value="true"${field.checked ? " checked" : ""}>`;
+      break;
+    case "textarea":
+    case "json":
+      control = `<textarea name="${name}" rows="2"${required}>${value}</textarea>`;
+      break;
+    case "select": {
+      const blank = field.required ? "" : '<option value="">— none —</option>';
+      const options = field.options
+        .map(
+          (option) =>
+            `<option value="${escapeHtml(option.value)}"${option.value === field.value ? " selected" : ""}>${escapeHtml(option.label)}</option>`,
+        )
+        .join("");
+      control = `<select name="${name}"${required}>${blank}${options}</select>`;
+      break;
+    }
+    case "number":
+      control = `<input type="number" name="${name}" value="${value}"${field.step !== null ? ` step="${escapeHtml(field.step)}"` : ""}${required}>`;
+      break;
+    case "datetime":
+      control = `<input type="datetime-local" name="${name}" value="${value}"${required}>`;
+      break;
+    case "date":
+      control = `<input type="date" name="${name}" value="${value}"${required}>`;
+      break;
+    case "time":
+      control = `<input type="time" name="${name}" value="${value}"${required}>`;
+      break;
+    default:
+      control = `<input type="text" name="${name}" value="${value}"${required}>`;
+  }
+
+  const error =
+    field.error !== null
+      ? `<small class="tempest-admin-form__field-error">${escapeHtml(field.error)}</small>`
+      : "";
+  return `${control}${error}`;
+}
+
+/**
+ * Render one related-child block.
+ *
+ * A read-only inline is a table with a link per row into the child's own
+ * admin. An editable one is a formset whose inputs are named
+ * `row.<key>.<column>`, plus one blank row so adding a child never means
+ * leaving the parent.
+ *
+ * @param inline - The prepared inline view model.
+ * @param csrfToken - The session's CSRF token, for the formset.
+ * @param error - A form-level error to show above an editable formset.
+ * @returns The block markup.
+ */
+function renderInline(
+  inline: AdminInlineView,
+  csrfToken: string,
+  error: string | null,
+): string {
+  const heading = `<header class="tempest-admin-inline__header">
+      <h2>${escapeHtml(inline.label)}${inline.total > 0 ? ` <span class="tempest-admin-inline__count">(${escapeHtml(inline.total)})</span>` : ""}</h2>
+      ${inline.addUrl !== null ? `<a class="tempest-admin-btn" href="${escapeHtml(inline.addUrl)}">Add</a>` : ""}
+    </header>`;
+
+  const more = inline.truncated
+    ? `<p class="tempest-admin-inline__more"><em>Showing the first ${escapeHtml(inline.rows.length)} of ${escapeHtml(inline.total)}.</em></p>`
+    : "";
+
+  if (!inline.editable) {
+    if (inline.rows.length === 0) {
+      return `<section class="tempest-admin-inline">${heading}<p><em>No related records.</em></p></section>`;
+    }
+    const head = `<tr>${inline.columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}<th></th></tr>`;
+    const body = inline.rows
+      .map(
+        (row) =>
+          `<tr>${row.cells.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}<td>${
+            row.url === null ? "" : `<a href="${escapeHtml(row.url)}">View</a>`
+          }</td></tr>`,
+      )
+      .join("");
+    return `<section class="tempest-admin-inline">
+      ${heading}
+      <div class="tempest-admin-inline__scroll">
+        <table class="tempest-admin-inline__table">
+          <thead>${head}</thead>
+          <tbody>${body}</tbody>
+        </table>
+      </div>
+      ${more}
+    </section>`;
+  }
+
+  const head = `<tr>${inline.columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}${
+    inline.canDelete ? "<th>Delete</th>" : ""
+  }</tr>`;
+
+  const renderRow = (row: AdminInlineRowView, isNew: boolean): string =>
+    `<tr${isNew ? ' class="tempest-admin-inline__new"' : ""}>${row.fields
+      .map((field) => `<td>${renderInlineCell(field)}</td>`)
+      .join("")}${
+      inline.canDelete
+        ? `<td class="tempest-admin-inline__del">${
+            isNew
+              ? ""
+              : `<input type="checkbox" name="row.${escapeHtml(row.key)}.__delete" value="true">`
+          }</td>`
+        : ""
+    }</tr>`;
+
+  const rows = inline.rows.map((row) => renderRow(row, false)).join("");
+  const blank = inline.newRow === null ? "" : renderRow(inline.newRow, true);
+
+  return `<section class="tempest-admin-inline">
+    ${heading}
+    ${error !== null ? `<p class="tempest-admin-form__error">${escapeHtml(error)}</p>` : ""}
+    <form method="post" action="${escapeHtml(inline.formAction)}" class="tempest-admin-inline__form">
+      <input type="hidden" name="csrf_token" value="${escapeHtml(csrfToken)}">
+      <div class="tempest-admin-inline__scroll">
+        <table class="tempest-admin-inline__table">
+          <thead>${head}</thead>
+          <tbody>${rows}${blank}</tbody>
+        </table>
+      </div>
+      <div class="tempest-admin-form__actions">
+        <button type="submit">Save ${escapeHtml(inline.label)}</button>
+      </div>
+    </form>
+    ${more}
+  </section>`;
 }
 
 /**
