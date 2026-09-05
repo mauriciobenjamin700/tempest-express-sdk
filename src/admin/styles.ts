@@ -1,0 +1,1572 @@
+/**
+ * The bundled admin stylesheet, served at `{prefix}/static/admin.css`.
+ *
+ * Ported verbatim from tempest-fastapi-sdk's `admin/static/admin.css` so both
+ * SDKs render the same panel. Everything is driven by the `--tempest-*` custom
+ * properties an `AdminTheme` overrides, so a project restyles the panel without
+ * touching this file — see `@/admin/theme`.
+ *
+ * It ships as a string rather than an asset because the package publishes only
+ * `dist`: a `.css` file on disk would not survive the build.
+ */
+
+/** The stylesheet text. */
+export const ADMIN_CSS: string = `:root {
+  --tempest-bg: #0f172a;
+  --tempest-bg-soft: #1e293b;
+  --tempest-bg-row: #f8fafc;
+  --tempest-bg-row-alt: #f1f5f9;
+  --tempest-fg: #0f172a;
+  --tempest-fg-soft: #475569;
+  --tempest-accent: #2563eb;
+  --tempest-accent-hover: #1d4ed8;
+  --tempest-accent-soft: rgba(37, 99, 235, 0.1);
+  --tempest-danger: #b91c1c;
+  /* Light surface + hairline used by cards / tables / dropdowns on the
+     (light) content area — distinct from the dark sidebar bg vars above.
+     Overridable by AdminTheme for dark mode. */
+  --tempest-surface: #ffffff;
+  --tempest-border: #e2e8f0;
+  --tempest-radius: 6px;
+  --tempest-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--tempest-font, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+  font-size: 14px;
+  color: var(--tempest-fg);
+  background: var(--tempest-page-bg, #f8fafc);
+  /* Sticky-footer column so the layout (and its sidebar) fills the
+     viewport even when the page content is short. */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--tempest-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--tempest-accent-hover);
+  text-decoration: underline;
+}
+
+button {
+  border: 0;
+  background: var(--tempest-accent);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: var(--tempest-radius);
+  cursor: pointer;
+  font: inherit;
+}
+
+button:hover {
+  background: var(--tempest-accent-hover);
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--tempest-radius);
+  border: 1px solid #cbd5e1;
+  background: #fff;
+}
+
+.tempest-admin-header {
+  position: relative;
+  z-index: 20;
+  background: var(--tempest-bg);
+  color: #f8fafc;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--tempest-shadow);
+}
+
+/* Centered brand — pinned to the middle of the header (i.e. the screen)
+   regardless of the left (burger) / right (nav) cluster widths. */
+.tempest-admin-header__brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.tempest-admin-header__brand a {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Logo image (shown instead of the brand text when theme.logo_url is
+   set). Capped to the header height so any aspect ratio fits cleanly. */
+.tempest-admin-header__logo {
+  display: block;
+  max-height: 32px;
+  width: auto;
+}
+
+.tempest-admin-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #cbd5e1;
+}
+
+.tempest-admin-header__nav a {
+  color: #cbd5e1;
+}
+
+.tempest-admin-header__user {
+  font-weight: 500;
+  color: #f1f5f9;
+}
+
+.tempest-admin-header__logout {
+  margin: 0;
+}
+
+.tempest-admin-header__logout button {
+  background: transparent;
+  color: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #475569;
+}
+
+.tempest-admin-header__logout button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tempest-admin-header__left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ---- Layout: persistent sidebar + content ---- */
+.tempest-admin-layout {
+  display: flex;
+  align-items: stretch;
+  flex: 1;            /* fill the viewport so the sidebar is full-height */
+}
+
+.tempest-admin-sidebar {
+  flex: 0 0 220px;
+  width: 220px;
+  background: var(--tempest-bg-soft);
+  color: #e2e8f0;
+  padding: 1rem 0.75rem;
+}
+
+.tempest-admin-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.tempest-admin-sidebar__heading {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  margin: 1rem 0.75rem 0.35rem;
+}
+
+.tempest-admin-sidebar__link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--tempest-radius);
+  color: #cbd5e1;
+}
+
+.tempest-admin-sidebar__link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  text-decoration: none;
+}
+
+.tempest-admin-sidebar__link--active,
+.tempest-admin-sidebar__link--active:hover {
+  background: var(--tempest-accent);
+  color: #fff;
+}
+
+/* Burger toggle (CSS-only, via the hidden checkbox) — mobile only. */
+.tempest-admin-burger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  padding: 0.3rem;
+}
+
+.tempest-admin-burger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #f8fafc;
+  border-radius: 2px;
+}
+
+.tempest-admin-scrim {
+  display: none;
+}
+
+.tempest-admin-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 1080px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.tempest-admin-messages {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tempest-admin-messages__item {
+  padding: 0.75rem 1rem;
+  border-radius: var(--tempest-radius);
+  border-left: 4px solid var(--tempest-accent);
+  background: #eff6ff;
+}
+
+.tempest-admin-messages__item--error {
+  border-left-color: var(--tempest-danger);
+  background: #fef2f2;
+}
+
+.tempest-admin-login {
+  max-width: 360px;
+  margin: 4rem auto;
+  background: #fff;
+  border-radius: var(--tempest-radius);
+  padding: 2rem;
+  box-shadow: var(--tempest-shadow);
+}
+
+.tempest-admin-login h1 {
+  margin-top: 0;
+}
+
+.tempest-admin-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tempest-admin-login__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tempest-admin-login__error {
+  background: #fef2f2;
+  color: var(--tempest-danger);
+  padding: 0.75rem 1rem;
+  border-radius: var(--tempest-radius);
+}
+
+.tempest-admin-dashboard__table,
+.tempest-admin-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: var(--tempest-radius);
+  overflow: hidden;
+  box-shadow: var(--tempest-shadow);
+}
+
+.tempest-admin-dashboard__table th,
+.tempest-admin-dashboard__table td,
+.tempest-admin-list__table th,
+.tempest-admin-list__table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+.tempest-admin-list__table tr:nth-child(even) td {
+  background: var(--tempest-bg-row-alt);
+}
+
+.tempest-admin-list__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1rem;
+}
+
+.tempest-admin-list__filters {
+  display: flex;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.tempest-admin-list__filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tempest-admin-list__pagination {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-detail__fields {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 0.5rem 1.5rem;
+  background: #fff;
+  border-radius: var(--tempest-radius);
+  padding: 1.5rem;
+  box-shadow: var(--tempest-shadow);
+}
+
+.tempest-admin-detail__fields dt {
+  font-weight: 600;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-detail__fields dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.tempest-admin-detail__audit-title {
+  font-size: 1rem;
+  margin: 1.5rem 0 0.5rem;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-detail__json {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: var(--tempest-bg-row);
+  border: 1px solid var(--tempest-border);
+  border-radius: var(--tempest-radius);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  overflow-x: auto;
+}
+
+.tempest-admin-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--tempest-border);
+}
+
+.tempest-admin-history__item {
+  position: relative;
+  padding: 0.5rem 0 1rem 1rem;
+}
+
+.tempest-admin-history__item::before {
+  content: "";
+  position: absolute;
+  left: -0.4rem;
+  top: 0.9rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--tempest-fg-soft);
+}
+
+.tempest-admin-history__item--create::before { background: #16a34a; }
+.tempest-admin-history__item--update::before { background: #d97706; }
+.tempest-admin-history__item--delete::before { background: #dc2626; }
+
+.tempest-admin-history__head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.tempest-admin-history__action {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.tempest-admin-history__meta {
+  color: var(--tempest-fg-soft);
+  font-size: 0.85rem;
+}
+
+.tempest-admin-history__changes {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.tempest-admin-history__changes th,
+.tempest-admin-history__changes td {
+  text-align: left;
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--tempest-border);
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.tempest-admin-history__changes th {
+  color: var(--tempest-fg-soft);
+  font-weight: 600;
+}
+
+.tempest-admin-history__empty {
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-ac {
+  position: relative;
+}
+
+.tempest-admin-ac__search {
+  width: 100%;
+}
+
+.tempest-admin-ac__results {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  border: 1px solid var(--tempest-border);
+  border-radius: var(--tempest-radius, 6px);
+  max-height: 12rem;
+  overflow-y: auto;
+  background: var(--tempest-surface);
+}
+
+.tempest-admin-ac__results:empty {
+  display: none;
+}
+
+.tempest-admin-ac__option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.tempest-admin-ac__option:hover,
+.tempest-admin-ac__option:focus {
+  background: var(--tempest-accent-soft, rgba(0, 0, 0, 0.06));
+}
+
+.tempest-admin-ac__empty {
+  padding: 0.4rem 0.6rem;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-inline {
+  margin-top: 2rem;
+}
+
+.tempest-admin-inline__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.tempest-admin-inline__header h2 {
+  font-size: 1rem;
+  margin: 0;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-inline__count {
+  font-weight: 400;
+}
+
+.tempest-admin-inline__scroll {
+  overflow-x: auto;
+}
+
+.tempest-admin-inline__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tempest-admin-inline__table th,
+.tempest-admin-inline__table td {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--tempest-border);
+  white-space: nowrap;
+}
+
+.tempest-admin-inline__table th {
+  color: var(--tempest-fg-soft);
+  font-weight: 600;
+}
+
+.tempest-admin-inline__empty,
+.tempest-admin-inline__more {
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.tempest-admin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--tempest-border);
+  border-radius: var(--tempest-radius, 8px);
+  background: var(--tempest-surface);
+}
+
+.tempest-admin-card__label {
+  font-size: 0.8rem;
+  color: var(--tempest-fg-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tempest-admin-card__value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.tempest-admin-card__value small {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-card__trend {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tempest-admin-card__trend small {
+  font-weight: 400;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-card__trend--up { color: #16a34a; }
+.tempest-admin-card__trend--down { color: #dc2626; }
+.tempest-admin-card__trend--flat { color: var(--tempest-fg-soft); }
+
+.tempest-admin-card__parts {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.tempest-admin-card__parts li {
+  display: grid;
+  grid-template-columns: 6rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.tempest-admin-card__part-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-card__part-bar {
+  display: block;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--tempest-border);
+  overflow: hidden;
+}
+
+.tempest-admin-card__part-bar span {
+  display: block;
+  height: 100%;
+  background: var(--tempest-accent, #2563eb);
+}
+
+.tempest-admin-card__help {
+  font-size: 0.8rem;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-import__result {
+  margin: 1rem 0;
+}
+
+.tempest-admin-import__ok {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.tempest-admin-import__failed {
+  color: #d97706;
+  font-weight: 600;
+}
+
+.tempest-admin-import__errors {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tempest-admin-import__errors th,
+.tempest-admin-import__errors td {
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--tempest-border);
+  vertical-align: top;
+}
+
+.tempest-admin-import__form label {
+  display: block;
+  margin: 1rem 0 0.5rem;
+}
+
+.tempest-admin-lenses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--tempest-border);
+  padding-bottom: 0.5rem;
+}
+
+.tempest-admin-lens {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--tempest-border);
+  color: var(--tempest-fg-soft);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.tempest-admin-lens:hover {
+  color: inherit;
+}
+
+.tempest-admin-lens--active {
+  background: var(--tempest-accent, #2563eb);
+  border-color: var(--tempest-accent, #2563eb);
+  color: #fff;
+}
+
+.tempest-admin-footer {
+  position: relative;
+  z-index: 20;
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--tempest-fg-soft);
+}
+
+/* List toolbar: search/filters on the left, actions (export) on the right. */
+.tempest-admin-list__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.tempest-admin-list__actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tempest-admin-list__actions a {
+  display: inline-block;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--tempest-accent);
+  border-radius: var(--tempest-radius);
+  background: #fff;
+  white-space: nowrap;
+}
+
+.tempest-admin-list__actions a:hover {
+  background: #eff6ff;
+  text-decoration: none;
+}
+
+/* Dashboard: system-metric stat cards + model cards. */
+.tempest-admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.tempest-admin-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: #fff;
+  border-radius: var(--tempest-radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--tempest-shadow);
+}
+
+.tempest-admin-stat__label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-stat__value {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.tempest-admin-stat__sub {
+  font-size: 0.8rem;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-models {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tempest-admin-model-card {
+  background: #fff;
+  border-radius: var(--tempest-radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--tempest-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tempest-admin-model-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tempest-admin-model-card__head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.tempest-admin-model-card__count {
+  font-weight: 700;
+  color: var(--tempest-accent);
+}
+
+.tempest-admin-model-card__actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Bulk-action bar above the list table. */
+.tempest-admin-bulk {
+  margin: 0;
+}
+
+.tempest-admin-bulk__bar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.tempest-admin-list__check {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.tempest-admin-list__check input {
+  width: auto;
+}
+
+/* Horizontal-scroll wrapper so wide tables never break the layout. */
+.tempest-admin-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--tempest-radius);
+  box-shadow: var(--tempest-shadow);
+}
+
+.tempest-admin-table-wrap .tempest-admin-list__table,
+.tempest-admin-table-wrap .tempest-admin-dashboard__table {
+  box-shadow: none;
+}
+
+/* Sortable column headers. */
+.tempest-admin-list__table th a.tempest-sort {
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.tempest-admin-list__table th a.tempest-sort:hover {
+  color: var(--tempest-accent);
+  text-decoration: none;
+}
+
+.tempest-sort__arrow {
+  font-size: 0.75em;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-sort--active .tempest-sort__arrow {
+  color: var(--tempest-accent);
+}
+
+/* Detail header actions (back / edit / delete). */
+.tempest-admin-detail__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.tempest-admin-detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tempest-admin-detail__delete {
+  margin: 0;
+}
+
+.tempest-admin-btn {
+  display: inline-block;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--tempest-accent);
+  border-radius: var(--tempest-radius);
+  background: #fff;
+}
+
+.tempest-admin-btn:hover {
+  background: #eff6ff;
+  text-decoration: none;
+}
+
+.tempest-admin-btn--danger {
+  background: var(--tempest-danger);
+}
+
+.tempest-admin-btn--danger:hover {
+  background: #991b1b;
+}
+
+/* Scoped under __actions so it beats \`.tempest-admin-list__actions a\`
+   (otherwise the white action-link background won + white text = invisible). */
+.tempest-admin-list__actions a.tempest-admin-list__new,
+a.tempest-admin-list__new {
+  background: var(--tempest-accent);
+  color: #fff;
+  border-color: var(--tempest-accent);
+}
+
+.tempest-admin-list__actions a.tempest-admin-list__new:hover,
+a.tempest-admin-list__new:hover {
+  background: var(--tempest-accent-hover);
+  color: #fff;
+}
+
+/* Create / edit form. */
+.tempest-admin-form__form {
+  display: grid;
+  gap: 1rem;
+  max-width: 640px;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: var(--tempest-radius);
+  box-shadow: var(--tempest-shadow);
+}
+
+.tempest-admin-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.tempest-admin-form__field > label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tempest-admin-form__field > label > span {
+  font-weight: 600;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-form__field input,
+.tempest-admin-form__field select,
+.tempest-admin-form__field textarea {
+  width: 100%;
+}
+
+.tempest-admin-form__json {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
+
+.tempest-admin-form__check {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tempest-admin-form__check input {
+  width: auto;
+}
+
+.tempest-admin-form__field--error input,
+.tempest-admin-form__field--error select,
+.tempest-admin-form__field--error textarea {
+  border-color: var(--tempest-danger);
+}
+
+.tempest-admin-form__field-error {
+  color: var(--tempest-danger);
+}
+
+.tempest-admin-form__error {
+  background: #fef2f2;
+  color: var(--tempest-danger);
+  padding: 0.75rem 1rem;
+  border-radius: var(--tempest-radius);
+  margin-bottom: 1rem;
+}
+
+.tempest-admin-form__actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* ---- Responsive ---- */
+
+/* Tablet and below. */
+@media (max-width: 1023px) {
+  .tempest-admin-main {
+    margin: 1.25rem auto;
+    padding: 0 1rem;
+  }
+}
+
+/* Mobile (<= 430px and small phones). */
+@media (max-width: 600px) {
+  .tempest-admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .tempest-admin-header__nav {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .tempest-admin-main {
+    margin: 1rem auto;
+    padding: 0 0.75rem;
+  }
+
+  .tempest-admin-list__header {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+
+  .tempest-admin-list__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tempest-admin-list__filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tempest-admin-list__filters input,
+  .tempest-admin-list__filters select,
+  .tempest-admin-list__filters button {
+    width: 100%;
+  }
+
+  .tempest-admin-list__actions {
+    justify-content: stretch;
+  }
+
+  .tempest-admin-list__actions a {
+    flex: 1;
+    text-align: center;
+  }
+
+  /* Stack the detail grid into single-column rows. */
+  .tempest-admin-detail__fields {
+    grid-template-columns: 1fr;
+    gap: 0.15rem 0;
+    padding: 1rem;
+  }
+
+  /* The logs table becomes stacked cards. Horizontal scroll is fine for a
+     list view you skim, but the logs table's fourth column carries the
+     message, the request context and the traceback — everything you came to
+     read — so at this width it sat off-screen behind a sideways drag, and an
+     opened traceback showed up only as a tall blank row. Labels come from
+     each cell's data-label, so the header can be dropped without losing
+     which value is which. Scoped to this table: the other list views keep
+     the scroll treatment. */
+  .tempest-admin-logs .tempest-admin-table-wrap {
+    overflow-x: visible;
+  }
+
+  .tempest-admin-logs__table thead {
+    display: none;
+  }
+
+  .tempest-admin-logs__table,
+  .tempest-admin-logs__table tbody,
+  .tempest-admin-logs__table tr,
+  .tempest-admin-logs__table td {
+    display: block;
+    width: 100%;
+  }
+
+  .tempest-admin-logs__table tr {
+    padding: 0.85rem 0.9rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .tempest-admin-logs__table tr:last-child {
+    border-bottom: none;
+  }
+
+  .tempest-admin-logs__table td {
+    padding: 0.1rem 0;
+    border: none;
+  }
+
+  .tempest-admin-logs__table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--tempest-fg-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.64rem;
+    font-weight: 600;
+  }
+
+  /* The message is the card's body, not another labelled field. */
+  .tempest-admin-logs__table td.tempest-admin-logs__msg {
+    margin-top: 0.5rem;
+  }
+
+  .tempest-admin-logs__table td.tempest-admin-logs__msg::before {
+    display: none;
+  }
+
+  .tempest-admin-logs__logger {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .tempest-admin-detail__fields dt {
+    margin-top: 0.75rem;
+  }
+
+  .tempest-admin-detail__fields dd {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .tempest-admin-login {
+    margin: 1.5rem auto;
+    padding: 1.5rem;
+  }
+
+  .tempest-admin-form__form {
+    padding: 1rem;
+  }
+
+  .tempest-admin-form__actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .tempest-admin-form__actions button,
+  .tempest-admin-form__actions .tempest-admin-form__cancel {
+    width: 100%;
+    text-align: center;
+  }
+
+  .tempest-admin-bulk__bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tempest-admin-bulk__bar select,
+  .tempest-admin-bulk__bar button {
+    width: 100%;
+  }
+}
+
+/* ---- Application logs page ---- */
+.tempest-log-badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.tempest-log-badge--debug {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.tempest-log-badge--info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.tempest-log-badge--warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.tempest-log-badge--error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.tempest-log-badge--critical {
+  background: #7f1d1d;
+  color: #fff;
+}
+
+.tempest-admin-logs__ts {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-logs__logger {
+  color: var(--tempest-fg-soft);
+  white-space: nowrap;
+}
+
+.tempest-admin-logs__msg {
+  word-break: break-word;
+}
+
+.tempest-admin-logs__empty {
+  color: var(--tempest-fg-soft);
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: var(--tempest-radius);
+  box-shadow: var(--tempest-shadow);
+}
+
+.tempest-admin-logs__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tempest-admin-logs__export {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--tempest-radius);
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tempest-admin-logs__export:hover {
+  background: #f1f5f9;
+}
+
+.tempest-admin-logs__meta {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+/* The gap is layout only — it does not survive a copy, and an operator copying a
+   row to paste into an issue would get "status_code404". The template keeps a
+   real space between the label and the value for that; this widens the visual
+   separation on top of it, since an uppercase micro-label sitting against a
+   monospace value reads as one token. */
+.tempest-admin-logs__meta li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.tempest-admin-logs__meta span {
+  color: var(--tempest-fg-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.68rem;
+}
+
+.tempest-admin-logs__meta code {
+  word-break: break-all;
+}
+
+/* Collapsed by default so a page full of 500s stays scannable; details/summary
+   keeps that working with no JavaScript, which the admin does not ship. */
+.tempest-admin-logs__trace {
+  margin-top: 0.5rem;
+}
+
+/* The summary carries the record's own message, so the whole item is the click
+   target instead of a separate link. It must therefore read as body text, not
+   as a control — the affordance is the marker plus the hint chip. */
+.tempest-admin-logs__trace summary {
+  cursor: pointer;
+  list-style: none;
+  display: block;
+}
+
+.tempest-admin-logs__trace summary::-webkit-details-marker {
+  display: none;
+}
+
+.tempest-admin-logs__msg-text::before {
+  content: "▸";
+  display: inline-block;
+  width: 0.9rem;
+  color: #991b1b;
+  font-size: 0.7rem;
+}
+
+.tempest-admin-logs__trace[open] .tempest-admin-logs__msg-text::before {
+  content: "▾";
+}
+
+.tempest-admin-logs__trace-hint {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #991b1b;
+}
+
+.tempest-admin-logs__trace[open] .tempest-admin-logs__trace-hint {
+  opacity: 0.55;
+}
+
+/* Lines wrap instead of extending. A <pre> is sized by its longest line and it
+   sits in a table cell, which sizes to content, so \`overflow-x\` on the <pre>
+   cannot shrink it: the table grew past its scroll container (measured 1364px
+   against a 1012px wrap) and the trace could only be read by dragging the table
+   sideways. Wrapping keeps the table at its container width. It costs the
+   alignment of the caret markers on screen; the markdown export carries the
+   exact unwrapped text for real analysis. */
+.tempest-admin-logs__trace pre {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem;
+  max-height: 24rem;
+  overflow-y: auto;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: var(--tempest-radius);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+.tempest-admin-logs__note {
+  color: var(--tempest-fg-soft);
+  font-size: 0.8rem;
+  margin-top: 0.75rem;
+}
+
+/* ---- Sidebar off-canvas on tablet/mobile, burger reveals it ---- */
+@media (max-width: 768px) {
+  .tempest-admin-burger {
+    display: flex;
+  }
+
+  .tempest-admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    width: 240px;
+    flex-basis: 240px;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    overflow-y: auto;
+    box-shadow: 0 0 24px rgba(15, 23, 42, 0.35);
+  }
+
+  .tempest-admin-navtoggle:checked ~ .tempest-admin-layout .tempest-admin-sidebar {
+    transform: translateX(0);
+  }
+
+  .tempest-admin-navtoggle:checked ~ .tempest-admin-layout .tempest-admin-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(15, 23, 42, 0.45);
+  }
+}
+
+/* ---- Desktop: sidebar overlays the header + footer ---- */
+@media (min-width: 769px) {
+  .tempest-admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;        /* above header/footer (z-index: 20) */
+    overflow-y: auto;
+    /* Clear the header bar so the first nav link sits below it. */
+    padding-top: 3.75rem;
+  }
+
+  /* The fixed sidebar leaves the flex flow, so reserve its gutter on
+     the layout row to keep the main content from sliding underneath. */
+  .tempest-admin-layout {
+    padding-left: 220px;
+  }
+}
+
+/* Flash banner shown after a custom bulk action runs. */
+.tempest-admin-flash {
+  margin: 0 0 1rem;
+  padding: 0.7rem 1rem;
+  border-radius: var(--tempest-radius);
+  border-left: 4px solid var(--tempest-accent);
+  background: var(--tempest-bg);
+  color: var(--tempest-fg);
+}
+
+.tempest-admin-flash--error {
+  border-left-color: var(--tempest-danger);
+}
+
+.tempest-admin-flash--warning {
+  border-left-color: #d97706;
+}
+
+/* Task panel — declared schedule and persisted runs. */
+.tempest-admin-tasks__scope {
+  margin: 0 0 1.25rem;
+  color: var(--tempest-fg-soft);
+  font-size: 0.9rem;
+}
+
+.tempest-admin-tasks__heading {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.tempest-admin-tasks__empty {
+  padding: 1rem;
+  border: 1px dashed var(--tempest-border);
+  border-radius: var(--tempest-radius);
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-tasks__trigger + .tempest-admin-tasks__trigger {
+  margin-top: 0.35rem;
+}
+
+.tempest-admin-tasks__offset {
+  color: var(--tempest-fg-soft);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.tempest-admin-tasks__status {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid var(--tempest-border);
+  color: var(--tempest-fg-soft);
+}
+
+.tempest-admin-tasks__status--running {
+  border-color: var(--tempest-accent);
+  color: var(--tempest-accent);
+}
+
+.tempest-admin-tasks__status--done {
+  border-color: #15803d;
+  color: #15803d;
+}
+
+.tempest-admin-tasks__status--failed {
+  border-color: var(--tempest-danger);
+  color: var(--tempest-danger);
+}
+
+/* Cancelled is terminal but not a failure, so it stays neutral: an
+   operator scanning for red should find only what went wrong. */
+.tempest-admin-tasks__status--cancelled {
+  border-color: var(--tempest-border);
+  color: var(--tempest-fg-soft);
+}
+
+/* The track uses the border token, not a row background: the list stripes
+   rows with --tempest-bg-row-alt, so a track painted in it vanished on
+   every other row — an empty progress cell reads as "no data", not as 0%. */
+.tempest-admin-tasks__bar {
+  display: inline-block;
+  width: 90px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--tempest-border);
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.tempest-admin-tasks__bar--wide {
+  display: block;
+  width: 100%;
+  height: 12px;
+  margin: 0 0 1.25rem;
+}
+
+.tempest-admin-tasks__bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--tempest-accent);
+}
+
+.tempest-admin-tasks__facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.25rem;
+  margin: 0 0 1.5rem;
+}
+
+.tempest-admin-tasks__facts dt {
+  color: var(--tempest-fg-soft);
+  font-size: 0.85rem;
+}
+
+.tempest-admin-tasks__facts dd {
+  margin: 0;
+}
+
+.tempest-admin-tasks__error pre {
+  padding: 0.85rem;
+  border-radius: var(--tempest-radius);
+  border-left: 4px solid var(--tempest-danger);
+  background: var(--tempest-bg-row-alt);
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.tempest-admin-tasks__cancel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0 0 1.5rem;
+}
+
+.tempest-admin-tasks__hint {
+  color: var(--tempest-fg-soft);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .tempest-admin-tasks__facts {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .tempest-admin-tasks__facts dd {
+    margin: 0 0 0.6rem;
+  }
+}
+`;

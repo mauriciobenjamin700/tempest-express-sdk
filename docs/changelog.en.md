@@ -9,6 +9,72 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.24.0] — 2026-09-05
+
+### Added
+
+- **admin**: a **server-rendered admin panel** — the Django-style operator UI
+  the FastAPI SDK ships, now in this SDK. `AdminSite` holds the registry,
+  `AdminModel` configures one model, and `makeAdminRouter(site, { engine,
+  authBackend, secretKey })` mounts login, dashboard, list views (search,
+  per-column-type filters, sortable columns, pagination) and auto-derived
+  create/edit/delete forms under `/admin`.
+
+  Widgets, filters and validation are derived from `tempest-db-js` column
+  metadata (`columnsOf`), not from a second schema the project has to keep in
+  sync: an `enum` column becomes a `<select>` of its members, a `datetime`
+  column a `datetime-local` input and a from/to filter pair, a `varchar(>255)`
+  a textarea. `AdminModel.automap` registers a whole models barrel at once and
+  skips the abstract bases.
+
+  Nothing new is installed: the HTML and the ~32 KB stylesheet (ported verbatim
+  from `tempest-fastapi-sdk`) are strings in this package, the session is signed
+  with `node:crypto`, and passwords go through the existing `PasswordUtils`.
+  There is no template engine and no framework JavaScript — the responsive
+  off-canvas sidebar is pure CSS.
+
+- **admin**: `UserModelAuthBackend` authenticates against a `BaseUserModel`
+  subclass, admitting only rows that are `isActive` **and** `isAdmin`. Pass an
+  `AdminMfaVerifier` and a principal who enrolled TOTP is sent through
+  `/admin/mfa` after the password, so the panel can never be the weaker door
+  into an MFA-protected account.
+
+- **admin**: `AdminSessionStore` issues stateless signed-cookie sessions
+  (HMAC-SHA256, `HttpOnly`, `SameSite=Lax`, `Secure` by default) carrying the
+  CSRF token every write form echoes back. A secret shorter than 32 characters
+  is refused at construction. `AdminTheme` restyles the panel through typed
+  fields injected as CSS custom properties, rejecting values that would break
+  out of the injected `<style>` block.
+
+### Changed
+
+- **BREAKING — admin**: the JSON admin was renamed so the HTML panel could take
+  the names it has in `tempest-fastapi-sdk`. `AdminSite` → `AdminJsonSite`,
+  `makeAdminRouter` → `makeAdminJsonRouter`, and the types took the same infix
+  (`AdminResource` → `AdminJsonResource`, `AdminField` → `AdminJsonField`,
+  `AdminListQuery`/`AdminListResult` → `AdminJsonListQuery`/`AdminJsonListResult`,
+  `AdminRouterOptions` → `AdminJsonRouterOptions`).
+
+  No deprecated alias is possible here: the old and new meanings collide on the
+  same identifier. Update the import and the constructor call — the behaviour,
+  the routes and the default `/admin` prefix are unchanged. Mounting the panel
+  and the JSON admin in one app now means giving one of them a different
+  `prefix`.
+
+- **deps**: the `tempest-db-js` peer floor moves to `>=0.8.0` (dev dependency
+  and CLI scaffold to `^0.8.0`), keeping consumers on the current DB foundation.
+
+### Fixed
+
+- **admin**: a blank create form now pre-fills each column's literal default, so
+  submitting it untouched writes what the database would have written. Without
+  it a `default(true)` flag arrived as `false` — the panel silently deactivated
+  every row it created. Caught in a real browser, not by the type-checker.
+
+- **admin**: the detail view renders **every** column, no longer narrowed by
+  `listDisplay`. The list view is a scannable summary; trimming the detail view
+  the same way hid data with nowhere else to read it.
+
 ## [0.23.0] — 2026-08-30
 
 ### Added

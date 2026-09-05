@@ -79,7 +79,11 @@ CLI are already at parity or close; the items below close the remaining gaps.
 ### Out of scope
 
 - `vision` (ort-vision) — belongs to `ort-vision-sdk`, not this SDK.
-- The server-rendered (jinja) HTML admin — superseded by the JSON `admin` API +
-  a decoupled frontend.
+
+The server-rendered HTML admin sat on this list until 0.24.0, on the reasoning
+that a JSON API plus a decoupled frontend superseded it. That reasoning did not
+survive contact with use: every project that wanted an operator screen had to
+build the frontend first — exactly the work the Python SDK's panel removes. The
+panel now ships; see [Admin panel](recipes/admin.md).
 
 `1.0.0` is cut once these close and the API settles in real use.

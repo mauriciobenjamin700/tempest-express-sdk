@@ -1,10 +1,10 @@
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import {
-  type AdminResource,
-  AdminSite,
+  type AdminJsonResource,
+  AdminJsonSite,
   createApp,
-  makeAdminRouter,
+  makeAdminJsonRouter,
   runServer,
   z,
 } from "@/index";
@@ -16,7 +16,7 @@ interface Widget {
 }
 
 /** An in-memory resource backing the admin. */
-function widgetResource(): AdminResource<Widget> {
+function widgetResource(): AdminJsonResource<Widget> {
   const store = new Map<string, Widget>([["1", { id: "1", name: "Alpha" }]]);
   let seq = 1;
   return {
@@ -56,13 +56,13 @@ let base: string;
 let authed = false;
 
 beforeAll(async () => {
-  const site = new AdminSite("Test Admin");
+  const site = new AdminJsonSite("Test Admin");
   site.register(widgetResource());
   const app = await createApp({
     health: false,
     configure: (a) => {
       a.use(
-        makeAdminRouter(site, {
+        makeAdminJsonRouter(site, {
           guard: (_req, _res, next) => next(authed ? undefined : new Error("locked")),
         }),
       );

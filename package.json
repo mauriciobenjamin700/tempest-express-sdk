@@ -1,6 +1,6 @@
 {
   "name": "tempest-express-sdk",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Shared Express/Zod/tempest-db-js building blocks: base schemas, repository, exceptions, pagination, settings and native Swagger + Redoc — the conventions used across Tempest projects, ported from tempest-fastapi-sdk.",
   "type": "module",
   "license": "MIT",
@@ -10,7 +10,9 @@
     "url": "git+https://github.com/mauriciobenjamin700/tempest-express-sdk.git"
   },
   "homepage": "https://mauriciobenjamin700.github.io/tempest-express-sdk/",
-  "bugs": "https://github.com/mauriciobenjamin700/tempest-express-sdk/issues",
+  "bugs": {
+    "url": "https://github.com/mauriciobenjamin700/tempest-express-sdk/issues"
+  },
   "keywords": [
     "express",
     "zod",
@@ -66,7 +68,7 @@
     "minio": "^8.0.0",
     "nodemailer": "^6.9.0",
     "redoc": "^2.0.0",
-    "tempest-db-js": ">=0.4.0",
+    "tempest-db-js": ">=0.8.0",
     "web-push": "^3.6.0",
     "ws": "^8.0.0",
     "zod": "^4.0.0"
@@ -113,7 +115,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.16",
     "redoc": "^2.5.0",
-    "tempest-db-js": "^0.4.0",
+    "tempest-db-js": "^0.8.0",
     "tsup": "^8.3.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.0",
@@ -121,5 +123,9 @@
     "web-push": "^3.6.7",
     "ws": "^8.18.0",
     "zod": "^4.5.4"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
   }
 }
