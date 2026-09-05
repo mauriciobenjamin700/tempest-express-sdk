@@ -9,6 +9,50 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.27.0] — 2026-09-05
+
+### Added
+
+- **admin**: **file and image uploads**. `AdminModel({ uploadFields,
+  uploadStorage })` renders those String columns as file inputs, switches the
+  form to `multipart/form-data`, writes the file through the storage backend and
+  stores the returned key (`<slug>/<field>/<uuid>.<ext>`). On create a file is
+  required only for a `NOT NULL` column with no default; on edit, uploading
+  nothing keeps the current file rather than clearing the column. Registering
+  `uploadFields` without an `uploadStorage` throws at construction, because
+  failing at boot beats failing on the first production upload.
+  `makeAdminRouter({ maxUploadBytes })` bounds the size (default 10 MB).
+
+- **admin**: **CSV import**. `AdminModel({ canImport: true })` exposes
+  `GET/POST {prefix}/m/{slug}/import`, which bulk-creates rows from an uploaded
+  UTF-8 CSV. Each row goes through the same coercion and validation as the form;
+  failures come back in a table numbered the way a spreadsheet numbers them
+  (starting at 2, since row 1 is the header) with the reason, and the rows that
+  passed are created — a partial import is a normal outcome, not an error. The
+  exported `parseCsv` follows RFC 4180 (quoted commas, embedded newlines,
+  doubled quotes) and strips the BOM Excel writes.
+
+- **admin**: **foreign-key autocomplete**. `AdminModel({ autocompleteFields })`
+  turns a foreign key into a typed search box backed by
+  `GET {prefix}/m/{slug}/autocomplete/{field}?q=`, which queries the referenced
+  admin's `searchFields` and returns up to 20 options — removing the 1000-row
+  pre-load a `<select>` needs. On edit the box opens on the current row's label
+  rather than its id. Where the Python SDK pulls HTMX from a CDN, this ships ~30
+  lines of plain DOM: a third-party script on an operator console is a request an
+  air-gapped deployment cannot make and a strict CSP has to whitelist.
+
+- **deps**: `busboy` joins as an **optional peer**, needed only by projects that
+  configure `uploadFields` or `canImport`; the error names the install command.
+  Express does not parse multipart, and a wire-format parser is the case for
+  depending rather than reimplementing. `parseMultipart` / `isMultipart` /
+  `MultipartLimitError` are exported for projects that need the same handling.
+
+### Fixed
+
+- **admin**: `createdBy` / `updatedBy` are no longer offered as form inputs. The
+  panel stamps them itself, so a value typed there was silently discarded on
+  submit — a field that does nothing is worse than no field.
+
 ## [0.26.0] — 2026-09-05
 
 ### Added

@@ -40,6 +40,10 @@ export interface AdminFormField {
   options: AdminSelectOption[];
   /** Per-field validation error, or `null`. */
   error: string | null;
+  /** For an `autocomplete` widget, the JSON search endpoint backing the input. */
+  autocompleteUrl: string | null;
+  /** For an `autocomplete` widget, the label of the currently selected row. */
+  displayLabel: string;
 }
 
 /** The outcome of parsing a submitted create/edit form. */
@@ -48,6 +52,18 @@ export interface ParsedAdminForm {
   data: Record<string, unknown>;
   /** Per-field error messages, keyed by column. Empty when the form is valid. */
   errors: Record<string, string>;
+}
+
+/** Options for {@link parseFormBody}. */
+export interface ParseFormBodyOptions {
+  /**
+   * Read upload columns as plain text instead of skipping them.
+   *
+   * The create/edit form skips them because the router writes the storage key
+   * after saving the file. A CSV import has no file to save — it carries the
+   * key already — so it reads them like any other string column.
+   */
+  uploadsAsText?: boolean;
 }
 
 /** Options for {@link buildFormFields}. */
@@ -62,6 +78,13 @@ export interface BuildFormFieldsOptions {
    * of a raw identity text input.
    */
   foreignKeyOptions?: Record<string, AdminSelectOption[]>;
+  /**
+   * Search endpoints for foreign-key columns listed in `autocompleteFields`,
+   * keyed by column. A field listed here renders as a typed search box.
+   */
+  autocompleteUrls?: Record<string, string>;
+  /** Current labels for autocomplete fields, keyed by column. */
+  autocompleteLabels?: Record<string, string>;
 }
 
 /**
@@ -129,15 +152,22 @@ export function buildFormFields(
   const values = options.values ?? {};
   const errors = options.errors ?? {};
   const foreignKeys = options.foreignKeyOptions ?? {};
+  const autocompleteUrls = options.autocompleteUrls ?? {};
+  const autocompleteLabels = options.autocompleteLabels ?? {};
+  const uploads = new Set(admin.uploadFields);
 
   return admin.editableFieldNames().flatMap((name) => {
     const column = columns[name];
     if (column === undefined) return [];
     const related = foreignKeys[name];
-    const spec =
-      related === undefined
-        ? widgetForColumn(column)
-        : { widget: "select" as const, step: null, options: related };
+    const autocompleteUrl = autocompleteUrls[name];
+    const spec = uploads.has(name)
+      ? { widget: "file" as const, step: null, options: [] }
+      : autocompleteUrl !== undefined
+        ? { widget: "autocomplete" as const, step: null, options: [] }
+        : related === undefined
+          ? widgetForColumn(column)
+          : { widget: "select" as const, step: null, options: related };
     const raw = name in values ? values[name] : literalDefault(column);
     return [
       {
@@ -150,6 +180,8 @@ export function buildFormFields(
         step: spec.step,
         options: spec.options,
         error: errors[name] ?? null,
+        autocompleteUrl: autocompleteUrl ?? null,
+        displayLabel: autocompleteLabels[name] ?? "",
       },
     ];
   });
@@ -230,14 +262,19 @@ function coerceValue(column: Column<unknown>, widget: AdminWidget, raw: string):
 export function parseFormBody(
   admin: AdminModel,
   body: Record<string, unknown>,
+  options: ParseFormBodyOptions = {},
 ): ParsedAdminForm {
   const columns = adminColumns(admin.model);
   const data: Record<string, unknown> = {};
   const errors: Record<string, string> = {};
 
+  const uploads =
+    options.uploadsAsText === true ? new Set<string>() : new Set(admin.uploadFields);
+
   for (const name of admin.editableFieldNames()) {
     const column = columns[name];
     if (column === undefined) continue;
+    if (uploads.has(name)) continue;
     const { widget } = widgetForColumn(column);
 
     if (widget === "checkbox") {

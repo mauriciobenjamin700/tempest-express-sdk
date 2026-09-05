@@ -22,7 +22,9 @@ export type AdminWidget =
   | "date"
   | "time"
   | "select"
-  | "json";
+  | "json"
+  | "file"
+  | "autocomplete";
 
 /** A `(value, label)` pair for a `select` widget. */
 export interface AdminSelectOption {

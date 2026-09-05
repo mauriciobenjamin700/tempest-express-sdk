@@ -63,6 +63,8 @@
 - **0.26.0** — admin governance: `accessPolicy` RBAC, the audit trail
   (`createdBy`/`updatedBy` stamping + change timeline), dashboard metric cards
   and lenses.
+- **0.27.0** — admin data in and out: file/image uploads (`uploadFields` +
+  `uploadStorage`), CSV import, and foreign-key autocomplete.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 

@@ -517,6 +517,93 @@ dela; a ordenação da lens vale até o operador clicar num cabeçalho de coluna
 aba **All** volta para a listagem sem preset, e o `lens` viaja nos links de
 paginação, ordenação e export.
 
+## 13. Upload de arquivo e imagem
+
+Uma coluna String que guarda o caminho/chave de um arquivo pode virar **input de
+upload**. Liste-a em `uploadFields` e passe um `uploadStorage` — os backends que
+o SDK já tem servem:
+
+```ts
+import { AdminModel, LocalUploadStorage } from "tempest-express-sdk";
+
+site.register(
+  new AdminModel({
+    model: DocumentModel,
+    uploadFields: ["attachment"],
+    uploadStorage: new LocalUploadStorage({ root: "media/", baseUrl: "/media" }),
+  }),
+);
+```
+
+- O formulário vira `multipart/form-data` sozinho quando há campo de upload.
+- **Create**: arquivo obrigatório só quando a coluna é `NOT NULL` e sem default.
+- **Edit**: sem arquivo novo, mantém o atual (o form mostra `Current: …`); com
+  arquivo, substitui.
+- A coluna guarda a **chave** do storage (`<slug>/<campo>/<uuid>.<ext>`); use o
+  `uploadStorage` depois para servir ou baixar.
+
+!!! info "`busboy` é peer opcional"
+    Multipart não vem no Express. O painel usa `busboy` — peer **opcional**, só
+    exigido por quem configura `uploadFields` ou `canImport`, e o erro diz o
+    comando de instalação. `npm install busboy`. Parser de formato de fio tem
+    cauda longa de correção (boundary, transfer encoding, escape de filename):
+    é o caso em que se depende em vez de reimplementar.
+
+!!! danger "Teto de upload"
+    `makeAdminRouter(site, { maxUploadBytes })` limita o tamanho aceito (default
+    10 MB). Arquivo acima do teto volta como erro no formulário, sem escrever
+    nada. O arquivo é bufferizado em memória — é o que um painel precisa (um
+    operador anexando um documento), não um caminho de ingestão em streaming.
+
+!!! warning "`uploadFields` exige `uploadStorage`"
+    Registrar um sem o outro levanta erro na construção do `AdminModel`: sem
+    storage não há onde gravar, e falhar no boot é melhor que falhar no primeiro
+    upload de produção.
+
+## 14. Import CSV
+
+`canImport: true` (junto de `canCreate`) expõe uma página de import que cria
+linhas em massa a partir de um arquivo enviado:
+
+```ts
+site.register(new AdminModel({ model: OrderModel, canImport: true }));
+```
+
+O arquivo é UTF-8 com header; colunas desconhecidas são ignoradas e as
+reconhecidas são as mesmas que o formulário edita. Cada linha passa pela mesma
+coerção e validação do formulário, e as que falham voltam numa tabela com o
+**número da linha da planilha** (começa em 2, porque a linha 1 é o header) e o
+motivo. As que passam são criadas — import parcial é resultado normal, não erro.
+
+!!! tip "O parser respeita a RFC 4180"
+    Campo entre aspas pode conter vírgula, quebra de linha e aspas duplicadas, e
+    o BOM que o Excel escreve é removido — sem isso o primeiro nome de coluna
+    nunca casaria. Import que estraga justamente as linhas que alguém teve o
+    trabalho de escapar é pior que import nenhum.
+
+## 15. Autocomplete de chave estrangeira
+
+FK para tabela grande demais para caber num `<select>` vira caixa de busca:
+
+```ts
+site.register(
+  new AdminModel({
+    model: OrderModel,
+    autocompleteFields: ["userId"],
+  }),
+);
+```
+
+O campo passa a buscar em `GET {prefix}/m/{slug}/autocomplete/{campo}?q=`, que
+consulta os `searchFields` do admin **referenciado** e devolve até 20 opções. Ao
+editar, a caixa abre já com o rótulo da linha atual, não com o UUID.
+
+!!! info "Sem CDN"
+    O SDK Python usa HTMX de CDN aqui. Este painel usa ~30 linhas de DOM puro,
+    porque script de terceiro num console de operador é uma requisição externa
+    que deploy fechado não faz e CSP estrita precisa liberar — e o que se
+    precisa é um fetch e uma lista.
+
 ## Recapitulando
 
 1. `BaseUserModel` + uma linha `isAdmin` semeada dá o login.
