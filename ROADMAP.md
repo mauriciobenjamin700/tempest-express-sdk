@@ -65,6 +65,8 @@
   and lenses.
 - **0.27.0** — admin data in and out: file/image uploads (`uploadFields` +
   `uploadStorage`), CSV import, and foreign-key autocomplete.
+- **0.28.0** — admin inlines: related child models on the parent's detail view,
+  read-only or as an in-place editable formset.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
