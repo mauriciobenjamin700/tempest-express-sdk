@@ -9,6 +9,38 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.30.0] — 2026-09-05
+
+### Adicionado
+
+- **tasks**: `TaskManager.register` aceita um `{ description, schedule }`
+  opcional e `TaskManager.inventory()` informa o que este processo rodaria,
+  ordenado por nome. O schedule é registrado e exibido, nunca interpretado — o
+  manager consome fila, ele não agenda.
+
+- **tasks**: `BaseJobModel` e `JobStore` — uma linha persistida por unidade de
+  trabalho longo, para as perguntas que um broker não responde (o export de
+  ontem terminou? por que aquele import falhou? o que está rodando agora?) terem
+  onde morar. Cada transição é um método, não um update cru, então "terminou"
+  sempre move as mesmas colunas juntas, e o `cancel` recusa run já em estado
+  terminal em vez de reescrevê-lo por baixo do operador. O store não é acoplado
+  ao `TaskManager` de propósito: nem toda mensagem enfileirada merece linha
+  durável, e o worker que escreve uma normalmente quer campos de domínio que o
+  envelope nunca carregou.
+
+- **admin**: a **página de tasks**. `makeAdminRouter({ tasks })` serve
+  `{prefix}/tasks` com as duas metades — o inventário declarado e os runs
+  registrados, com filtro por status e nome — mais a tela por run com payload,
+  resultado, erro e tentativas, e botão Cancel enquanto o run não está terminal.
+  Qualquer uma das metades pode ser omitida, e seção sem fonte fica de fora em
+  vez de renderizar vazia. O que a página deliberadamente não mostra é
+  profundidade de fila: nenhum broker expõe isso, e um número que parecesse essa
+  resposta seria pior que nenhum.
+
+- **admin**: a folha de estilo embutida ganhou as cores de badge de status de
+  job, numa constante própria para o port base continuar cópia verbatim
+  re-sincronizável.
+
 ## [0.29.0] — 2026-09-05
 
 ### Adicionado
