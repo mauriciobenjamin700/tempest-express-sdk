@@ -10,6 +10,7 @@
 
 import type { AdminAction } from "@/admin/actions";
 import { adminColumns, humanizeField } from "@/admin/columns";
+import type { AdminLens } from "@/admin/lenses";
 import {
   type AsyncSession,
   BaseRepository,
@@ -27,6 +28,18 @@ const NEVER_EDITABLE: readonly string[] = [
 
 /** Column keys hidden from the list view unless `listDisplay` says otherwise. */
 const NEVER_LISTED: readonly string[] = ["hashedPassword"];
+
+/**
+ * Columns the detail view moves out of the field list and into its audit
+ * panel, where "who and when" reads better next to the change history than
+ * scattered among the domain fields.
+ */
+const AUDIT_FIELDS: readonly string[] = [
+  "createdAt",
+  "updatedAt",
+  "createdBy",
+  "updatedBy",
+];
 
 /** Configuration accepted by {@link AdminModel}. */
 export interface AdminModelOptions<C extends ModelClass> {
@@ -64,6 +77,16 @@ export interface AdminModelOptions<C extends ModelClass> {
    * delete and runs against the checked rows.
    */
   actions?: readonly AdminAction<C>[];
+  /**
+   * Audit-log model backing the detail view's change timeline. Pair it with a
+   * repository that actually writes the rows — the panel only reads them.
+   */
+  auditModel?: ModelClass;
+  /**
+   * Saved list-view presets rendered as tabs above the table, each applying
+   * its filters and ordering through `?lens=<slug>`.
+   */
+  lenses?: readonly AdminLens[];
 }
 
 /**
@@ -103,6 +126,11 @@ export class AdminModel<C extends ModelClass = ModelClass> {
   /** Whether the delete action is exposed. */
   readonly canDelete: boolean;
 
+  /** Audit-log model backing the detail timeline, or `null`. */
+  readonly auditModel: ModelClass | null;
+  /** Saved list-view presets, in declaration order. */
+  readonly lenses: AdminLens[];
+
   private readonly actions = new Map<string, AdminAction>();
   private readonly slugOverride: string | null;
   private readonly listDisplayOverride: string[] | null;
@@ -130,6 +158,9 @@ export class AdminModel<C extends ModelClass = ModelClass> {
     this.canCreate = options.canCreate ?? true;
     this.canEdit = options.canEdit ?? true;
     this.canDelete = options.canDelete ?? true;
+
+    this.auditModel = options.auditModel ?? null;
+    this.lenses = [...(options.lenses ?? [])];
 
     for (const action of options.actions ?? []) {
       if (this.actions.has(action.name)) {
@@ -226,6 +257,27 @@ export class AdminModel<C extends ModelClass = ModelClass> {
   }
 
   /**
+   * Look a lens up by its slug.
+   *
+   * @param slug - The `?lens=` value.
+   * @returns The lens, or `null` when nothing matches.
+   */
+  getLens(slug: string): AdminLens | null {
+    return this.lenses.find((lens) => lens.slug === slug) ?? null;
+  }
+
+  /**
+   * Return the audit/timestamp columns the model actually declares.
+   *
+   * @returns The subset of `createdAt` / `updatedAt` / `createdBy` /
+   *   `updatedBy` present on the model, in that order.
+   */
+  auditFieldNames(): string[] {
+    const known = new Set(this.columnNames());
+    return AUDIT_FIELDS.filter((name) => known.has(name));
+  }
+
+  /**
    * Return the columns the detail view renders.
    *
    * Unlike {@link AdminModel.listDisplayNames}, this is not narrowed by
@@ -233,10 +285,16 @@ export class AdminModel<C extends ModelClass = ModelClass> {
    * where an operator goes to see the whole record, so trimming it there would
    * hide data with nowhere else to read it.
    *
-   * @returns Every column but the password hash, in declaration order.
+   * The audit/timestamp columns are held back too — they render in the detail
+   * view's own audit panel, next to the change history, rather than scattered
+   * among the domain fields.
+   *
+   * @returns Every domain column, in declaration order.
    */
   detailFieldNames(): string[] {
-    return this.columnNames().filter((name) => !NEVER_LISTED.includes(name));
+    return this.columnNames().filter(
+      (name) => !NEVER_LISTED.includes(name) && !AUDIT_FIELDS.includes(name),
+    );
   }
 
   /**
