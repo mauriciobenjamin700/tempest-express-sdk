@@ -40,6 +40,12 @@ página que existe é reportada só como `INFO`, e o build passa verde. O script
 varre o `site/` buildado e resolve todo `href` com fragmento contra os `id` reais
 da página de destino. Já pegou dois links mortos que o `--strict` deixou passar.
 
+**`npm install --package-lock-only` e `npm pack` reformatam o `package.json`** —
+o `"files": ["dist"]` volta para array multilinha, que é exatamente o que o
+`biome` recusa. Depois de qualquer comando `npm` que toque o manifesto, rode
+`npx biome check --fix package.json` **antes** de commitar; sem isso o `npm run
+check` falha no passo seguinte com um diff de formatação que não é seu.
+
 ### O que os comandos não cobrem
 
 - **Comportamento em runtime.** `tsc` verde não diz nada sobre o que o endpoint
