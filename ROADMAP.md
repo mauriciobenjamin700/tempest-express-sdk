@@ -60,6 +60,9 @@
 - **0.25.0** — admin operations: bulk actions (activate / deactivate / delete),
   custom actions via `adminAction`, CSV/JSON export honouring the current query,
   and foreign-key selects in forms and list filters.
+- **0.26.0** — admin governance: `accessPolicy` RBAC, the audit trail
+  (`createdBy`/`updatedBy` stamping + change timeline), dashboard metric cards
+  and lenses.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
