@@ -176,6 +176,8 @@ const app = await createApp({
 | `POST /admin/logout` | Encerra a sessão |
 | `GET /admin/` | Dashboard: contagem por model + CPU/memória |
 | `GET /admin/m/{slug}` | List view: busca, filtros, ordenação, paginação |
+| `POST /admin/m/{slug}/bulk` | Ações em massa nas linhas marcadas |
+| `GET /admin/m/{slug}/export.csv` · `.json` | Export do resultado atual |
 | `GET/POST /admin/m/{slug}/new` | Criar (quando `canCreate`) |
 | `GET /admin/m/{slug}/{id}` | Detalhe, com Edit/Delete |
 | `GET/POST /admin/m/{slug}/{id}/edit` | Editar (quando `canEdit`) |
@@ -256,6 +258,127 @@ linkada por último e sobrescreve tudo.
     no mobile (≤768px) vira off-canvas, aberta pelo ícone burger e fechada
     tocando no scrim — CSS puro, sem JS.
 
+## 6. Ações em massa
+
+A list view mostra um checkbox por linha, um "selecionar tudo" e uma barra de
+ação que opera nas linhas marcadas. Três ações já vêm prontas — **Activate**,
+**Deactivate** (quando `canEdit` e o model tem a coluna `isActive`) e
+**Delete** (quando `canDelete`) — e cada uma volta com um banner dizendo quantas
+linhas mudaram.
+
+### Ações customizadas
+
+Qualquer coisa específica do domínio — "enviar boas-vindas", "marcar como
+enviado", "recalcular totais" — é uma **ação customizada**: um handler criado
+com `adminAction` e passado em `AdminModel({ actions: [...] })`.
+
+```ts
+import { AdminModel, adminAction } from "tempest-express-sdk";
+
+import { site } from "./site";
+import { OrderModel } from "../db/models";
+import { mailer } from "../core/email";
+
+const markPaid = adminAction({ label: "Marcar como pago" }, async (ctx) => {
+  const changed = await ctx.repository.update(
+    { id: { in: ctx.ids } },
+    { status: "paid" },
+  );
+  return { message: `${changed} pedido(s) marcado(s) como pago.` };
+});
+
+const notifyCustomers = adminAction(
+  { label: "Avisar clientes", dangerous: false },
+  async (ctx) => {
+    const orders = await ctx.repository.list({ id: { in: ctx.ids } });
+    for (const order of orders) await mailer.send(order.email, "Seu pedido");
+    return { message: `${orders.length} e-mails enviados.` };
+  },
+);
+
+site.register(
+  new AdminModel({ model: OrderModel, actions: [markPaid, notifyCustomers] }),
+);
+```
+
+O handler recebe um contexto com:
+
+| Campo | O que é |
+| --- | --- |
+| `ids` | Identidades das linhas marcadas. |
+| `repository` | `BaseRepository` do model, na sessão do request. |
+| `dbSession` | A sessão de banco, para trabalho além do repository. |
+| `request` | O request inbound. |
+| `session` | A sessão do admin autenticado. |
+| `principal` | A linha do operador que disparou a ação. |
+
+Retorne `{ message, category }` para exibir um banner (`category` aceita
+`"success"` — o default —, `"error"` e `"warning"`), ou `null` para não mostrar
+nada. `dangerous: true` marca a ação como destrutiva no dropdown.
+
+!!! tip "O handler continua uma função comum"
+    O SDK Python usa um decorator `@admin_action`; aqui `adminAction` **devolve**
+    o descritor. O handler fica direto chamável e testável
+    (`markPaid.handler(ctx)`), sem sintaxe de decorator para ligar no build de
+    quem consome.
+
+!!! info "O nome sai do label"
+    O identificador submetido é o slug do label (`"Marcar como pago"` →
+    `marcar-como-pago`), namespaced como `custom:<nome>` para nunca colidir com
+    uma ação embutida. Passe `name` para fixá-lo — o valor vai no HTML, então
+    mudá-lo é mudar a superfície. Dois nomes iguais no mesmo model levantam erro
+    na construção.
+
+!!! warning "Exceção no handler vira banner, não 500"
+    Uma ação que levanta é registrada no log e volta como banner de erro na list
+    view, com a mensagem da exceção. O operador vê o que falhou em vez de uma
+    página de erro genérica — mas a mensagem chega ao navegador, então não
+    coloque segredo no texto da exceção.
+
+## 7. Export CSV / JSON
+
+Os botões **Export CSV** e **Export JSON** baixam o resultado **atual** —
+mesma busca, mesmos filtros, mesma ordenação, mesmas colunas do `listDisplay`:
+
+```text
+GET {prefix}/m/{slug}/export.csv?q=...&filter_status=paid&sort=createdAt&dir=desc
+GET {prefix}/m/{slug}/export.json?...
+```
+
+O CSV segue RFC 4180 (aspas duplicadas, campo entre aspas quando tem vírgula,
+aspas ou quebra de linha) e o JSON é um array de objetos coluna→valor. `Date`
+vira ISO, `bigint` vira string decimal, binário vira base64.
+
+!!! danger "O teto existe por um motivo"
+    Export é varredura de tabela inteira transmitida para um navegador.
+    `makeAdminRouter(site, { exportMaxRows: 5000 })` limita quantas linhas saem
+    (default `5000`) — é o que impede um clique curioso numa tabela grande de
+    virar incidente. Suba o teto conscientemente.
+
+## 8. Select de chave estrangeira
+
+Uma coluna FK cujo model de destino está **registrado no mesmo site** vira um
+`<select>` das linhas relacionadas, no formulário e no filtro da listagem, em
+vez de um campo de UUID cru. O label da opção sai do primeiro `searchFields` do
+admin referenciado; sem ele, de `name` / `title` / `email` / `label` /
+`reference`; e por último da identidade.
+
+```ts
+class OrderModel extends BaseModel {
+  static override tablename = "sales_order";
+  userId = column.uuid().references("user.id");
+}
+
+site.register(new AdminModel({ model: UserModel, searchFields: ["name"] }));
+site.register(
+  new AdminModel({ model: OrderModel, listFilter: ["userId"] }),
+);
+```
+
+FK para tabela **não registrada** continua input de texto — um dropdown vazio
+seria pior que o campo cru. As opções são limitadas a 1000 linhas; acima disso
+a tabela de destino pede um campo de busca, não uma lista.
+
 ## Recapitulando
 
 1. `BaseUserModel` + uma linha `isAdmin` semeada dá o login.
@@ -263,3 +386,5 @@ linkada por último e sobrescreve tudo.
 3. `makeAdminRouter(site, { engine, authBackend, secretKey })` monta o painel.
 4. Widget, filtro e validação saem das **colunas do model** — não há schema
    duplicado para manter em sincronia.
+5. `actions: [...]` leva a operação do dia a dia para dentro do painel; export e
+   FK-select saem de graça do que o model já declara.

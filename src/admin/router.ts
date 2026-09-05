@@ -28,15 +28,29 @@
  * with `403` when it does not match.
  */
 
+import type {
+  AdminAction,
+  AdminActionContext,
+  AdminActionResult,
+  BulkActionOption,
+} from "@/admin/actions";
 import type { AdminAuthBackend } from "@/admin/auth";
 import {
+  type AdminSelectOption,
   adminColumns,
   filterForColumn,
+  foreignKeyTable,
   humanizeField,
   isSearchableColumn,
 } from "@/admin/columns";
 import type { AdminModel } from "@/admin/config";
-import { buildFormFields, formatCellValue, parseFormBody } from "@/admin/forms";
+import {
+  buildFormFields,
+  foreignKeyFields,
+  foreignKeyLabel,
+  formatCellValue,
+  parseFormBody,
+} from "@/admin/forms";
 import { type AdminSession, AdminSessionStore, csrfTokenMatches } from "@/admin/session";
 import type { AdminSite } from "@/admin/site";
 import { ADMIN_CSS } from "@/admin/styles";
@@ -57,12 +71,18 @@ import {
 } from "@/admin/templates";
 import { resolveAdminTheme } from "@/admin/theme";
 import { JSONLogger } from "@/core";
-import type { AsyncEngine, AsyncSession, Condition, WhereInput } from "@/db";
+import type { AsyncEngine, AsyncSession, Column, Condition, WhereInput } from "@/db";
 import { and, or } from "@/db";
 import { MetricsUtils } from "@/utils";
 import express, { type Request, type Response, type Router } from "express";
 
 const logger = new JSONLogger("tempest_express_sdk.admin.router");
+
+/** Cap on related rows pre-loaded into a foreign-key dropdown. */
+const FK_OPTION_CAP = 1000;
+
+/** Cap on the flash message length echoed back through the redirect query. */
+const FLASH_MAX_LENGTH = 300;
 
 /** Fixed outcome codes carried in the redirect query after a write. */
 const FLASH_MESSAGES: Record<string, AdminMessage> = {
@@ -89,12 +109,53 @@ export interface AdminRouterOptions {
   sessionMaxAgeSeconds?: number;
   /** Show the CPU/memory panel on the dashboard. Default `true`. */
   showMetrics?: boolean;
+  /**
+   * Hard cap on rows the CSV/JSON export writes. Default `5000`. An export is
+   * a full table scan streamed to a browser, so the cap is what keeps a curious
+   * click on a large table from becoming an outage.
+   */
+  exportMaxRows?: number;
+}
+
+/** A request's resolved search, filters and ordering, shared by list + export. */
+interface ResolvedListQuery {
+  /** The free-text search term (empty when absent). */
+  search: string;
+  /** The text columns the search actually ran against. */
+  searchable: string[];
+  /** The combined `where` condition, or `undefined` for "everything". */
+  where: Condition | WhereInput<Record<string, unknown>> | undefined;
+  /** The ordering column, or `undefined` to leave it to the repository. */
+  orderBy: string | undefined;
+  /** Whether the ordering is ascending. */
+  ascending: boolean;
+  /** The column the request explicitly sorted by, or `null`. */
+  sortColumn: string | null;
+  /** View models for the filter bar. */
+  filterViews: AdminFilterView[];
+  /** Query-string parameters every generated link carries forward. */
+  baseQuery: Record<string, string>;
 }
 
 /** The per-request state the authenticated handlers share. */
 interface AdminRequestState {
   session: AdminSession;
   dbSession: AsyncSession;
+  principal: unknown;
+}
+
+/**
+ * Run a custom action, normalizing a handler that resolves to nothing.
+ *
+ * @param action - The registered action.
+ * @param context - The context handed to the handler.
+ * @returns The result to flash, or `null` when the handler reported none.
+ */
+async function runCustomAction(
+  action: AdminAction,
+  context: AdminActionContext,
+): Promise<AdminActionResult | null> {
+  return (await action.handler(context)) ?? null;
 }
 
 /**
@@ -139,6 +200,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   const prefix = (options.prefix ?? "/admin").replace(/\/$/, "");
   const theme = resolveAdminTheme(site.theme);
   const showMetrics = options.showMetrics ?? true;
+  const exportMaxRows = options.exportMaxRows ?? 5000;
   const sessions = new AdminSessionStore({
     secret: options.secretKey,
     ...(options.cookieName === undefined ? {} : { cookieName: options.cookieName }),
@@ -180,8 +242,17 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
    * @returns The banners to render (empty when the request carries none).
    */
   const flashFor = (req: Request): AdminMessage[] => {
-    const message = FLASH_MESSAGES[queryString(req.query.ok)];
-    return message === undefined ? [] : [message];
+    const fixed = FLASH_MESSAGES[queryString(req.query.ok)];
+    if (fixed !== undefined) return [fixed];
+    const text = queryString(req.query.flash);
+    if (text === "") return [];
+    const level = queryString(req.query.level);
+    return [
+      {
+        text: text.slice(0, FLASH_MAX_LENGTH),
+        level: level === "error" || level === "warning" ? level : "success",
+      },
+    ];
   };
 
   /**
@@ -248,7 +319,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       res.redirect(`${prefix}/mfa`);
       return null;
     }
-    return { session, dbSession };
+    return { session, dbSession, principal };
   };
 
   /**
@@ -450,7 +521,9 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         renderFormPage(context(req, state.session), {
           mode: "create",
           title: admin.verboseName(),
-          fields: buildFormFields(admin),
+          fields: buildFormFields(admin, {
+            foreignKeyOptions: await foreignKeyOptionsFor(admin, state.dbSession),
+          }),
           actionUrl: `${prefix}/m/${admin.slug()}/new`,
           backUrl: `${prefix}/m/${admin.slug()}`,
           error: null,
@@ -474,13 +547,18 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
 
       const body = req.body as Record<string, unknown>;
       const parsed = parseFormBody(admin, body);
+      const foreignKeyOptions = await foreignKeyOptionsFor(admin, state.dbSession);
       const rerender = (error: string | null, status: number): void => {
         html(
           res,
           renderFormPage(context(req, state.session), {
             mode: "create",
             title: admin.verboseName(),
-            fields: buildFormFields(admin, { values: body, errors: parsed.errors }),
+            fields: buildFormFields(admin, {
+              values: body,
+              errors: parsed.errors,
+              foreignKeyOptions,
+            }),
             actionUrl: `${prefix}/m/${admin.slug()}/new`,
             backUrl: `${prefix}/m/${admin.slug()}`,
             error,
@@ -500,6 +578,123 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         return;
       }
       res.redirect(`${prefix}/m/${admin.slug()}?ok=created`);
+    }),
+  );
+
+  router.get(
+    `${prefix}/m/:slug/export.:format`,
+    guarded(async (req, res) => {
+      const state = await authenticate(req, res);
+      if (state === null) return;
+      const admin = resolveAdmin(req, res, state);
+      if (admin === null) return;
+      const format = String(req.params.format);
+      if (format !== "csv" && format !== "json") {
+        html(res, renderNotFound(context(req, state.session)), 404);
+        return;
+      }
+
+      const query = await resolveListQuery(req, admin, state.dbSession);
+      const result = await admin.repository(state.dbSession).paginate({
+        page: 1,
+        pageSize: exportMaxRows,
+        ...(query.orderBy === undefined ? {} : { orderBy: query.orderBy as never }),
+        ascending: query.ascending,
+        ...(query.where === undefined ? {} : { filters: query.where as never }),
+      });
+
+      const columns = admin.listDisplayNames();
+      const rows = result.items as Record<string, unknown>[];
+      const payload = format === "csv" ? toCsv(columns, rows) : toJson(columns, rows);
+      res
+        .status(200)
+        .type(format === "csv" ? "text/csv; charset=utf-8" : "application/json")
+        .set("content-disposition", `attachment; filename="${admin.slug()}.${format}"`)
+        .send(payload);
+    }),
+  );
+
+  router.post(
+    `${prefix}/m/:slug/bulk`,
+    guarded(async (req, res) => {
+      const state = await authenticate(req, res);
+      if (state === null) return;
+      const admin = resolveAdmin(req, res, state);
+      if (admin === null) return;
+      if (!checkCsrf(req, res, state)) return;
+
+      const body = req.body as Record<string, unknown>;
+      const action = typeof body.action === "string" ? body.action : "";
+      const raw = body.ids;
+      const ids = (Array.isArray(raw) ? raw : raw === undefined ? [] : [raw])
+        .filter((value): value is string => typeof value === "string")
+        .filter((value) => value !== "");
+
+      const listUrl = `${prefix}/m/${admin.slug()}`;
+      const back = (message: string, level: AdminMessage["level"]): void => {
+        res.redirect(`${listUrl}?${buildQuery({ flash: message, level })}`);
+      };
+
+      if (ids.length === 0) {
+        back("No rows were selected.", "warning");
+        return;
+      }
+      if (!bulkActionsFor(admin).some((option) => option.value === action)) {
+        html(res, renderNotFound(context(req, state.session)), 400);
+        return;
+      }
+
+      const repository = admin.repository(state.dbSession);
+      const scope = { [admin.identityField]: { in: ids } } as never;
+
+      if (action.startsWith("custom:")) {
+        const custom = admin.getAction(action.slice("custom:".length));
+        if (custom === null) {
+          html(res, renderNotFound(context(req, state.session)), 400);
+          return;
+        }
+        let result: AdminActionResult | null;
+        try {
+          result = await runCustomAction(custom, {
+            ids,
+            repository,
+            dbSession: state.dbSession,
+            request: req,
+            session: state.session,
+            principal: state.principal,
+          });
+        } catch (error) {
+          logger.error("Admin action failed", {
+            slug: admin.slug(),
+            action: custom.name,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          back(
+            `${custom.label} failed: ${error instanceof Error ? error.message : String(error)}`,
+            "error",
+          );
+          return;
+        }
+        if (result === null) {
+          res.redirect(listUrl);
+          return;
+        }
+        back(result.message, result.category ?? "success");
+        return;
+      }
+
+      if (action === "delete") {
+        const removed = await repository.delete(scope);
+        back(`Deleted ${removed} record${removed === 1 ? "" : "s"}.`, "success");
+        return;
+      }
+
+      const active = action === "activate";
+      const changed = await repository.update(scope, { isActive: active } as never);
+      back(
+        `${active ? "Activated" : "Deactivated"} ${changed} record${changed === 1 ? "" : "s"}.`,
+        "success",
+      );
     }),
   );
 
@@ -552,7 +747,10 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         renderFormPage(context(req, state.session), {
           mode: "edit",
           title: admin.verboseName(),
-          fields: buildFormFields(admin, { values: row }),
+          fields: buildFormFields(admin, {
+            values: row,
+            foreignKeyOptions: await foreignKeyOptionsFor(admin, state.dbSession),
+          }),
           actionUrl: `${prefix}/m/${admin.slug()}/${identity}/edit`,
           backUrl: `${prefix}/m/${admin.slug()}/${identity}`,
           error: null,
@@ -577,13 +775,18 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
 
       const body = req.body as Record<string, unknown>;
       const parsed = parseFormBody(admin, body);
+      const foreignKeyOptions = await foreignKeyOptionsFor(admin, state.dbSession);
       const rerender = (error: string | null, status: number): void => {
         html(
           res,
           renderFormPage(context(req, state.session), {
             mode: "edit",
             title: admin.verboseName(),
-            fields: buildFormFields(admin, { values: body, errors: parsed.errors }),
+            fields: buildFormFields(admin, {
+              values: body,
+              errors: parsed.errors,
+              foreignKeyOptions,
+            }),
             actionUrl: `${prefix}/m/${admin.slug()}/${identity}/edit`,
             backUrl: `${prefix}/m/${admin.slug()}/${identity}`,
             error,
@@ -665,8 +868,95 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     state: AdminRequestState,
   ): Promise<string> {
     const columns = adminColumns(admin.model);
-    const search = queryString(req.query.q);
+    const query = await resolveListQuery(req, admin, state.dbSession);
     const page = Math.max(1, Number.parseInt(queryString(req.query.page), 10) || 1);
+
+    const result = await admin.repository(state.dbSession).paginate({
+      page,
+      pageSize: admin.pageSize,
+      ...(query.orderBy === undefined ? {} : { orderBy: query.orderBy as never }),
+      ascending: query.ascending,
+      ...(query.where === undefined ? {} : { filters: query.where as never }),
+    });
+
+    const displayed = admin.listDisplayNames();
+    const sort: Record<string, AdminSortView> = {};
+    for (const column of displayed) {
+      if (!(column in columns)) continue;
+      const active = (query.sortColumn ?? admin.orderKey) === column;
+      const nextAscending = active ? !query.ascending : true;
+      sort[column] = {
+        url: `?${buildQuery({
+          ...query.baseQuery,
+          sort: column,
+          dir: nextAscending ? "asc" : "desc",
+        })}`,
+        active,
+        ascending: query.ascending,
+      };
+    }
+
+    const sortParams = {
+      sort: query.sortColumn ?? undefined,
+      dir: query.sortColumn === null ? undefined : query.ascending ? "asc" : "desc",
+    };
+    const pageUrl = (target: number): string =>
+      `?${buildQuery({ ...query.baseQuery, ...sortParams, page: target })}`;
+    const exportQuery = buildQuery({ ...query.baseQuery, ...sortParams });
+    const exportUrl = (format: string): string =>
+      `${prefix}/m/${admin.slug()}/export.${format}${exportQuery === "" ? "" : `?${exportQuery}`}`;
+
+    const view: AdminListView = {
+      title: admin.verboseNamePlural(),
+      columns: displayed,
+      rows: (result.items as Record<string, unknown>[]).map((row) => {
+        const identity = String(row[admin.identityField]);
+        return {
+          identity,
+          cells: displayed.map((column) => formatCellValue(row[column])),
+          url: `${prefix}/m/${admin.slug()}/${identity}`,
+        };
+      }),
+      total: result.total,
+      page: result.page,
+      pages: result.pages,
+      prevUrl: result.page > 1 ? pageUrl(result.page - 1) : null,
+      nextUrl: result.page < result.pages ? pageUrl(result.page + 1) : null,
+      searchable: query.searchable.length > 0,
+      searchValue: query.search,
+      filters: query.filterViews,
+      sort,
+      newUrl: admin.canCreate ? `${prefix}/m/${admin.slug()}/new` : null,
+      bulkActions: bulkActionsFor(admin),
+      bulkUrl: `${prefix}/m/${admin.slug()}/bulk`,
+      exportCsvUrl: exportUrl("csv"),
+      exportJsonUrl: exportUrl("json"),
+    };
+
+    return renderListPage(context(req, state.session), view);
+  }
+
+  /**
+   * Resolve a request's search, filters and ordering into a `where` condition
+   * plus the view models that render the filter bar.
+   *
+   * Shared by the list view and the export endpoint so both honor exactly the
+   * same query: an export that quietly disagrees with the page it was taken
+   * from is worse than no export at all.
+   *
+   * @param req - The inbound request.
+   * @param admin - The model configuration.
+   * @param dbSession - The request's DB session (used to load FK filter options).
+   * @returns The condition, ordering, filter view models and the query-string
+   *   parameters every generated link has to carry forward.
+   */
+  async function resolveListQuery(
+    req: Request,
+    admin: AdminModel,
+    dbSession: AsyncSession,
+  ): Promise<ResolvedListQuery> {
+    const columns = adminColumns(admin.model);
+    const search = queryString(req.query.q);
     const sortField = queryString(req.query.sort);
     const sortColumn = sortField in columns ? sortField : null;
     const ascending =
@@ -679,6 +969,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       const column = columns[field];
       if (column === undefined) continue;
       const spec = filterForColumn(column);
+
       if (spec.kind === "daterange") {
         const from = queryString(req.query[`filter_${field}_from`]);
         const to = queryString(req.query[`filter_${field}_to`]);
@@ -697,6 +988,9 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         });
         continue;
       }
+
+      const related = await relatedOptions(column, dbSession);
+      const options = related ?? spec.options;
       const value = queryString(req.query[`filter_${field}`]);
       if (value !== "") {
         conditions.push({
@@ -706,11 +1000,11 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       filterViews.push({
         field,
         label: humanizeField(field),
-        kind: spec.kind,
+        kind: related === null ? spec.kind : "select",
         value,
         valueFrom: "",
         valueTo: "",
-        options: spec.options.map((option) => ({
+        options: options.map((option) => ({
           value: option.value,
           label: option.label,
           selected: option.value === value,
@@ -728,17 +1022,6 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       );
     }
 
-    const where = conditions.length === 0 ? undefined : and(...conditions);
-    const orderBy = sortColumn ?? admin.orderKey ?? undefined;
-    const result = await admin.repository(state.dbSession).paginate({
-      page,
-      pageSize: admin.pageSize,
-      ...(orderBy === undefined ? {} : { orderBy: orderBy as never }),
-      ascending,
-      ...(where === undefined ? {} : { filters: where as never }),
-    });
-
-    const displayed = admin.listDisplayNames();
     const baseQuery: Record<string, string> = { q: search };
     for (const view of filterViews) {
       if (view.kind === "daterange") {
@@ -749,57 +1032,160 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       }
     }
 
-    const sort: Record<string, AdminSortView> = {};
-    for (const column of displayed) {
-      if (!(column in columns)) continue;
-      const active = (sortColumn ?? admin.orderKey) === column;
-      const nextAscending = active ? !ascending : true;
-      sort[column] = {
-        url: `?${buildQuery({
-          ...baseQuery,
-          sort: column,
-          dir: nextAscending ? "asc" : "desc",
-        })}`,
-        active,
-        ascending,
-      };
-    }
-
-    const pageUrl = (target: number): string =>
-      `?${buildQuery({
-        ...baseQuery,
-        sort: sortColumn ?? undefined,
-        dir: sortColumn === null ? undefined : ascending ? "asc" : "desc",
-        page: target,
-      })}`;
-
-    const view: AdminListView = {
-      title: admin.verboseNamePlural(),
-      columns: displayed,
-      rows: (result.items as Record<string, unknown>[]).map((row) => {
-        const identity = String(row[admin.identityField]);
-        return {
-          identity,
-          cells: displayed.map((column) => formatCellValue(row[column])),
-          url: `${prefix}/m/${admin.slug()}/${identity}`,
-        };
-      }),
-      total: result.total,
-      page: result.page,
-      pages: result.pages,
-      prevUrl: result.page > 1 ? pageUrl(result.page - 1) : null,
-      nextUrl: result.page < result.pages ? pageUrl(result.page + 1) : null,
-      searchable: searchable.length > 0,
-      searchValue: search,
-      filters: filterViews,
-      sort,
-      newUrl: admin.canCreate ? `${prefix}/m/${admin.slug()}/new` : null,
+    return {
+      search,
+      searchable,
+      where: conditions.length === 0 ? undefined : and(...conditions),
+      orderBy: sortColumn ?? admin.orderKey ?? undefined,
+      ascending,
+      sortColumn,
+      filterViews,
+      baseQuery,
     };
+  }
 
-    return renderListPage(context(req, state.session), view);
+  /**
+   * Load the `(value, label)` options for a foreign-key column whose target
+   * model is registered on this site.
+   *
+   * A foreign key to an unmanaged table returns `null`, so the caller keeps the
+   * plain identity input rather than offering an empty dropdown.
+   *
+   * @param column - The column to inspect.
+   * @param dbSession - The request's DB session.
+   * @returns The related-row options (capped), or `null` when unmanaged.
+   */
+  async function relatedOptions(
+    column: Column<unknown>,
+    dbSession: AsyncSession,
+  ): Promise<AdminSelectOption[] | null> {
+    const table = foreignKeyTable(column);
+    if (table === null) return null;
+    const referenced = site.get(table);
+    if (referenced === null) return null;
+    const rows = (await referenced.repository(dbSession).list()) as Record<
+      string,
+      unknown
+    >[];
+    return rows.slice(0, FK_OPTION_CAP).map((row) => ({
+      value: String(row[referenced.identityField]),
+      label: foreignKeyLabel(referenced, row),
+    }));
+  }
+
+  /**
+   * Load select options for every editable foreign key pointing at a model this
+   * site manages, so the form shows related rows instead of raw identities.
+   *
+   * @param admin - The model configuration being rendered.
+   * @param dbSession - The request's DB session.
+   * @returns Options keyed by column (empty when the model has no managed FKs).
+   */
+  async function foreignKeyOptionsFor(
+    admin: AdminModel,
+    dbSession: AsyncSession,
+  ): Promise<Record<string, AdminSelectOption[]>> {
+    const columns = adminColumns(admin.model);
+    const options: Record<string, AdminSelectOption[]> = {};
+    for (const field of Object.keys(foreignKeyFields(admin))) {
+      const column = columns[field];
+      if (column === undefined) continue;
+      const related = await relatedOptions(column, dbSession);
+      if (related !== null) options[field] = related;
+    }
+    return options;
   }
 
   return router;
+}
+
+/**
+ * Return the bulk actions a configuration offers, as dropdown options.
+ *
+ * Activation toggles need `canEdit` and an `isActive` column; delete needs
+ * `canDelete`. Custom actions are namespaced `custom:<name>` so their values can
+ * never collide with a built-in one.
+ *
+ * @param admin - The model configuration.
+ * @returns The options (empty when no mutation is permitted).
+ */
+function bulkActionsFor(admin: AdminModel): BulkActionOption[] {
+  const actions: BulkActionOption[] = [];
+  const hasActiveFlag = "isActive" in adminColumns(admin.model);
+  if (admin.canEdit && hasActiveFlag) {
+    actions.push({ value: "activate", label: "Activate", dangerous: false });
+    actions.push({ value: "deactivate", label: "Deactivate", dangerous: false });
+  }
+  if (admin.canDelete) {
+    actions.push({ value: "delete", label: "Delete", dangerous: true });
+  }
+  for (const action of admin.customActions()) {
+    actions.push({
+      value: `custom:${action.name}`,
+      label: action.label,
+      dangerous: action.dangerous,
+    });
+  }
+  return actions;
+}
+
+/**
+ * Render one exported value into something CSV and JSON can both carry.
+ *
+ * @param value - The stored value.
+ * @returns An ISO string for dates, a decimal string for `bigint`, base64 for
+ *   binary, and the value unchanged otherwise.
+ */
+function exportValue(value: unknown): unknown {
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "bigint") return value.toString();
+  if (value instanceof Uint8Array) return Buffer.from(value).toString("base64");
+  return value;
+}
+
+/**
+ * Quote one CSV field per RFC 4180.
+ *
+ * @param value - The already-exported value.
+ * @returns The field text, quoted when it carries a comma, quote or newline.
+ */
+function csvField(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  const text = typeof value === "object" ? JSON.stringify(value) : String(value);
+  if (/[",\r\n]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
+  return text;
+}
+
+/**
+ * Serialize rows to a CSV document with a header row.
+ *
+ * @param columns - Column keys, in header and value order.
+ * @param rows - The rows to serialize.
+ * @returns The CSV text, CRLF-delimited as the format specifies.
+ */
+function toCsv(columns: string[], rows: Record<string, unknown>[]): string {
+  const lines = [columns.map(csvField).join(",")];
+  for (const row of rows) {
+    lines.push(columns.map((column) => csvField(exportValue(row[column]))).join(","));
+  }
+  return `${lines.join("\r\n")}\r\n`;
+}
+
+/**
+ * Serialize rows to a JSON array of column→value objects.
+ *
+ * @param columns - Column keys to include.
+ * @param rows - The rows to serialize.
+ * @returns The JSON text.
+ */
+function toJson(columns: string[], rows: Record<string, unknown>[]): string {
+  return JSON.stringify(
+    rows.map((row) =>
+      Object.fromEntries(columns.map((column) => [column, exportValue(row[column])])),
+    ),
+    null,
+    2,
+  );
 }
 
 /**

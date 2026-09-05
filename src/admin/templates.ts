@@ -11,6 +11,7 @@
  * Every value interpolated into markup goes through {@link escapeHtml}.
  */
 
+import type { BulkActionOption } from "@/admin/actions";
 import type { AdminFormField } from "@/admin/forms";
 import type { AdminSession } from "@/admin/session";
 import type { AdminSite } from "@/admin/site";
@@ -352,6 +353,14 @@ export interface AdminListView {
   sort: Record<string, AdminSortView>;
   /** URL of the create form, or `null` when creation is disabled. */
   newUrl: string | null;
+  /** Bulk actions offered above the table. Empty hides the whole bulk UI. */
+  bulkActions: BulkActionOption[];
+  /** URL the bulk form posts to. */
+  bulkUrl: string;
+  /** URL exporting the current result set as CSV. */
+  exportCsvUrl: string;
+  /** URL exporting the current result set as JSON. */
+  exportJsonUrl: string;
 }
 
 /**
@@ -389,6 +398,9 @@ function renderFilter(filter: AdminFilterView): string {
  * @returns The full page.
  */
 export function renderListPage(context: AdminRenderContext, view: AdminListView): string {
+  const bulk = view.bulkActions.length > 0 && context.session !== null;
+  const checkColumn = bulk ? 1 : 0;
+
   const headers = view.columns
     .map((column) => {
       const state = view.sort[column];
@@ -401,12 +413,47 @@ export function renderListPage(context: AdminRenderContext, view: AdminListView)
   const rows =
     view.rows.length > 0
       ? view.rows
-          .map(
-            (row) =>
-              `<tr>${row.cells.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}<td><a href="${escapeHtml(row.url)}">View</a></td></tr>`,
-          )
+          .map((row) => {
+            const check = bulk
+              ? `<td class="tempest-admin-list__check"><input type="checkbox" name="ids" value="${escapeHtml(row.identity)}" data-row-check aria-label="Select row"></td>`
+              : "";
+            const cells = row.cells
+              .map((cell) => `<td>${escapeHtml(cell)}</td>`)
+              .join("");
+            return `<tr>${check}${cells}<td><a href="${escapeHtml(row.url)}">View</a></td></tr>`;
+          })
           .join("")
-      : `<tr><td colspan="${view.columns.length + 1}">No records.</td></tr>`;
+      : `<tr><td colspan="${view.columns.length + 1 + checkColumn}">No records.</td></tr>`;
+
+  const bulkBar = bulk
+    ? `<form method="post" action="${escapeHtml(view.bulkUrl)}" class="tempest-admin-bulk" onsubmit="return confirm('Apply the selected action to the checked rows?');">
+    <input type="hidden" name="csrf_token" value="${escapeHtml(context.session?.csrfToken)}">
+    <div class="tempest-admin-bulk__bar">
+      <select name="action" aria-label="Bulk action">
+        ${view.bulkActions
+          .map(
+            (action) =>
+              `<option value="${escapeHtml(action.value)}">${escapeHtml(action.label)}${action.dangerous ? " ⚠" : ""}</option>`,
+          )
+          .join("")}
+      </select>
+      <button type="submit">Apply to selected</button>
+    </div>`
+    : "";
+
+  const selectAllScript = bulk
+    ? `<script>
+    (function () {
+      var master = document.querySelector('[data-select-all]');
+      if (!master) return;
+      master.addEventListener('change', function () {
+        document.querySelectorAll('[data-row-check]').forEach(function (box) {
+          box.checked = master.checked;
+        });
+      });
+    })();
+  </script>`
+    : "";
 
   const hasControls = view.searchable || view.filters.length > 0;
   const body = `<section class="tempest-admin-list">
@@ -422,14 +469,19 @@ export function renderListPage(context: AdminRenderContext, view: AdminListView)
     </form>
     <div class="tempest-admin-list__actions">
       ${view.newUrl !== null ? `<a class="tempest-admin-list__new" href="${escapeHtml(view.newUrl)}">+ New</a>` : ""}
+      <a href="${escapeHtml(view.exportCsvUrl)}">Export CSV</a>
+      <a href="${escapeHtml(view.exportJsonUrl)}">Export JSON</a>
     </div>
   </div>
+  ${bulkBar}
   <div class="tempest-admin-table-wrap">
     <table class="tempest-admin-list__table">
-      <thead><tr>${headers}<th>Actions</th></tr></thead>
+      <thead><tr>${bulk ? '<th class="tempest-admin-list__check"><input type="checkbox" data-select-all aria-label="Select all"></th>' : ""}${headers}<th>Actions</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   </div>
+  ${bulk ? "</form>" : ""}
+  ${selectAllScript}
   ${
     view.pages > 1
       ? `<nav class="tempest-admin-list__pagination" aria-label="Pagination">

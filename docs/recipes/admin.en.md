@@ -175,6 +175,8 @@ const app = await createApp({
 | `POST /admin/logout` | Drop the session |
 | `GET /admin/` | Dashboard: row counts + CPU/memory |
 | `GET /admin/m/{slug}` | List view: search, filters, sorting, pagination |
+| `POST /admin/m/{slug}/bulk` | Bulk actions on the checked rows |
+| `GET /admin/m/{slug}/export.csv` · `.json` | Export of the current result set |
 | `GET/POST /admin/m/{slug}/new` | Create (when `canCreate`) |
 | `GET /admin/m/{slug}/{id}` | Detail, with Edit/Delete |
 | `GET/POST /admin/m/{slug}/{id}/edit` | Edit (when `canEdit`) |
@@ -255,6 +257,127 @@ stylesheet — it is linked last and overrides everything.
     visible; on mobile (≤768px) it goes off-canvas, opened by the burger icon and
     closed by tapping the scrim — pure CSS, no JS.
 
+## 6. Bulk actions
+
+The list view shows a checkbox per row, a select-all, and an action bar that
+operates on the checked rows. Three actions ship built in — **Activate**,
+**Deactivate** (when `canEdit` and the model has an `isActive` column) and
+**Delete** (when `canDelete`) — and each comes back with a banner saying how
+many rows changed.
+
+### Custom actions
+
+Anything domain-specific — "send welcome email", "mark as shipped",
+"recalculate totals" — is a **custom action**: a handler built with
+`adminAction` and passed to `AdminModel({ actions: [...] })`.
+
+```ts
+import { AdminModel, adminAction } from "tempest-express-sdk";
+
+import { site } from "./site";
+import { OrderModel } from "../db/models";
+import { mailer } from "../core/email";
+
+const markPaid = adminAction({ label: "Mark as paid" }, async (ctx) => {
+  const changed = await ctx.repository.update(
+    { id: { in: ctx.ids } },
+    { status: "paid" },
+  );
+  return { message: `${changed} order(s) marked as paid.` };
+});
+
+const notifyCustomers = adminAction(
+  { label: "Notify customers", dangerous: false },
+  async (ctx) => {
+    const orders = await ctx.repository.list({ id: { in: ctx.ids } });
+    for (const order of orders) await mailer.send(order.email, "Your order");
+    return { message: `${orders.length} emails sent.` };
+  },
+);
+
+site.register(
+  new AdminModel({ model: OrderModel, actions: [markPaid, notifyCustomers] }),
+);
+```
+
+The handler receives a context with:
+
+| Field | What it is |
+| --- | --- |
+| `ids` | Identities of the checked rows. |
+| `repository` | The model's `BaseRepository`, on the request's session. |
+| `dbSession` | The DB session, for work beyond the repository. |
+| `request` | The inbound request. |
+| `session` | The authenticated admin session. |
+| `principal` | The operator row that triggered the action. |
+
+Return `{ message, category }` to show a banner (`category` accepts
+`"success"` — the default —, `"error"` and `"warning"`), or `null` to show
+nothing. `dangerous: true` marks the action as destructive in the dropdown.
+
+!!! tip "The handler stays an ordinary function"
+    The Python SDK uses an `@admin_action` decorator; here `adminAction`
+    **returns** the descriptor. The handler stays directly callable and testable
+    (`markPaid.handler(ctx)`), with no decorator syntax for a consumer to enable
+    in their build.
+
+!!! info "The name comes from the label"
+    The submitted identifier is a slug of the label (`"Mark as paid"` →
+    `mark-as-paid`), namespaced as `custom:<name>` so it can never collide with a
+    built-in action. Pass `name` to pin it — the value ships in the HTML, so
+    changing it changes the surface. Two identical names on one model throw at
+    construction.
+
+!!! warning "A throwing handler becomes a banner, not a 500"
+    An action that throws is logged and comes back as an error banner on the list
+    view carrying the exception's message. The operator sees what failed instead
+    of a generic error page — but that message reaches the browser, so keep
+    secrets out of exception text.
+
+## 7. CSV / JSON export
+
+The **Export CSV** and **Export JSON** buttons download the **current** result
+set — same search, same filters, same ordering, same `listDisplay` columns:
+
+```text
+GET {prefix}/m/{slug}/export.csv?q=...&filter_status=paid&sort=createdAt&dir=desc
+GET {prefix}/m/{slug}/export.json?...
+```
+
+The CSV follows RFC 4180 (doubled quotes, a field quoted when it carries a
+comma, quote or newline) and the JSON is an array of column→value objects.
+`Date` becomes ISO, `bigint` a decimal string, binary base64.
+
+!!! danger "The cap is there for a reason"
+    An export is a full table scan streamed to a browser.
+    `makeAdminRouter(site, { exportMaxRows: 5000 })` bounds how many rows leave
+    (default `5000`) — it is what keeps a curious click on a large table from
+    becoming an outage. Raise it deliberately.
+
+## 8. Foreign-key select
+
+A foreign-key column whose target model is **registered on the same site**
+becomes a `<select>` of related rows, both in the form and in the list filter,
+instead of a raw UUID field. The option label comes from the referenced admin's
+first `searchFields`; failing that from `name` / `title` / `email` / `label` /
+`reference`; and last from the identity.
+
+```ts
+class OrderModel extends BaseModel {
+  static override tablename = "sales_order";
+  userId = column.uuid().references("user.id");
+}
+
+site.register(new AdminModel({ model: UserModel, searchFields: ["name"] }));
+site.register(
+  new AdminModel({ model: OrderModel, listFilter: ["userId"] }),
+);
+```
+
+A foreign key to an **unregistered** table stays a text input — an empty
+dropdown would be worse than the raw field. Options are capped at 1000 rows;
+past that the target table wants a search box, not a list.
+
 ## Recap
 
 1. `BaseUserModel` plus one seeded `isAdmin` row gives you the login.
@@ -262,3 +385,5 @@ stylesheet — it is linked last and overrides everything.
 3. `makeAdminRouter(site, { engine, authBackend, secretKey })` mounts the panel.
 4. Widgets, filters and validation come from the **model's columns** — there is
    no duplicated schema to keep in sync.
+5. `actions: [...]` brings day-to-day operations into the panel; export and
+   FK-select fall out of what the model already declares.

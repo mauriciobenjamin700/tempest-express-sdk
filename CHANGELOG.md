@@ -4,6 +4,47 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.25.0] — 2026-09-05
+
+### Added
+
+- **admin**: **bulk actions** on the list view. Every row gets a checkbox plus a
+  select-all, and the action bar applies **Activate** / **Deactivate** (gated on
+  `canEdit` and an `isActive` column) or **Delete** (gated on `canDelete`) to the
+  checked rows, reporting how many changed. Every submission carries the
+  session's CSRF token.
+
+- **admin**: **custom actions** via `adminAction({ label }, handler)`, passed to
+  `AdminModel({ actions: [...] })`. Each joins the bulk dropdown namespaced as
+  `custom:<name>`, so a custom action can never collide with a built-in one. The
+  handler receives the checked `ids`, a repository on the request's session, the
+  DB session, the request, the admin session and the acting principal, and
+  returns `{ message, category }` to flash a banner (or `null` for none). A
+  handler that throws is logged and comes back as an error banner rather than a
+  `500`.
+
+  Where the Python SDK uses an `@admin_action` decorator, `adminAction` returns
+  the descriptor instead: the handler stays an ordinary function the consumer can
+  call and unit-test (`action.handler(ctx)`), with no decorator syntax to enable
+  in their build.
+
+- **admin**: **CSV / JSON export** at `GET {prefix}/m/{slug}/export.csv|json`,
+  honouring the request's search, filters, ordering and `listDisplay` columns —
+  the list view and the export now resolve the query through one shared code
+  path, because an export that quietly disagrees with the page it was taken from
+  is worse than no export. CSV follows RFC 4180; `Date` becomes ISO, `bigint` a
+  decimal string, binary base64. `makeAdminRouter({ exportMaxRows })` caps the
+  row count (default `5000`) so a click on a large table cannot become an outage.
+
+- **admin**: **foreign-key selects**. A FK column whose target model is
+  registered on the same site renders as a `<select>` of related rows in both the
+  create/edit form and the list filter, labelled by the referenced admin's first
+  `searchFields` (falling back to `name`/`title`/`email`/`label`/`reference`,
+  then the identity). A FK to an unregistered table stays a text input — an empty
+  dropdown would be worse than the raw field. Options are capped at 1000 rows.
+  New helpers `foreignKeyFields`, `foreignKeyLabel` and `foreignKeyTable` are
+  exported for projects that build their own screens.
+
 ## [0.24.0] — 2026-09-05
 
 ### Added

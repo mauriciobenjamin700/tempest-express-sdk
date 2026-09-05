@@ -8,6 +8,7 @@
  * metadata so an unconfigured model is already browsable.
  */
 
+import type { AdminAction } from "@/admin/actions";
 import { adminColumns, humanizeField } from "@/admin/columns";
 import {
   type AsyncSession,
@@ -57,6 +58,12 @@ export interface AdminModelOptions<C extends ModelClass> {
   canEdit?: boolean;
   /** Whether the delete action is exposed. Default `true`. */
   canDelete?: boolean;
+  /**
+   * Custom bulk actions, built with `adminAction`. Each one joins the list
+   * view's action dropdown alongside the built-in activate / deactivate /
+   * delete and runs against the checked rows.
+   */
+  actions?: readonly AdminAction<C>[];
 }
 
 /**
@@ -96,6 +103,7 @@ export class AdminModel<C extends ModelClass = ModelClass> {
   /** Whether the delete action is exposed. */
   readonly canDelete: boolean;
 
+  private readonly actions = new Map<string, AdminAction>();
   private readonly slugOverride: string | null;
   private readonly listDisplayOverride: string[] | null;
   private readonly verboseNameOverride: string | null;
@@ -122,6 +130,15 @@ export class AdminModel<C extends ModelClass = ModelClass> {
     this.canCreate = options.canCreate ?? true;
     this.canEdit = options.canEdit ?? true;
     this.canDelete = options.canDelete ?? true;
+
+    for (const action of options.actions ?? []) {
+      if (this.actions.has(action.name)) {
+        throw new Error(
+          `Duplicate admin action name "${action.name}" on ${this.model.tablename}`,
+        );
+      }
+      this.actions.set(action.name, action as AdminAction);
+    }
 
     const known = new Set(this.columnNames());
     for (const [option, names] of [
@@ -234,6 +251,27 @@ export class AdminModel<C extends ModelClass = ModelClass> {
   editableFieldNames(): string[] {
     const skip = new Set([...this.readonlyFields, ...NEVER_EDITABLE]);
     return this.columnNames().filter((name) => !skip.has(name));
+  }
+
+  /**
+   * Return the registered custom actions, in declaration order.
+   *
+   * @returns The actions passed via `actions` (empty when none). The model
+   *   type is erased here, the way {@link AdminSite} erases it when it stores a
+   *   configuration — a registry keyed by slug cannot stay generic.
+   */
+  customActions(): AdminAction[] {
+    return [...this.actions.values()];
+  }
+
+  /**
+   * Look a custom action up by name.
+   *
+   * @param name - The action identifier (its submitted form value).
+   * @returns The action, or `null` when nothing matches.
+   */
+  getAction(name: string): AdminAction | null {
+    return this.actions.get(name) ?? null;
   }
 
   /**

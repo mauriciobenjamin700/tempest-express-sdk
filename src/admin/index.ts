@@ -9,12 +9,23 @@
  */
 
 export {
+  type AdminAction,
+  type AdminActionCategory,
+  type AdminActionContext,
+  type AdminActionHandler,
+  type AdminActionOptions,
+  type AdminActionResult,
+  type BulkActionOption,
+  adminAction,
+} from "@/admin/actions";
+export {
   type AdminFilterKind,
   type AdminSelectOption,
   type AdminWidget,
   type WidgetSpec,
   adminColumns,
   filterForColumn,
+  foreignKeyTable,
   humanizeField,
   isColumnOptional,
   isSearchableColumn,
@@ -30,6 +41,8 @@ export {
   type BuildFormFieldsOptions,
   type ParsedAdminForm,
   buildFormFields,
+  foreignKeyFields,
+  foreignKeyLabel,
   formatCellValue,
   formatFieldValue,
   parseFormBody,

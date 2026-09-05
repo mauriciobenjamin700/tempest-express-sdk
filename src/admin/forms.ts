@@ -12,6 +12,7 @@ import {
   type AdminSelectOption,
   type AdminWidget,
   adminColumns,
+  foreignKeyTable,
   humanizeField,
   isColumnOptional,
   widgetForColumn,
@@ -55,6 +56,12 @@ export interface BuildFormFieldsOptions {
   values?: Record<string, unknown>;
   /** Per-field errors to surface, keyed by column. */
   errors?: Record<string, string>;
+  /**
+   * Options for foreign-key columns whose target model is registered, keyed by
+   * column. A field listed here renders as a `<select>` of related rows instead
+   * of a raw identity text input.
+   */
+  foreignKeyOptions?: Record<string, AdminSelectOption[]>;
 }
 
 /**
@@ -121,11 +128,16 @@ export function buildFormFields(
   const columns = adminColumns(admin.model);
   const values = options.values ?? {};
   const errors = options.errors ?? {};
+  const foreignKeys = options.foreignKeyOptions ?? {};
 
   return admin.editableFieldNames().flatMap((name) => {
     const column = columns[name];
     if (column === undefined) return [];
-    const spec = widgetForColumn(column);
+    const related = foreignKeys[name];
+    const spec =
+      related === undefined
+        ? widgetForColumn(column)
+        : { widget: "select" as const, step: null, options: related };
     const raw = name in values ? values[name] : literalDefault(column);
     return [
       {
@@ -192,7 +204,7 @@ function coerceValue(column: Column<unknown>, widget: AdminWidget, raw: string):
         throw new Error("Enter valid JSON.");
       }
     case "select": {
-      const allowed = meta.values ?? [];
+      const allowed = kind === "enum" ? (meta.values ?? []) : [];
       if (allowed.length > 0 && !allowed.includes(raw)) {
         throw new Error(`Choose one of: ${allowed.join(", ")}.`);
       }
@@ -267,4 +279,45 @@ export function formatCellValue(value: unknown): string {
   if (typeof value === "boolean") return value ? "Yes" : "No";
   if (typeof value === "object") return JSON.stringify(value);
   return String(value);
+}
+
+/**
+ * Return the editable foreign-key columns of an admin, as `field → table`.
+ *
+ * @param admin - The model configuration.
+ * @returns One entry per editable column that references another table.
+ */
+export function foreignKeyFields(admin: AdminModel): Record<string, string> {
+  const columns = adminColumns(admin.model);
+  const out: Record<string, string> = {};
+  for (const name of admin.editableFieldNames()) {
+    const column = columns[name];
+    if (column === undefined) continue;
+    const table = foreignKeyTable(column);
+    if (table !== null) out[name] = table;
+  }
+  return out;
+}
+
+/**
+ * Build a human label for a referenced row — the analog of Django's `__str__`.
+ *
+ * Prefers the referenced admin's first search field, then a conventional
+ * display attribute, then the row's identity, so a dropdown of related rows
+ * reads as names rather than as a column of UUIDs.
+ *
+ * @param admin - The **referenced** model's configuration.
+ * @param row - The referenced row.
+ * @returns A label for the option.
+ */
+export function foreignKeyLabel(admin: AdminModel, row: Record<string, unknown>): string {
+  for (const field of admin.searchFields) {
+    const value = row[field];
+    if (typeof value === "string" && value !== "") return value;
+  }
+  for (const field of ["name", "title", "email", "label", "reference"]) {
+    const value = row[field];
+    if (typeof value === "string" && value !== "") return value;
+  }
+  return String(row[admin.identityField] ?? "");
 }
