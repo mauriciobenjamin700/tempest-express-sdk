@@ -25,10 +25,35 @@ export interface LogsRouterOptions {
   guards?: RequestHandler[];
 }
 
+/**
+ * Resolve which log files a source selector reads.
+ *
+ * @param dir - The log directory.
+ * @param source - The selector.
+ * @returns Absolute paths, newest-first order applied by the caller.
+ */
 function filesFor(dir: string, source: LogSource): string[] {
   if (source === "500") return [join(dir, HTTP_500_LOG_FILE)];
   if (source === "all") return Object.values(LEVEL_LOG_FILES).map((f) => join(dir, f));
   return [join(dir, LEVEL_LOG_FILES[source])];
+}
+
+/**
+ * Read and parse the structured log records a source selector covers.
+ *
+ * Shared by the JSON logs endpoint and the admin panel's logs page so the two
+ * never disagree about what "the error log" contains. A corrupt line is skipped
+ * rather than failing the read: one bad write should not hide the rest.
+ *
+ * @param dir - The log directory.
+ * @param source - Which file(s) to read.
+ * @returns The parsed records, in file order (oldest first).
+ */
+export async function readLogEntries(
+  dir: string,
+  source: LogSource,
+): Promise<Record<string, unknown>[]> {
+  return await readEntries(filesFor(dir, source));
 }
 
 async function readEntries(files: string[]): Promise<Record<string, unknown>[]> {

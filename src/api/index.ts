@@ -72,4 +72,5 @@ export {
   type LogSource,
   type LogsRouterOptions,
   makeLogsRouter,
+  readLogEntries,
 } from "@/api/logs";

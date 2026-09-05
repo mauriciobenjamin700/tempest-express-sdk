@@ -67,6 +67,8 @@
   `uploadStorage`), CSV import, and foreign-key autocomplete.
 - **0.28.0** — admin inlines: related child models on the parent's detail view,
   read-only or as an in-place editable formset.
+- **0.29.0** — admin operations screens: the application-logs page with
+  markdown/JSON export, and the policy-gated SQL console.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 

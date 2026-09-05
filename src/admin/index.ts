@@ -21,6 +21,23 @@ export {
   trendPercent,
 } from "@/admin/dashboard";
 export {
+  type AdminLogEntry,
+  filterLogEntries,
+  renderLogEntriesJson,
+  renderLogEntriesMarkdown,
+  toLogEntry,
+} from "@/admin/logs";
+export {
+  type SqlAnalysis,
+  type SqlAuditEntry,
+  type SqlAuditHook,
+  SqlCapability,
+  type SqlConsolePolicy,
+  analyzeSql,
+  checkSqlPolicy,
+  loadSqlParser,
+} from "@/admin/sqlConsole";
+export {
   type AdminInline,
   type AdminInlineOptions,
   adminInline,
@@ -111,6 +128,9 @@ export {
   type AdminFormView,
   type AdminImportView,
   type AdminInlineRowView,
+  type AdminLogRowView,
+  type AdminLogsView,
+  type AdminSqlView,
   type AdminInlineView,
   type AdminListView,
   type AdminMessage,
@@ -122,6 +142,8 @@ export {
   renderDetailPage,
   renderFormPage,
   renderImportPage,
+  renderLogsPage,
+  renderSqlPage,
   renderLayout,
   renderListPage,
   renderLoginPage,
@@ -135,6 +157,7 @@ export {
 } from "@/admin/theme";
 export {
   type AdminRouterOptions,
+  type AdminSqlConsoleOptions,
   groupInlineSubmission,
   makeAdminRouter,
   parseCsv,

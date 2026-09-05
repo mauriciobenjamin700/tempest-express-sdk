@@ -9,6 +9,46 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.29.0] — 2026-09-05
+
+### Adicionado
+
+- **admin**: a **página de logs**. `makeAdminRouter({ logDir })` lê os arquivos
+  JSON estruturados que o `configureFileLogging` escreve e os serve em
+  `{prefix}/logs` — com filtro por fonte e por busca, paginado, mais recente
+  primeiro, com badge colorido por nível. Registro com traceback vira um
+  `<details>` recolhido cuja summary é a mensagem, então página cheia de 500
+  continua escaneável sem JavaScript. A busca casa mensagem, logger **e
+  traceback**, porque quem caça um 500 costuma ter um pedaço do trace.
+  `{prefix}/logs/export?format=md|json` baixa a mesma seleção filtrada (máximo
+  500 registros): o markdown põe cada traceback num bloco cercado e declara
+  quantos dos casamentos ele carrega, para export parcial nunca se passar por
+  completo. A página é opt-in — sem `logDir` responde 404, porque o payload
+  expõe traceback e metadado de request.
+
+- **admin**: o **SQL console**, desligado por padrão.
+  `makeAdminRouter({ sqlConsole })` serve `{prefix}/sql` atrás de uma política:
+  capabilities (`read` / `insert` / `update` / `delete` / `ddl` / `drop` /
+  `admin`), allowlist e denylist de tabela, recusa de `UPDATE`/`DELETE` sem
+  `WHERE`, e teto de linhas. Statement é classificado por **parse**
+  (`node-sql-parser`, novo peer opcional), não por match de string, e o que o
+  parser não entende exige a capability `admin` — a mais privilegiada, não a
+  menos. Toda tentativa, permitida ou recusada, chega ao `onAudit`; hook que
+  levanta é logado e engolido, já que trilha de auditoria que derruba o que
+  audita acaba desligada.
+
+  A documentação diz sem rodeio o que isso é: **defesa em profundidade, não
+  fronteira de segurança**. A fronteira que segura é o usuário do banco, e
+  `sqlConsole.run` existe para o console poder ser apontado a um papel restrito.
+
+  `analyzeSql`, `checkSqlPolicy`, `SqlCapability` e os helpers de log
+  (`toLogEntry`, `filterLogEntries`, `renderLogEntriesMarkdown`,
+  `renderLogEntriesJson`) ficam exportados para quem monta as próprias telas.
+
+- **api**: `readLogEntries(dir, source)` passa a ser exportado — o leitor que o
+  endpoint JSON de logs e a página do admin agora compartilham, para os dois
+  nunca discordarem sobre o que "o log de erro" contém.
+
 ## [0.28.0] — 2026-09-05
 
 ### Adicionado

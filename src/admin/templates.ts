@@ -62,6 +62,8 @@ export interface AdminRenderContext {
   currentPath: string;
   /** Sidebar entries, one per registered model. */
   navModels: AdminNavEntry[];
+  /** Sidebar entries for the system tools (logs, SQL console). */
+  navSystem: AdminNavEntry[];
   /** Banners rendered above the content. */
   messages: AdminMessage[];
 }
@@ -82,7 +84,8 @@ export function renderLayout(
   title: string,
   body: string,
 ): string {
-  const { site, theme, prefix, session, currentPath, navModels, messages } = context;
+  const { site, theme, prefix, session, currentPath, navModels, navSystem, messages } =
+    context;
   const authed = session !== null;
   const indexUrl = `${prefix}/`;
 
@@ -99,6 +102,15 @@ export function renderLayout(
         ${
           navModels.length > 0
             ? `<span class="tempest-admin-sidebar__heading">Models</span>${navModels
+                .map((entry) =>
+                  navLink(entry.url, entry.label, currentPath.startsWith(entry.url)),
+                )
+                .join("")}`
+            : ""
+        }
+        ${
+          navSystem.length > 0
+            ? `<span class="tempest-admin-sidebar__heading">System</span>${navSystem
                 .map((entry) =>
                   navLink(entry.url, entry.label, currentPath.startsWith(entry.url)),
                 )
@@ -1056,6 +1068,201 @@ export function renderFormPage(context: AdminRenderContext, view: AdminFormView)
   ${view.fields.some((field) => field.widget === "autocomplete") ? AUTOCOMPLETE_SCRIPT : ""}
 </section>`;
   return renderLayout(context, `${heading} · ${context.site.title}`, body);
+}
+
+/** One row of the logs page. */
+export interface AdminLogRowView {
+  /** Severity, lowercased, driving the badge colour. */
+  level: string;
+  /** ISO timestamp, or `""`. */
+  timestamp: string;
+  /** Logger name. */
+  logger: string;
+  /** Message text. */
+  message: string;
+  /** Stack trace, or `null` when the record carries none. */
+  stack: string | null;
+  /** Correlation fields, already formatted as `key: value` pairs. */
+  context: { key: string; value: string }[];
+}
+
+/** The view model the logs page renders. */
+export interface AdminLogsView {
+  /** Available source selectors. */
+  sources: { value: string; label: string; selected: boolean }[];
+  /** The current search term. */
+  query: string;
+  /** The rows on this page, newest first. */
+  rows: AdminLogRowView[];
+  /** Total matching records. */
+  total: number;
+  /** Current page, 1-based. */
+  page: number;
+  /** Total pages. */
+  pages: number;
+  /** URL of the previous page, or `null`. */
+  prevUrl: string | null;
+  /** URL of the next page, or `null`. */
+  nextUrl: string | null;
+  /** URL exporting the current selection as markdown. */
+  exportMarkdownUrl: string;
+  /** URL exporting the current selection as JSON. */
+  exportJsonUrl: string;
+  /** Cap the export applies. */
+  exportMax: number;
+}
+
+/**
+ * Render the application-logs page.
+ *
+ * A record carrying a stack becomes a `<details>` whose summary is the message
+ * itself, collapsed by default: a page full of 500s has to stay scannable, and
+ * that needs no JavaScript.
+ *
+ * @param context - The shared chrome data.
+ * @param view - The prepared logs view model.
+ * @returns The full page.
+ */
+export function renderLogsPage(context: AdminRenderContext, view: AdminLogsView): string {
+  const options = view.sources
+    .map(
+      (source) =>
+        `<option value="${escapeHtml(source.value)}"${source.selected ? " selected" : ""}>${escapeHtml(source.label)}</option>`,
+    )
+    .join("");
+
+  const rows =
+    view.rows.length > 0
+      ? view.rows
+          .map((row) => {
+            const context_ = row.context
+              .map(
+                (entry) =>
+                  `<span class="tempest-admin-logs__meta"><b>${escapeHtml(entry.key)}</b>: ${escapeHtml(entry.value)}</span>`,
+              )
+              .join(" ");
+            const message =
+              row.stack === null
+                ? `${escapeHtml(row.message)}${context_ === "" ? "" : `<br>${context_}`}`
+                : `<details><summary>${escapeHtml(row.message)}</summary>${
+                    context_ === "" ? "" : `<p>${context_}</p>`
+                  }<pre>${escapeHtml(row.stack)}</pre></details>`;
+            return `<tr>
+        <td data-label="Level"><span class="tempest-log-badge tempest-log-badge--${escapeHtml(row.level)}">${escapeHtml(row.level)}</span></td>
+        <td data-label="When">${escapeHtml(row.timestamp)}</td>
+        <td data-label="Logger">${escapeHtml(row.logger)}</td>
+        <td data-label="Message">${message}</td>
+      </tr>`;
+          })
+          .join("")
+      : `<tr><td colspan="4">No log records yet. Point <code>configureFileLogging</code> at the same directory to populate this page.</td></tr>`;
+
+  const body = `<section class="tempest-admin-logs">
+  <header class="tempest-admin-list__header">
+    <h1>Logs</h1>
+    <p>${escapeHtml(view.total)} record${view.total === 1 ? "" : "s"}.</p>
+  </header>
+  <div class="tempest-admin-list__toolbar">
+    <form method="get" class="tempest-admin-list__filters">
+      <label><span>Source</span><select name="source">${options}</select></label>
+      <input type="search" name="q" value="${escapeHtml(view.query)}" placeholder="Search…" aria-label="Search">
+      <button type="submit">Apply</button>
+    </form>
+    <div class="tempest-admin-list__actions">
+      <a href="${escapeHtml(view.exportMarkdownUrl)}">Export Markdown</a>
+      <a href="${escapeHtml(view.exportJsonUrl)}">Export JSON</a>
+    </div>
+  </div>
+  <div class="tempest-admin-table-wrap">
+    <table class="tempest-admin-list__table">
+      <thead><tr><th>Level</th><th>When</th><th>Logger</th><th>Message</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+  ${
+    view.pages > 1
+      ? `<nav class="tempest-admin-list__pagination" aria-label="Pagination">
+    ${view.prevUrl !== null ? `<a href="${escapeHtml(view.prevUrl)}">← Prev</a>` : ""}
+    <span>Page ${escapeHtml(view.page)} of ${escapeHtml(view.pages)}</span>
+    ${view.nextUrl !== null ? `<a href="${escapeHtml(view.nextUrl)}">Next →</a>` : ""}
+  </nav>`
+      : ""
+  }
+  <p class="tempest-admin-form__hint">Exports carry at most ${escapeHtml(view.exportMax)} records, newest first, honouring the filters above.</p>
+</section>`;
+  return renderLayout(context, `Logs · ${context.site.title}`, body);
+}
+
+/** The view model the SQL console renders. */
+export interface AdminSqlView {
+  /** The submitted statement, echoed back into the textarea. */
+  sql: string;
+  /** Capabilities this console is allowed to use. */
+  capabilities: string[];
+  /** A refusal or execution error, or `null`. */
+  error: string | null;
+  /** Column names of the result, when one ran. */
+  columns: string[];
+  /** Result rows, already formatted. */
+  rows: string[][];
+  /** Rows returned, or `null` when nothing ran. */
+  rowCount: number | null;
+  /** Whether the result was truncated by the row cap. */
+  truncated: boolean;
+  /** Wall-clock duration in milliseconds, or `null`. */
+  durationMs: number | null;
+}
+
+/**
+ * Render the SQL console.
+ *
+ * @param context - The shared chrome data (with an active session).
+ * @param view - The prepared console view model.
+ * @returns The full page.
+ * @throws Error When called without a session, since the form needs a CSRF token.
+ */
+export function renderSqlPage(context: AdminRenderContext, view: AdminSqlView): string {
+  if (context.session === null) throw new Error("The SQL console requires a session");
+
+  const result =
+    view.rowCount === null
+      ? ""
+      : `<p class="tempest-admin-form__hint">${escapeHtml(view.rowCount)} row${view.rowCount === 1 ? "" : "s"}${
+          view.durationMs === null ? "" : ` in ${escapeHtml(view.durationMs)} ms`
+        }${view.truncated ? " (truncated by the row cap)" : ""}.</p>
+      <div class="tempest-admin-table-wrap">
+        <table class="tempest-admin-list__table">
+          <thead><tr>${view.columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead>
+          <tbody>${view.rows
+            .map(
+              (row) =>
+                `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`,
+            )
+            .join("")}</tbody>
+        </table>
+      </div>`;
+
+  const body = `<section class="tempest-admin-sql">
+  <header class="tempest-admin-list__header">
+    <h1>SQL console</h1>
+    <p>Capabilities: <code>${escapeHtml(view.capabilities.join(", "))}</code></p>
+  </header>
+  ${view.error !== null ? `<p class="tempest-admin-form__error">${escapeHtml(view.error)}</p>` : ""}
+  <form method="post" action="${escapeHtml(`${context.prefix}/sql`)}" class="tempest-admin-form__form">
+    <input type="hidden" name="csrf_token" value="${escapeHtml(context.session.csrfToken)}">
+    <div class="tempest-admin-form__field">
+      <label>
+        <span>Statement</span>
+        <textarea name="sql" rows="6" spellcheck="false" required>${escapeHtml(view.sql)}</textarea>
+      </label>
+    </div>
+    <div class="tempest-admin-form__actions">
+      <button type="submit">Run</button>
+    </div>
+  </form>
+  ${result}
+</section>`;
+  return renderLayout(context, `SQL console · ${context.site.title}`, body);
 }
 
 /** The outcome of a CSV import, as the page renders it. */
