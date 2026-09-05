@@ -4,6 +4,46 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.29.0] — 2026-09-05
+
+### Added
+
+- **admin**: the **logs page**. `makeAdminRouter({ logDir })` reads the
+  structured JSON files `configureFileLogging` writes and serves them at
+  `{prefix}/logs` — filtered by source and search term, paginated, newest first,
+  with colour-coded level badges. A record carrying a traceback becomes a
+  collapsed `<details>` whose summary is the message, so a page full of 500s
+  stays scannable without JavaScript. Search matches the message, the logger
+  **and the traceback**, because someone hunting a 500 usually has a fragment of
+  the trace. `{prefix}/logs/export?format=md|json` downloads the same filtered
+  selection (at most 500 records): markdown puts each traceback in a fenced
+  block and declares how many of the matches it carries, so a partial export
+  never reads as a complete one. The page is opt-in — without `logDir` it 404s,
+  because the payload exposes tracebacks and request metadata.
+
+- **admin**: the **SQL console**, off by default. `makeAdminRouter({ sqlConsole })`
+  serves `{prefix}/sql` behind a policy: capabilities (`read` / `insert` /
+  `update` / `delete` / `ddl` / `drop` / `admin`), table allow and deny lists, a
+  refusal of `UPDATE`/`DELETE` without `WHERE`, and a row cap. Statements are
+  classified by parsing them (`node-sql-parser`, a new optional peer) rather
+  than by matching strings, and anything the parser cannot understand needs the
+  `admin` capability — the most privileged, not the least. Every attempt,
+  allowed or refused, reaches `onAudit`; a hook that throws is logged and
+  swallowed, since an audit trail that can break the thing it audits gets turned
+  off.
+
+  The docs state plainly what this is: **defence in depth, not a security
+  boundary**. The boundary that holds is the database user, and `sqlConsole.run`
+  exists so the console can be pointed at a restricted role.
+
+  `analyzeSql`, `checkSqlPolicy`, `SqlCapability` and the log helpers
+  (`toLogEntry`, `filterLogEntries`, `renderLogEntriesMarkdown`,
+  `renderLogEntriesJson`) are exported for projects building their own screens.
+
+- **api**: `readLogEntries(dir, source)` is exported — the reader the JSON logs
+  endpoint and the admin page now share, so the two can never disagree about
+  what "the error log" contains.
+
 ## [0.28.0] — 2026-09-05
 
 ### Added
