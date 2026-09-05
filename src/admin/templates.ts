@@ -1193,6 +1193,196 @@ export function renderLogsPage(context: AdminRenderContext, view: AdminLogsView)
   return renderLayout(context, `Logs · ${context.site.title}`, body);
 }
 
+/** The tasks page view model. */
+export interface AdminTasksView {
+  /** Declared tasks this process would run, or `null` when no manager was given. */
+  inventory: { name: string; description: string; schedule: string }[] | null;
+  /** Persisted runs, or `null` when no job store was given. */
+  runs: {
+    rows: {
+      id: string;
+      name: string;
+      status: string;
+      startedAt: string;
+      finishedAt: string;
+      attempts: string;
+      url: string;
+    }[];
+    total: number;
+    page: number;
+    pages: number;
+    prevUrl: string | null;
+    nextUrl: string | null;
+    statuses: { value: string; label: string; selected: boolean }[];
+    nameQuery: string;
+  } | null;
+}
+
+/**
+ * Render the background-tasks page.
+ *
+ * Either half may be missing: a service given only a `TaskManager` shows what
+ * is declared, one given only a job store shows what ran. A section with no
+ * source is omitted rather than rendered empty, because an empty table implies
+ * there is nothing to see — and what the panel deliberately cannot show is live
+ * queue depth, which no broker exposes.
+ *
+ * @param context - The shared chrome data.
+ * @param view - The prepared tasks view model.
+ * @returns The full page.
+ */
+export function renderTasksPage(
+  context: AdminRenderContext,
+  view: AdminTasksView,
+): string {
+  const declared =
+    view.inventory === null
+      ? ""
+      : `<section class="tempest-admin-tasks__declared">
+    <h2>Declared</h2>
+    ${
+      view.inventory.length === 0
+        ? "<p><em>No tasks registered in this process.</em></p>"
+        : `<div class="tempest-admin-table-wrap"><table class="tempest-admin-list__table">
+      <thead><tr><th>Task</th><th>Schedule</th><th>Description</th></tr></thead>
+      <tbody>${view.inventory
+        .map(
+          (entry) =>
+            `<tr><td>${escapeHtml(entry.name)}</td><td>${escapeHtml(entry.schedule)}</td><td>${escapeHtml(entry.description)}</td></tr>`,
+        )
+        .join("")}</tbody>
+    </table></div>`
+    }
+  </section>`;
+
+  const runs =
+    view.runs === null
+      ? ""
+      : `<section class="tempest-admin-tasks__runs">
+    <h2>Runs</h2>
+    <div class="tempest-admin-list__toolbar">
+      <form method="get" class="tempest-admin-list__filters">
+        <label><span>Status</span><select name="status">${view.runs.statuses
+          .map(
+            (status) =>
+              `<option value="${escapeHtml(status.value)}"${status.selected ? " selected" : ""}>${escapeHtml(status.label)}</option>`,
+          )
+          .join("")}</select></label>
+        <input type="search" name="task" value="${escapeHtml(view.runs.nameQuery)}" placeholder="Task name…" aria-label="Task name">
+        <button type="submit">Apply</button>
+      </form>
+    </div>
+    <div class="tempest-admin-table-wrap"><table class="tempest-admin-list__table">
+      <thead><tr><th>Task</th><th>Status</th><th>Started</th><th>Finished</th><th>Attempts</th><th></th></tr></thead>
+      <tbody>${
+        view.runs.rows.length === 0
+          ? '<tr><td colspan="6">No runs recorded yet.</td></tr>'
+          : view.runs.rows
+              .map(
+                (row) => `<tr>
+          <td>${escapeHtml(row.name)}</td>
+          <td><span class="tempest-log-badge tempest-log-badge--${escapeHtml(row.status)}">${escapeHtml(row.status)}</span></td>
+          <td>${escapeHtml(row.startedAt)}</td>
+          <td>${escapeHtml(row.finishedAt)}</td>
+          <td>${escapeHtml(row.attempts)}</td>
+          <td><a href="${escapeHtml(row.url)}">View</a></td>
+        </tr>`,
+              )
+              .join("")
+      }</tbody>
+    </table></div>
+    ${
+      view.runs.pages > 1
+        ? `<nav class="tempest-admin-list__pagination" aria-label="Pagination">
+      ${view.runs.prevUrl !== null ? `<a href="${escapeHtml(view.runs.prevUrl)}">← Prev</a>` : ""}
+      <span>Page ${escapeHtml(view.runs.page)} of ${escapeHtml(view.runs.pages)}</span>
+      ${view.runs.nextUrl !== null ? `<a href="${escapeHtml(view.runs.nextUrl)}">Next →</a>` : ""}
+    </nav>`
+        : ""
+    }
+  </section>`;
+
+  const body = `<section class="tempest-admin-tasks">
+  <header class="tempest-admin-list__header">
+    <h1>Tasks</h1>
+    <p>What this process declares, and what its workers recorded.</p>
+  </header>
+  ${declared}
+  ${runs}
+  <p class="tempest-admin-form__hint">Live queue depth is not shown: a broker does not expose it, and a number that looked like one would be worse than none.</p>
+</section>`;
+  return renderLayout(context, `Tasks · ${context.site.title}`, body);
+}
+
+/** One job run, as the detail page renders it. */
+export interface AdminTaskDetailView {
+  /** The job id. */
+  id: string;
+  /** The task name. */
+  name: string;
+  /** Lifecycle state. */
+  status: string;
+  /** Field rows: timestamps, attempts and the like. */
+  fields: { label: string; value: string }[];
+  /** The payload, pretty-printed, or `null`. */
+  payload: string | null;
+  /** The result, pretty-printed, or `null`. */
+  result: string | null;
+  /** The failure message, or `null`. */
+  error: string | null;
+  /** URL back to the tasks page. */
+  backUrl: string;
+  /** URL the cancel form posts to, or `null` when the run cannot be cancelled. */
+  cancelUrl: string | null;
+}
+
+/**
+ * Render one job run.
+ *
+ * @param context - The shared chrome data (with an active session).
+ * @param view - The prepared run view model.
+ * @returns The full page.
+ * @throws Error When called without a session, since cancel needs a CSRF token.
+ */
+export function renderTaskDetailPage(
+  context: AdminRenderContext,
+  view: AdminTaskDetailView,
+): string {
+  if (context.session === null) throw new Error("The task detail requires a session");
+
+  const block = (label: string, content: string | null): string =>
+    content === null
+      ? ""
+      : `<h2>${escapeHtml(label)}</h2><pre class="tempest-admin-detail__json">${escapeHtml(content)}</pre>`;
+
+  const body = `<section class="tempest-admin-detail">
+  <header class="tempest-admin-detail__header">
+    <h1>${escapeHtml(view.name)} · <span class="tempest-log-badge tempest-log-badge--${escapeHtml(view.status)}">${escapeHtml(view.status)}</span></h1>
+    <div class="tempest-admin-detail__actions">
+      <a href="${escapeHtml(view.backUrl)}">← Back to tasks</a>
+      ${
+        view.cancelUrl !== null
+          ? `<form method="post" action="${escapeHtml(view.cancelUrl)}" class="tempest-admin-detail__delete" onsubmit="return confirm('Ask this run to stop?');">
+        <input type="hidden" name="csrf_token" value="${escapeHtml(context.session.csrfToken)}">
+        <button type="submit" class="tempest-admin-btn--danger">Cancel</button>
+      </form>`
+          : ""
+      }
+    </div>
+  </header>
+  <dl class="tempest-admin-detail__fields">${view.fields
+    .map(
+      (field) =>
+        `<dt>${escapeHtml(field.label)}</dt><dd>${field.value === "" ? "<em>—</em>" : escapeHtml(field.value)}</dd>`,
+    )
+    .join("")}</dl>
+  ${view.error === null ? "" : `<p class="tempest-admin-form__error">${escapeHtml(view.error)}</p>`}
+  ${block("Payload", view.payload)}
+  ${block("Result", view.result)}
+</section>`;
+  return renderLayout(context, `${view.name} · ${context.site.title}`, body);
+}
+
 /** The view model the SQL console renders. */
 export interface AdminSqlView {
   /** The submitted statement, echoed back into the textarea. */

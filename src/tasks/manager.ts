@@ -19,6 +19,28 @@ interface TaskEnvelope {
   payload: unknown;
 }
 
+/** One registered task, as the inventory reports it. */
+export interface TaskInventoryEntry {
+  /** The task name handlers are registered under. */
+  name: string;
+  /** A human-readable description, when the registration supplied one. */
+  description: string | null;
+  /** The declared schedule, when the registration supplied one. */
+  schedule: string | null;
+}
+
+/** Optional metadata attached at registration, surfaced by the inventory. */
+export interface TaskRegistrationOptions {
+  /** What the task does, for an operator reading the panel. */
+  description?: string;
+  /**
+   * The schedule this task is expected to run on (a cron expression, an
+   * interval — whatever your scheduler speaks). Recorded and displayed, never
+   * interpreted: the manager consumes a queue, it does not schedule.
+   */
+  schedule?: string;
+}
+
 /** Options for {@link TaskManager}. */
 export interface TaskManagerOptions {
   /** The broker to publish/consume on. Defaults to a {@link MemoryBroker}. */
@@ -33,6 +55,7 @@ export class TaskManager {
   private readonly broker: BrokerManager;
   private readonly queue: string;
   private readonly handlers = new Map<string, TaskHandler>();
+  private readonly metadata = new Map<string, TaskRegistrationOptions>();
   private unsubscribe: (() => Promise<void>) | null = null;
 
   /**
@@ -48,9 +71,39 @@ export class TaskManager {
    *
    * @param name - The task name.
    * @param handler - The handler invoked with the task payload.
+   * @param options - Description and declared schedule, surfaced by
+   *   {@link TaskManager.inventory} and by the admin panel's tasks page.
    */
-  register<P = unknown>(name: string, handler: TaskHandler<P>): void {
+  register<P = unknown>(
+    name: string,
+    handler: TaskHandler<P>,
+    options: TaskRegistrationOptions = {},
+  ): void {
     this.handlers.set(name, handler as TaskHandler);
+    this.metadata.set(name, options);
+  }
+
+  /**
+   * Return what this process would run, ordered by name.
+   *
+   * This is the **declared** side of background work — the handlers this
+   * process knows about — not queue state. A broker's pending depth is not
+   * something the manager can see, and a screen that implied otherwise would
+   * be worse than one that says nothing.
+   *
+   * @returns One entry per registered task.
+   */
+  inventory(): TaskInventoryEntry[] {
+    return [...this.handlers.keys()]
+      .sort((left, right) => left.localeCompare(right))
+      .map((name) => {
+        const meta = this.metadata.get(name) ?? {};
+        return {
+          name,
+          description: meta.description ?? null,
+          schedule: meta.schedule ?? null,
+        };
+      });
   }
 
   /**

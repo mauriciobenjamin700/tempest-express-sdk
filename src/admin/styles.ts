@@ -10,8 +10,25 @@
  * `dist`: a `.css` file on disk would not survive the build.
  */
 
+/**
+ * Rules this SDK adds on top of the ported base, for screens the Python panel
+ * does not have. Kept in its own constant so the port above stays a verbatim
+ * copy that can be re-synced without losing local additions.
+ *
+ * The job-status badges reuse the log badge's shape and only set colours: a
+ * failed run has to read as failed at a glance, and the base sheet only knows
+ * log levels.
+ */
+const ADMIN_CSS_EXTRA = `
+.tempest-log-badge--succeeded { background: #dcfce7; color: #166534; }
+.tempest-log-badge--failed { background: #fee2e2; color: #991b1b; }
+.tempest-log-badge--running { background: #dbeafe; color: #1e40af; }
+.tempest-log-badge--queued { background: #f1f5f9; color: #475569; }
+.tempest-log-badge--cancelled { background: #fef3c7; color: #92400e; }
+`;
+
 /** The stylesheet text. */
-export const ADMIN_CSS: string = `:root {
+const ADMIN_CSS_BASE = `:root {
   --tempest-bg: #0f172a;
   --tempest-bg-soft: #1e293b;
   --tempest-bg-row: #f8fafc;
@@ -1570,3 +1587,6 @@ a.tempest-admin-list__new:hover {
   }
 }
 `;
+
+/** The stylesheet the panel serves: the ported base plus this SDK's additions. */
+export const ADMIN_CSS: string = `${ADMIN_CSS_BASE}${ADMIN_CSS_EXTRA}`;

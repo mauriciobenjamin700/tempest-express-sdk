@@ -98,6 +98,7 @@ import {
   type AdminMessage,
   type AdminRenderContext,
   type AdminSortView,
+  type AdminTasksView,
   renderDashboardPage,
   renderDetailPage,
   renderFormPage,
@@ -107,6 +108,8 @@ import {
   renderLogsPage,
   renderMfaPage,
   renderSqlPage,
+  renderTaskDetailPage,
+  renderTasksPage,
 } from "@/admin/templates";
 import type {
   AdminAuditEntryView,
@@ -119,10 +122,26 @@ import { JSONLogger } from "@/core";
 import { BaseRepository } from "@/db";
 import type { AsyncEngine, AsyncSession, Column, Condition, WhereInput } from "@/db";
 import { and, or } from "@/db";
+import type { JobStatus, JobStore, TaskManager } from "@/tasks";
 import { MetricsUtils } from "@/utils";
 import express, { type Request, type Response, type Router } from "express";
 
 const logger = new JSONLogger("tempest_express_sdk.admin.router");
+
+/** Job lifecycle values the tasks page filters by. */
+const JOB_STATUSES: readonly string[] = [
+  "queued",
+  "running",
+  "succeeded",
+  "failed",
+  "cancelled",
+];
+
+/** Job statuses a run can no longer leave, so cancel is not offered. */
+const TERMINAL_JOB_STATUSES: readonly string[] = ["succeeded", "failed", "cancelled"];
+
+/** Runs per page on the tasks page. */
+const TASK_PAGE_SIZE = 25;
 
 /** Log source selectors the page offers. */
 const LOG_SOURCES = ["all", "debug", "info", "warning", "error", "500"] as const;
@@ -198,6 +217,20 @@ export interface AdminRouterOptions {
    * and the boundary that holds is the database user behind `run`.
    */
   sqlConsole?: AdminSqlConsoleOptions;
+  /**
+   * Expose the background-tasks page. Either half may be omitted: with only a
+   * `manager` the page shows what this process declares, with only a `jobs`
+   * store it shows what the workers recorded.
+   */
+  tasks?: AdminTasksOptions;
+}
+
+/** Configuration for the optional tasks page. */
+export interface AdminTasksOptions {
+  /** The task manager whose registry supplies the declared schedule. */
+  manager?: TaskManager;
+  /** Builds a job store on the request's session, supplying the run history. */
+  jobs?: (session: AsyncSession) => JobStore;
 }
 
 /** Configuration for the optional SQL console. */
@@ -310,6 +343,9 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   }
   if (options.sqlConsole !== undefined) {
     systemNav.push({ label: "SQL console", url: `${prefix}/sql` });
+  }
+  if (options.tasks !== undefined) {
+    systemNav.push({ label: "Tasks", url: `${prefix}/tasks` });
   }
   const maxUploadBytes = options.maxUploadBytes ?? 10 * 1024 * 1024;
   const sessions = new AdminSessionStore({
@@ -875,6 +911,133 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         });
       }),
     );
+  }
+
+  if (options.tasks !== undefined) {
+    const tasks = options.tasks;
+
+    router.get(
+      `${prefix}/tasks`,
+      guarded(async (req, res) => {
+        const state = await authenticate(req, res);
+        if (state === null) return;
+
+        const inventory =
+          tasks.manager === undefined
+            ? null
+            : tasks.manager.inventory().map((entry) => ({
+                name: entry.name,
+                description: entry.description ?? "",
+                schedule: entry.schedule ?? "—",
+              }));
+
+        let runs: AdminTasksView["runs"] = null;
+        if (tasks.jobs !== undefined) {
+          const store = tasks.jobs(state.dbSession);
+          const page = Math.max(1, Number.parseInt(queryString(req.query.page), 10) || 1);
+          const status = queryString(req.query.status);
+          const name = queryString(req.query.task);
+          const result = await store.list({
+            page,
+            pageSize: TASK_PAGE_SIZE,
+            ...(name === "" ? {} : { name }),
+            ...(JOB_STATUSES.includes(status) ? { status: status as JobStatus } : {}),
+          });
+          const pageUrl = (target: number): string =>
+            `?${buildQuery({ status, task: name, page: target })}`;
+
+          runs = {
+            rows: result.items.map((row) => ({
+              id: String(row.id),
+              name: String(row.name ?? ""),
+              status: String(row.status ?? ""),
+              startedAt: formatCellValue(row.startedAt),
+              finishedAt: formatCellValue(row.finishedAt),
+              attempts: formatCellValue(row.attempts),
+              url: `${prefix}/tasks/${String(row.id)}`,
+            })),
+            total: result.total,
+            page: result.page,
+            pages: result.pages,
+            prevUrl: result.page > 1 ? pageUrl(result.page - 1) : null,
+            nextUrl: result.page < result.pages ? pageUrl(result.page + 1) : null,
+            statuses: ["", ...JOB_STATUSES].map((value) => ({
+              value,
+              label: value === "" ? "— any —" : humanizeField(value),
+              selected: value === status,
+            })),
+            nameQuery: name,
+          };
+        }
+
+        html(
+          res,
+          renderTasksPage(context(req, state.session, state.visible), {
+            inventory,
+            runs,
+          }),
+        );
+      }),
+    );
+
+    if (tasks.jobs !== undefined) {
+      const jobs = tasks.jobs;
+
+      router.get(
+        `${prefix}/tasks/:id`,
+        guarded(async (req, res) => {
+          const state = await authenticate(req, res);
+          if (state === null) return;
+          const row = await jobs(state.dbSession).get(String(req.params.id));
+          if (row === null) {
+            html(res, renderNotFound(context(req, state.session, state.visible)), 404);
+            return;
+          }
+          const status = String(row.status ?? "");
+          html(
+            res,
+            renderTaskDetailPage(context(req, state.session, state.visible), {
+              id: String(row.id),
+              name: String(row.name ?? ""),
+              status,
+              fields: [
+                { label: "Created At", value: formatCellValue(row.createdAt) },
+                { label: "Started At", value: formatCellValue(row.startedAt) },
+                { label: "Finished At", value: formatCellValue(row.finishedAt) },
+                { label: "Attempts", value: formatCellValue(row.attempts) },
+              ],
+              payload: jsonBlock(row.payload),
+              result: jsonBlock(row.result),
+              error: typeof row.error === "string" && row.error !== "" ? row.error : null,
+              backUrl: `${prefix}/tasks`,
+              cancelUrl: TERMINAL_JOB_STATUSES.includes(status)
+                ? null
+                : `${prefix}/tasks/${String(row.id)}/cancel`,
+            }),
+          );
+        }),
+      );
+
+      router.post(
+        `${prefix}/tasks/:id/cancel`,
+        guarded(async (req, res) => {
+          const state = await authenticate(req, res);
+          if (state === null) return;
+          if (!checkCsrf(req, res, state)) return;
+
+          const id = String(req.params.id);
+          const cancelled = await jobs(state.dbSession).cancel(id);
+          res.redirect(
+            `${prefix}/tasks/${id}?${buildQuery({
+              flash: cancelled
+                ? "The run was asked to stop."
+                : "That run had already finished.",
+              level: cancelled ? "success" : "warning",
+            })}`,
+          );
+        }),
+      );
+    }
   }
 
   router.get(
@@ -2352,6 +2515,18 @@ function inlineFields(
   return buildFormFields(childAdmin, { values, errors })
     .filter((field) => names.includes(field.name))
     .map((field) => ({ ...field, name: `row.${key}.${field.name}` }));
+}
+
+/**
+ * Pretty-print a stored JSON column for display, or return `null`.
+ *
+ * @param value - The stored value.
+ * @returns The indented JSON, or `null` when the column is empty.
+ */
+function jsonBlock(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "object" && Object.keys(value as object).length === 0) return null;
+  return JSON.stringify(value, null, 2);
 }
 
 /**
