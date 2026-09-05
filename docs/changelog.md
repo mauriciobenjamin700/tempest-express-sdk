@@ -9,6 +9,29 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.28.0] — 2026-09-05
+
+### Adicionado
+
+- **admin**: **inlines** — models filhos exibidos na tela de detalhe do pai.
+  Entradas `adminInline({ model, fkField })` passadas em
+  `AdminModel({ inlines })` renderizam as linhas que apontam para o registro:
+  uma tabela somente leitura com link para o admin do filho ou — com `editable`
+  — um formset in-place com uma linha de inputs por filho mais uma linha em
+  branco, salvos num submit só que cria, edita e exclui de uma vez. `canDelete`
+  adiciona o checkbox de exclusão por linha, condicionado à flag do admin do
+  filho.
+
+  A coluna que aponta para o pai fica fora do formset, e **toda linha submetida
+  é verificada como pertencente a este pai** antes de ser gravada ou excluída:
+  chave de linha vem do navegador, então uma submissão forjada poderia nomear o
+  filho de outro pai e transformar a página em superfície de edição da tabela
+  inteira. Linha em branco é ignorada, e linha que falha na validação volta com
+  os valores submetidos e o erro por campo, enquanto o resto do submit é salvo.
+
+  `groupInlineSubmission` fica exportado para quem faz o parse da mesma
+  convenção `row.<chave>.<coluna>` por conta própria.
+
 ## [0.27.0] — 2026-09-05
 
 ### Adicionado
