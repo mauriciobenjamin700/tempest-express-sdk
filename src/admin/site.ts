@@ -9,6 +9,7 @@
  */
 
 import { AdminModel, type AdminModelOptions } from "@/admin/config";
+import type { MetricCard } from "@/admin/dashboard";
 import type { AdminTheme } from "@/admin/theme";
 import { Model, type ModelClass } from "@/db";
 
@@ -24,6 +25,11 @@ export interface AdminSiteOptions {
   siteUrl?: string;
   /** Typed appearance overrides. Omitted keeps the stock look. */
   theme?: AdminTheme;
+  /**
+   * Business-metric cards rendered at the top of the dashboard, each computed
+   * from the database on load. Distinct from the system CPU/memory panel.
+   */
+  dashboardCards?: readonly MetricCard[];
 }
 
 /** Options accepted by {@link AdminSite.automap}. */
@@ -78,6 +84,8 @@ export class AdminSite {
   readonly siteUrl: string | null;
   /** Typed appearance overrides. */
   readonly theme: AdminTheme;
+  /** Business-metric cards rendered at the top of the dashboard. */
+  readonly dashboardCards: MetricCard[];
 
   private readonly registry = new Map<string, AdminModel>();
 
@@ -92,6 +100,7 @@ export class AdminSite {
     this.indexSubtitle = options.indexSubtitle ?? "Site administration";
     this.siteUrl = options.siteUrl ?? null;
     this.theme = options.theme ?? {};
+    this.dashboardCards = [...(options.dashboardCards ?? [])];
   }
 
   /**

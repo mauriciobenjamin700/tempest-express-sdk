@@ -229,6 +229,30 @@ export interface AdminDashboardCard {
   newUrl: string | null;
 }
 
+/** One business-metric card, already computed and formatted for rendering. */
+export interface AdminBusinessCardView {
+  /** The card heading. */
+  label: string;
+  /** Which shape to render. */
+  kind: "value" | "trend" | "partition";
+  /** Headline value (`value` and `trend` cards). */
+  value: string;
+  /** Optional unit suffix. */
+  unit: string | null;
+  /** Trend direction (`trend` cards). */
+  direction: "up" | "down" | "flat";
+  /** Formatted percentage change, or `null` when there is no baseline. */
+  percent: string | null;
+  /** Previous-period value, as text (`trend` cards). */
+  previous: string;
+  /** Segments with their share of the total (`partition` cards). */
+  segments: { label: string; value: string; percent: number }[];
+  /** Optional sub-label. */
+  helpText: string | null;
+  /** Set when the card's compute threw, so the dashboard still renders. */
+  error: string | null;
+}
+
 /** The system metrics panel on the dashboard. */
 export interface AdminDashboardMetrics {
   /** CPU load as a percentage of available cores. */
@@ -254,6 +278,7 @@ export function renderDashboardPage(
   context: AdminRenderContext,
   cards: AdminDashboardCard[],
   metrics: AdminDashboardMetrics | null,
+  businessCards: AdminBusinessCardView[] = [],
 ): string {
   const metricsPanel =
     metrics === null
@@ -269,6 +294,13 @@ export function renderDashboardPage(
       <span class="tempest-admin-stat__sub">${escapeHtml(metrics.memoryUsedGb)} / ${escapeHtml(metrics.memoryTotalGb)} GB</span>
     </div>
   </div>`;
+
+  const business =
+    businessCards.length > 0
+      ? `<div class="tempest-admin-cards" aria-label="Business metrics">${businessCards
+          .map(renderBusinessCard)
+          .join("")}</div>`
+      : "";
 
   const models =
     cards.length > 0
@@ -292,9 +324,73 @@ export function renderDashboardPage(
   <h1>${escapeHtml(context.site.title)}</h1>
   <p>${escapeHtml(context.site.indexSubtitle)}</p>
   ${metricsPanel}
+  ${business}
   ${models}
 </section>`;
   return renderLayout(context, context.site.title, body);
+}
+
+/**
+ * Render one business-metric card.
+ *
+ * A card whose compute threw renders as the card with an error line rather
+ * than taking the dashboard down: one broken query should not cost the
+ * operator every other number on the page.
+ *
+ * @param card - The computed card view model.
+ * @returns The card markup.
+ */
+function renderBusinessCard(card: AdminBusinessCardView): string {
+  const help =
+    card.helpText !== null
+      ? `<span class="tempest-admin-card__help">${escapeHtml(card.helpText)}</span>`
+      : "";
+
+  if (card.error !== null) {
+    return `<article class="tempest-admin-card tempest-admin-card--value">
+      <span class="tempest-admin-card__label">${escapeHtml(card.label)}</span>
+      <span class="tempest-admin-card__value">—</span>
+      <span class="tempest-admin-card__help">${escapeHtml(card.error)}</span>
+    </article>`;
+  }
+
+  const unit = card.unit !== null ? ` <small>${escapeHtml(card.unit)}</small>` : "";
+
+  if (card.kind === "partition") {
+    const parts = card.segments
+      .map(
+        (segment) => `<li>
+        <span class="tempest-admin-card__part-label">${escapeHtml(segment.label)}</span>
+        <span class="tempest-admin-card__part-bar"><span style="width: ${Math.round(segment.percent)}%"></span></span>
+        <span class="tempest-admin-card__part-value">${escapeHtml(segment.value)}</span>
+      </li>`,
+      )
+      .join("");
+    return `<article class="tempest-admin-card tempest-admin-card--partition">
+      <span class="tempest-admin-card__label">${escapeHtml(card.label)}</span>
+      <ul class="tempest-admin-card__parts">${parts}</ul>
+      ${help}
+    </article>`;
+  }
+
+  if (card.kind === "trend") {
+    const arrow = card.direction === "up" ? "▲" : card.direction === "down" ? "▼" : "▬";
+    return `<article class="tempest-admin-card tempest-admin-card--trend">
+      <span class="tempest-admin-card__label">${escapeHtml(card.label)}</span>
+      <span class="tempest-admin-card__value">${escapeHtml(card.value)}${unit}</span>
+      <span class="tempest-admin-card__trend tempest-admin-card__trend--${escapeHtml(card.direction)}">
+        ${arrow} ${card.percent === null ? "—" : escapeHtml(card.percent)}
+        <small>vs prev ${escapeHtml(card.previous)}</small>
+      </span>
+      ${help}
+    </article>`;
+  }
+
+  return `<article class="tempest-admin-card tempest-admin-card--value">
+      <span class="tempest-admin-card__label">${escapeHtml(card.label)}</span>
+      <span class="tempest-admin-card__value">${escapeHtml(card.value)}${unit}</span>
+      ${help}
+    </article>`;
 }
 
 /** A filter control rendered above the list view. */
@@ -361,6 +457,8 @@ export interface AdminListView {
   exportCsvUrl: string;
   /** URL exporting the current result set as JSON. */
   exportJsonUrl: string;
+  /** Saved-preset tabs rendered above the table. Empty hides the strip. */
+  lenses: { label: string; url: string; active: boolean }[];
 }
 
 /**
@@ -473,6 +571,16 @@ export function renderListPage(context: AdminRenderContext, view: AdminListView)
       <a href="${escapeHtml(view.exportJsonUrl)}">Export JSON</a>
     </div>
   </div>
+  ${
+    view.lenses.length > 0
+      ? `<nav class="tempest-admin-lenses" aria-label="Lenses">${view.lenses
+          .map(
+            (lens) =>
+              `<a class="tempest-admin-lens${lens.active ? " tempest-admin-lens--active" : ""}" href="${escapeHtml(lens.url)}">${escapeHtml(lens.label)}</a>`,
+          )
+          .join("")}</nav>`
+      : ""
+  }
   ${bulkBar}
   <div class="tempest-admin-table-wrap">
     <table class="tempest-admin-list__table">
@@ -495,6 +603,28 @@ export function renderListPage(context: AdminRenderContext, view: AdminListView)
   return renderLayout(context, `${view.title} · ${context.site.title}`, body);
 }
 
+/** One entry in the detail view's change timeline. */
+export interface AdminAuditEntryView {
+  /** The mutation kind (`create` / `update` / `delete`). */
+  action: string;
+  /** When it happened, already formatted. */
+  at: string;
+  /** Who did it — a resolved display name, or the raw actor id. */
+  actor: string;
+  /** The per-field diff. */
+  changes: { field: string; before: string; after: string }[];
+  /** Extra metadata the writer recorded, as JSON text, or `null`. */
+  context: string | null;
+}
+
+/** The "who and when" panel below a record's fields. */
+export interface AdminAuditView {
+  /** Timestamp and actor rows, already resolved and formatted. */
+  fields: { label: string; value: string }[];
+  /** The change timeline, newest first. Empty when there is none to show. */
+  history: AdminAuditEntryView[];
+}
+
 /** The view model the detail page renders. */
 export interface AdminDetailView {
   /** Singular display name. */
@@ -509,6 +639,8 @@ export interface AdminDetailView {
   editUrl: string | null;
   /** URL the delete form posts to, or `null` when deletion is disabled. */
   deleteUrl: string | null;
+  /** The audit panel, or `null` when the model carries no audit columns. */
+  audit: AdminAuditView | null;
 }
 
 /**
@@ -532,6 +664,8 @@ export function renderDetailPage(
     )
     .join("");
 
+  const auditPanel = view.audit === null ? "" : renderAuditPanel(view.audit);
+
   const body = `<section class="tempest-admin-detail">
   <header class="tempest-admin-detail__header">
     <h1>${escapeHtml(view.title)} · ${escapeHtml(view.identity)}</h1>
@@ -549,8 +683,66 @@ export function renderDetailPage(
     </div>
   </header>
   <dl class="tempest-admin-detail__fields">${fields}</dl>
+  ${auditPanel}
 </section>`;
   return renderLayout(context, `${view.title} · ${view.identity}`, body);
+}
+
+/**
+ * Render the audit panel: timestamps, actors and the change timeline.
+ *
+ * Each history entry is a `<details>` so a record with a long history stays
+ * scannable — the same reason the logs page collapses tracebacks — and it needs
+ * no JavaScript to expand.
+ *
+ * @param audit - The resolved audit view model.
+ * @returns The panel markup.
+ */
+function renderAuditPanel(audit: AdminAuditView): string {
+  const rows = audit.fields
+    .map(
+      (field) =>
+        `<dt>${escapeHtml(field.label)}</dt><dd>${field.value === "" ? "<em>—</em>" : escapeHtml(field.value)}</dd>`,
+    )
+    .join("");
+
+  const history =
+    audit.history.length > 0
+      ? `<ol class="tempest-admin-history">${audit.history
+          .map((entry) => {
+            const changes =
+              entry.changes.length > 0
+                ? `<table class="tempest-admin-history__changes"><thead><tr><th>Field</th><th>Before</th><th>After</th></tr></thead><tbody>${entry.changes
+                    .map(
+                      (change) =>
+                        `<tr><td>${escapeHtml(change.field)}</td><td>${escapeHtml(change.before)}</td><td>${escapeHtml(change.after)}</td></tr>`,
+                    )
+                    .join("")}</tbody></table>`
+                : "<p><em>No field changes recorded.</em></p>";
+            const context =
+              entry.context !== null
+                ? `<pre class="tempest-admin-detail__json">${escapeHtml(entry.context)}</pre>`
+                : "";
+            return `<li class="tempest-admin-history__item">
+        <details>
+          <summary>
+            <span class="tempest-admin-history__action">${escapeHtml(entry.action)}</span>
+            <span class="tempest-admin-history__actor">${escapeHtml(entry.actor)}</span>
+            <span class="tempest-admin-history__at">${escapeHtml(entry.at)}</span>
+          </summary>
+          ${changes}
+          ${context}
+        </details>
+      </li>`;
+          })
+          .join("")}</ol>`
+      : "";
+
+  return `<section class="tempest-admin-audit">
+    <h2>Audit</h2>
+    <dl class="tempest-admin-detail__fields">${rows}</dl>
+    ${history}
+  </section>`;
 }
 
 /** The view model the create/edit form renders. */

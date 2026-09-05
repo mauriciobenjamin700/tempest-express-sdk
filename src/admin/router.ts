@@ -45,12 +45,20 @@ import {
 } from "@/admin/columns";
 import type { AdminModel } from "@/admin/config";
 import {
+  type CardData,
+  type MetricCard,
+  partitionTotal,
+  trendDirection,
+  trendPercent,
+} from "@/admin/dashboard";
+import {
   buildFormFields,
   foreignKeyFields,
   foreignKeyLabel,
   formatCellValue,
   parseFormBody,
 } from "@/admin/forms";
+import { type AdminAccessPolicy, AdminPermission } from "@/admin/permissions";
 import { type AdminSession, AdminSessionStore, csrfTokenMatches } from "@/admin/session";
 import type { AdminSite } from "@/admin/site";
 import { ADMIN_CSS } from "@/admin/styles";
@@ -69,14 +77,23 @@ import {
   renderLoginPage,
   renderMfaPage,
 } from "@/admin/templates";
+import type {
+  AdminAuditEntryView,
+  AdminAuditView,
+  AdminBusinessCardView,
+} from "@/admin/templates";
 import { resolveAdminTheme } from "@/admin/theme";
 import { JSONLogger } from "@/core";
+import { BaseRepository } from "@/db";
 import type { AsyncEngine, AsyncSession, Column, Condition, WhereInput } from "@/db";
 import { and, or } from "@/db";
 import { MetricsUtils } from "@/utils";
 import express, { type Request, type Response, type Router } from "express";
 
 const logger = new JSONLogger("tempest_express_sdk.admin.router");
+
+/** Cap on audit-history entries rendered on the detail view. */
+const AUDIT_HISTORY_LIMIT = 50;
 
 /** Cap on related rows pre-loaded into a foreign-key dropdown. */
 const FK_OPTION_CAP = 1000;
@@ -115,6 +132,11 @@ export interface AdminRouterOptions {
    * click on a large table from becoming an outage.
    */
   exportMaxRows?: number;
+  /**
+   * Granular access control layered on top of the `AdminModel` flags. Omitted
+   * lets every signed-in operator do whatever those flags allow.
+   */
+  accessPolicy?: AdminAccessPolicy;
 }
 
 /** A request's resolved search, filters and ordering, shared by list + export. */
@@ -135,6 +157,8 @@ interface ResolvedListQuery {
   filterViews: AdminFilterView[];
   /** Query-string parameters every generated link carries forward. */
   baseQuery: Record<string, string>;
+  /** The active lens slug, or `""` when none was requested. */
+  lens: string;
 }
 
 /** The per-request state the authenticated handlers share. */
@@ -142,6 +166,8 @@ interface AdminRequestState {
   session: AdminSession;
   dbSession: AsyncSession;
   principal: unknown;
+  /** The registered models this principal is allowed to see. */
+  visible: AdminModel[];
 }
 
 /**
@@ -222,18 +248,44 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
    * @param session - The active session, or `null` on the login/MFA pages.
    * @returns The render context.
    */
-  const context = (req: Request, session: AdminSession | null): AdminRenderContext => ({
+  const context = (
+    req: Request,
+    session: AdminSession | null,
+    models: AdminModel[] = site.list(),
+  ): AdminRenderContext => ({
     site,
     theme,
     prefix,
     session,
     currentPath: req.originalUrl.split("?")[0] ?? req.path,
-    navModels: site.list().map((admin) => ({
+    navModels: models.map((admin) => ({
       label: admin.verboseNamePlural(),
       url: `${prefix}/m/${admin.slug()}`,
     })),
     messages: flashFor(req),
   });
+
+  /**
+   * Ask the access policy whether a principal may perform an action.
+   *
+   * With no policy configured everything the `AdminModel` flags allow is
+   * allowed; a policy narrows that further and never widens it, so the flags
+   * stay the outer bound.
+   *
+   * @param principal - The authenticated principal.
+   * @param admin - The model configuration being acted on.
+   * @param action - The action being attempted.
+   * @returns Whether the action may proceed.
+   */
+  const allows = async (
+    principal: unknown,
+    admin: AdminModel,
+    action: AdminPermission,
+  ): Promise<boolean> => {
+    if (!flagAllows(admin, action)) return false;
+    if (options.accessPolicy === undefined) return true;
+    return Boolean(await options.accessPolicy(principal, admin, action));
+  };
 
   /**
    * Resolve the fixed outcome code a redirect carries into a banner.
@@ -319,7 +371,11 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       res.redirect(`${prefix}/mfa`);
       return null;
     }
-    return { session, dbSession, principal };
+    const visible: AdminModel[] = [];
+    for (const admin of site.list()) {
+      if (await allows(principal, admin, AdminPermission.VIEW)) visible.push(admin);
+    }
+    return { session, dbSession, principal, visible };
   };
 
   /**
@@ -330,15 +386,26 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
    * @param state - The authenticated request state.
    * @returns The configuration, or `null` when a 404 was already sent.
    */
-  const resolveAdmin = (
+  const resolveAdmin = async (
     req: Request,
     res: Response,
     state: AdminRequestState,
-  ): AdminModel | null => {
+    action: AdminPermission = AdminPermission.VIEW,
+  ): Promise<AdminModel | null> => {
     const admin = site.get(String(req.params.slug));
-    if (admin === null) {
-      html(res, renderNotFound(context(req, state.session)), 404);
+    if (admin === null || !(await allows(state.principal, admin, AdminPermission.VIEW))) {
+      html(res, renderNotFound(context(req, state.session, state.visible)), 404);
       return null;
+    }
+    if (action !== AdminPermission.VIEW) {
+      if (!flagAllows(admin, action)) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
+        return null;
+      }
+      if (!(await allows(state.principal, admin, action))) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 403);
+        return null;
+      }
     }
     return admin;
   };
@@ -367,7 +434,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   const checkCsrf = (req: Request, res: Response, state: AdminRequestState): boolean => {
     const body = req.body as Record<string, unknown>;
     if (csrfTokenMatches(state.session, body?.csrf_token)) return true;
-    html(res, renderNotFound(context(req, state.session)), 403);
+    html(res, renderNotFound(context(req, state.session, state.visible)), 403);
     return false;
   };
 
@@ -461,7 +528,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       if (state === null) return;
 
       const cards: AdminDashboardCard[] = [];
-      for (const admin of site.list()) {
+      for (const admin of state.visible) {
         let count: number | null = null;
         try {
           count = await admin.repository(state.dbSession).count();
@@ -475,8 +542,15 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
           label: admin.verboseNamePlural(),
           count,
           url: `${prefix}/m/${admin.slug()}`,
-          newUrl: admin.canCreate ? `${prefix}/m/${admin.slug()}/new` : null,
+          newUrl: (await allows(state.principal, admin, AdminPermission.CREATE))
+            ? `${prefix}/m/${admin.slug()}/new`
+            : null,
         });
+      }
+
+      const businessCards: AdminBusinessCardView[] = [];
+      for (const card of site.dashboardCards) {
+        businessCards.push(await computeBusinessCard(card, state.dbSession));
       }
 
       let metrics: AdminDashboardMetrics | null = null;
@@ -490,7 +564,15 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         };
       }
 
-      html(res, renderDashboardPage(context(req, state.session), cards, metrics));
+      html(
+        res,
+        renderDashboardPage(
+          context(req, state.session, state.visible),
+          cards,
+          metrics,
+          businessCards,
+        ),
+      );
     }),
   );
 
@@ -499,7 +581,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state);
       if (admin === null) return;
       html(res, await renderList(req, admin, state));
     }),
@@ -510,15 +592,15 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state, AdminPermission.CREATE);
       if (admin === null) return;
       if (!admin.canCreate) {
-        html(res, renderNotFound(context(req, state.session)), 404);
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
       html(
         res,
-        renderFormPage(context(req, state.session), {
+        renderFormPage(context(req, state.session, state.visible), {
           mode: "create",
           title: admin.verboseName(),
           fields: buildFormFields(admin, {
@@ -537,10 +619,10 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state, AdminPermission.CREATE);
       if (admin === null) return;
       if (!admin.canCreate) {
-        html(res, renderNotFound(context(req, state.session)), 404);
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
       if (!checkCsrf(req, res, state)) return;
@@ -551,7 +633,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       const rerender = (error: string | null, status: number): void => {
         html(
           res,
-          renderFormPage(context(req, state.session), {
+          renderFormPage(context(req, state.session, state.visible), {
             mode: "create",
             title: admin.verboseName(),
             fields: buildFormFields(admin, {
@@ -571,6 +653,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         rerender("Please fix the highlighted fields.", 400);
         return;
       }
+      stampActor(admin, parsed.data, backend.principalId(state.principal as never), true);
       try {
         await admin.repository(state.dbSession).create(parsed.data as never);
       } catch (error) {
@@ -586,11 +669,11 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state);
       if (admin === null) return;
       const format = String(req.params.format);
       if (format !== "csv" && format !== "json") {
-        html(res, renderNotFound(context(req, state.session)), 404);
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
 
@@ -619,7 +702,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state);
       if (admin === null) return;
       if (!checkCsrf(req, res, state)) return;
 
@@ -640,7 +723,13 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         return;
       }
       if (!bulkActionsFor(admin).some((option) => option.value === action)) {
-        html(res, renderNotFound(context(req, state.session)), 400);
+        html(res, renderNotFound(context(req, state.session, state.visible)), 400);
+        return;
+      }
+
+      const needed = action === "delete" ? AdminPermission.DELETE : AdminPermission.EDIT;
+      if (!(await allows(state.principal, admin, needed))) {
+        html(res, renderNotFound(context(req, state.session, state.visible)), 403);
         return;
       }
 
@@ -650,7 +739,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       if (action.startsWith("custom:")) {
         const custom = admin.getAction(action.slice("custom:".length));
         if (custom === null) {
-          html(res, renderNotFound(context(req, state.session)), 400);
+          html(res, renderNotFound(context(req, state.session, state.visible)), 400);
           return;
         }
         let result: AdminActionResult | null;
@@ -703,25 +792,28 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state);
       if (admin === null) return;
       const row = await findRow(admin, state.dbSession, String(req.params.identity));
       if (row === null) {
-        html(res, renderNotFound(context(req, state.session)), 404);
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
       const identity = String(row[admin.identityField]);
       html(
         res,
-        renderDetailPage(context(req, state.session), {
+        renderDetailPage(context(req, state.session, state.visible), {
           title: admin.verboseName(),
           identity,
+          audit: await buildAuditView(admin, row, state.dbSession),
           fields: admin
             .detailFieldNames()
             .map((name) => ({ label: name, value: formatCellValue(row[name]) })),
           backUrl: `${prefix}/m/${admin.slug()}`,
-          editUrl: admin.canEdit ? `${prefix}/m/${admin.slug()}/${identity}/edit` : null,
-          deleteUrl: admin.canDelete
+          editUrl: (await allows(state.principal, admin, AdminPermission.EDIT))
+            ? `${prefix}/m/${admin.slug()}/${identity}/edit`
+            : null,
+          deleteUrl: (await allows(state.principal, admin, AdminPermission.DELETE))
             ? `${prefix}/m/${admin.slug()}/${identity}/delete`
             : null,
         }),
@@ -734,17 +826,17 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state, AdminPermission.EDIT);
       if (admin === null) return;
       const identity = String(req.params.identity);
       const row = admin.canEdit ? await findRow(admin, state.dbSession, identity) : null;
       if (row === null) {
-        html(res, renderNotFound(context(req, state.session)), 404);
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
       html(
         res,
-        renderFormPage(context(req, state.session), {
+        renderFormPage(context(req, state.session, state.visible), {
           mode: "edit",
           title: admin.verboseName(),
           fields: buildFormFields(admin, {
@@ -764,11 +856,11 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state, AdminPermission.EDIT);
       if (admin === null) return;
       const identity = String(req.params.identity);
       if (!admin.canEdit) {
-        html(res, renderNotFound(context(req, state.session)), 404);
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
       if (!checkCsrf(req, res, state)) return;
@@ -779,7 +871,7 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       const rerender = (error: string | null, status: number): void => {
         html(
           res,
-          renderFormPage(context(req, state.session), {
+          renderFormPage(context(req, state.session, state.visible), {
             mode: "edit",
             title: admin.verboseName(),
             fields: buildFormFields(admin, {
@@ -799,12 +891,18 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
         rerender("Please fix the highlighted fields.", 400);
         return;
       }
+      stampActor(
+        admin,
+        parsed.data,
+        backend.principalId(state.principal as never),
+        false,
+      );
       try {
         const changed = await admin
           .repository(state.dbSession)
           .update({ [admin.identityField]: identity } as never, parsed.data as never);
         if (changed === 0) {
-          html(res, renderNotFound(context(req, state.session)), 404);
+          html(res, renderNotFound(context(req, state.session, state.visible)), 404);
           return;
         }
       } catch (error) {
@@ -820,10 +918,10 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     guarded(async (req, res) => {
       const state = await authenticate(req, res);
       if (state === null) return;
-      const admin = resolveAdmin(req, res, state);
+      const admin = await resolveAdmin(req, res, state, AdminPermission.DELETE);
       if (admin === null) return;
       if (!admin.canDelete) {
-        html(res, renderNotFound(context(req, state.session)), 404);
+        html(res, renderNotFound(context(req, state.session, state.visible)), 404);
         return;
       }
       if (!checkCsrf(req, res, state)) return;
@@ -833,6 +931,81 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       res.redirect(`${prefix}/m/${admin.slug()}?ok=deleted`);
     }),
   );
+
+  /**
+   * Resolve an actor id into a display name through the auth backend.
+   *
+   * @param actor - The stored actor id, or `null`.
+   * @param dbSession - The request's DB session.
+   * @returns The principal's display name, the raw id when it no longer
+   *   resolves, or `""` when the column was never set.
+   */
+  async function actorLabel(actor: unknown, dbSession: AsyncSession): Promise<string> {
+    if (actor === null || actor === undefined || actor === "") return "";
+    const principal = await backend.loadPrincipal(dbSession, String(actor));
+    return principal === null ? String(actor) : backend.displayName(principal);
+  }
+
+  /**
+   * Build the detail view's audit panel: timestamps, actors and — when an
+   * `auditModel` is configured — the change timeline for this row.
+   *
+   * @param admin - The model configuration.
+   * @param row - The record being shown.
+   * @param dbSession - The request's DB session.
+   * @returns The panel view model, or `null` when the model carries no audit
+   *   columns and no timeline to show.
+   */
+  async function buildAuditView(
+    admin: AdminModel,
+    row: Record<string, unknown>,
+    dbSession: AsyncSession,
+  ): Promise<AdminAuditView | null> {
+    const fields: { label: string; value: string }[] = [];
+    for (const name of admin.auditFieldNames()) {
+      const value =
+        name === "createdBy" || name === "updatedBy"
+          ? await actorLabel(row[name], dbSession)
+          : formatCellValue(row[name]);
+      fields.push({ label: humanizeField(name), value });
+    }
+
+    const history: AdminAuditEntryView[] = [];
+    if (admin.auditModel !== null) {
+      const entity = (admin.model as unknown as { name: string }).name;
+      const entityId = String(row[admin.identityField]);
+      const page = await new BaseRepository(admin.auditModel, dbSession).paginate({
+        page: 1,
+        pageSize: AUDIT_HISTORY_LIMIT,
+        orderBy: "createdAt" as never,
+        ascending: false,
+        filters: { entity, entityId } as never,
+      });
+      for (const entry of page.items as Record<string, unknown>[]) {
+        const changes = (entry.changes ?? {}) as Record<
+          string,
+          { before?: unknown; after?: unknown }
+        >;
+        history.push({
+          action: String(entry.action ?? ""),
+          at: formatCellValue(entry.createdAt),
+          actor: (await actorLabel(entry.actor, dbSession)) || "—",
+          changes: Object.entries(changes).map(([field, change]) => ({
+            field,
+            before: formatCellValue(change?.before),
+            after: formatCellValue(change?.after),
+          })),
+          context:
+            entry.context === null || entry.context === undefined
+              ? null
+              : JSON.stringify(entry.context, null, 2),
+        });
+      }
+    }
+
+    if (fields.length === 0 && history.length === 0) return null;
+    return { fields, history };
+  }
 
   /**
    * Look one row up by the configured identity column.
@@ -851,6 +1024,29 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       .repository(dbSession)
       .first({ [admin.identityField]: identity } as never);
     return (row as Record<string, unknown> | null) ?? null;
+  }
+
+  /**
+   * Filter the bulk-action dropdown down to what this principal may run.
+   *
+   * Offering an action the policy will refuse trains operators to ignore
+   * failures, so the option is removed rather than left to fail on submit.
+   *
+   * @param admin - The model configuration.
+   * @param principal - The acting principal.
+   * @returns The permitted options.
+   */
+  async function permittedBulkActions(
+    admin: AdminModel,
+    principal: unknown,
+  ): Promise<BulkActionOption[]> {
+    const permitted: BulkActionOption[] = [];
+    for (const option of bulkActionsFor(admin)) {
+      const needed =
+        option.value === "delete" ? AdminPermission.DELETE : AdminPermission.EDIT;
+      if (await allows(principal, admin, needed)) permitted.push(option);
+    }
+    return permitted;
   }
 
   /**
@@ -926,14 +1122,31 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       searchValue: query.search,
       filters: query.filterViews,
       sort,
-      newUrl: admin.canCreate ? `${prefix}/m/${admin.slug()}/new` : null,
-      bulkActions: bulkActionsFor(admin),
+      newUrl: (await allows(state.principal, admin, AdminPermission.CREATE))
+        ? `${prefix}/m/${admin.slug()}/new`
+        : null,
+      bulkActions: await permittedBulkActions(admin, state.principal),
       bulkUrl: `${prefix}/m/${admin.slug()}/bulk`,
       exportCsvUrl: exportUrl("csv"),
       exportJsonUrl: exportUrl("json"),
+      lenses:
+        admin.lenses.length === 0
+          ? []
+          : [
+              {
+                label: "All",
+                url: `?${buildQuery({ ...query.baseQuery, lens: undefined })}`,
+                active: query.lens === "",
+              },
+              ...admin.lenses.map((entry) => ({
+                label: entry.label,
+                url: `?${buildQuery({ ...query.baseQuery, lens: entry.slug })}`,
+                active: query.lens === entry.slug,
+              })),
+            ],
     };
 
-    return renderListPage(context(req, state.session), view);
+    return renderListPage(context(req, state.session, state.visible), view);
   }
 
   /**
@@ -959,10 +1172,12 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
     const search = queryString(req.query.q);
     const sortField = queryString(req.query.sort);
     const sortColumn = sortField in columns ? sortField : null;
-    const ascending =
-      sortColumn === null ? admin.orderAscending : queryString(req.query.dir) !== "desc";
+    const lens = admin.getLens(queryString(req.query.lens));
 
     const conditions: (WhereInput<Record<string, unknown>> | Condition)[] = [];
+    if (lens !== null && Object.keys(lens.filters).length > 0) {
+      conditions.push(lens.filters);
+    }
     const filterViews: AdminFilterView[] = [];
 
     for (const field of admin.listFilter) {
@@ -1032,15 +1247,28 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
       }
     }
 
+    const lensOrder = lens?.orderBy ?? null;
+    const lensDescending = lensOrder?.startsWith("-");
+    const lensColumn = lensOrder === null ? null : lensOrder.replace(/^-/, "");
+    const ascending =
+      sortColumn !== null
+        ? queryString(req.query.dir) !== "desc"
+        : lensColumn !== null
+          ? !lensDescending
+          : admin.orderAscending;
+
+    if (lens !== null) baseQuery.lens = lens.slug;
+
     return {
       search,
       searchable,
       where: conditions.length === 0 ? undefined : and(...conditions),
-      orderBy: sortColumn ?? admin.orderKey ?? undefined,
+      orderBy: sortColumn ?? lensColumn ?? admin.orderKey ?? undefined,
       ascending,
       sortColumn,
       filterViews,
       baseQuery,
+      lens: lens?.slug ?? "",
     };
   }
 
@@ -1097,6 +1325,133 @@ export function makeAdminRouter(site: AdminSite, options: AdminRouterOptions): R
   }
 
   return router;
+}
+
+/**
+ * Whether a configuration's own flags permit an action.
+ *
+ * Kept separate from the access policy because the two failures mean different
+ * things: a flag turned off means the view does not exist (`404`), while a
+ * policy refusal means it exists and this operator may not use it (`403`).
+ *
+ * @param admin - The model configuration.
+ * @param action - The action being attempted.
+ * @returns Whether the flags allow it.
+ */
+function flagAllows(admin: AdminModel, action: AdminPermission): boolean {
+  if (action === AdminPermission.CREATE) return admin.canCreate;
+  if (action === AdminPermission.EDIT) return admin.canEdit;
+  if (action === AdminPermission.DELETE) return admin.canDelete;
+  return true;
+}
+
+/**
+ * Stamp `createdBy` / `updatedBy` with the acting operator.
+ *
+ * Only columns the model actually declares are touched, so a model without the
+ * audit columns is unaffected — the panel never invents a field the table does
+ * not have.
+ *
+ * @param admin - The model configuration being written.
+ * @param data - The coerced payload, mutated in place.
+ * @param actorId - The acting principal's id.
+ * @param creating - `true` on create (stamps both), `false` on edit.
+ */
+function stampActor(
+  admin: AdminModel,
+  data: Record<string, unknown>,
+  actorId: string,
+  creating: boolean,
+): void {
+  const columns = adminColumns(admin.model);
+  if (creating && "createdBy" in columns) data.createdBy = actorId;
+  if ("updatedBy" in columns) data.updatedBy = actorId;
+}
+
+/**
+ * Format a metric number for display, keeping integers integral.
+ *
+ * @param value - The raw value.
+ * @returns The formatted text.
+ */
+function formatMetric(value: number | string): string {
+  if (typeof value === "string") return value;
+  return Number.isInteger(value) ? String(value) : value.toFixed(2);
+}
+
+/**
+ * Compute one dashboard card into its view model.
+ *
+ * A card whose `compute` throws comes back as an error card rather than
+ * propagating: one broken query should not cost the operator every other
+ * number on the dashboard.
+ *
+ * @param card - The registered card.
+ * @param dbSession - The request's DB session.
+ * @returns The view model the template renders.
+ */
+async function computeBusinessCard(
+  card: MetricCard,
+  dbSession: AsyncSession,
+): Promise<AdminBusinessCardView> {
+  const base = {
+    label: card.label,
+    unit: null as string | null,
+    direction: "flat" as const,
+    percent: null as string | null,
+    previous: "",
+    segments: [] as { label: string; value: string; percent: number }[],
+    helpText: card.helpText ?? null,
+  };
+
+  let data: CardData;
+  try {
+    data = await card.compute(dbSession);
+  } catch (error) {
+    logger.warning("Admin dashboard card failed", {
+      card: card.label,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return { ...base, kind: "value", value: "", error: "Could not compute this metric." };
+  }
+
+  if (data.kind === "partition") {
+    const total = partitionTotal(data);
+    return {
+      ...base,
+      kind: "partition",
+      value: formatMetric(total),
+      segments: data.segments.map((segment) => ({
+        label: segment.label,
+        value: formatMetric(segment.value),
+        percent: total === 0 ? 0 : (segment.value / total) * 100,
+      })),
+      error: null,
+    };
+  }
+
+  if (data.kind === "trend") {
+    const percent = trendPercent(data);
+    return {
+      ...base,
+      kind: "trend",
+      value: formatMetric(data.value),
+      unit: data.unit ?? null,
+      direction: trendDirection(data),
+      percent:
+        percent === null ? null : `${percent >= 0 ? "+" : ""}${percent.toFixed(1)}%`,
+      previous: formatMetric(data.previous),
+      error: null,
+    };
+  }
+
+  return {
+    ...base,
+    kind: "value",
+    value: formatMetric(data.value),
+    unit: data.unit ?? null,
+    error: null,
+  };
 }
 
 /**

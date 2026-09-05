@@ -435,7 +435,8 @@ describe("admin configuration", () => {
     const admin = new AdminModel({ model: WidgetModel, listDisplay: ["label"] });
     expect(admin.listDisplayNames()).toEqual(["label"]);
     expect(admin.detailFieldNames()).toContain("notes");
-    expect(admin.detailFieldNames()).toContain("createdAt");
+    expect(admin.detailFieldNames()).not.toContain("createdAt");
+    expect(admin.auditFieldNames()).toEqual(["createdAt", "updatedAt"]);
   });
 
   it("rejects a reference to an unknown column", () => {

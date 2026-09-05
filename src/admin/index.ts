@@ -9,6 +9,27 @@
  */
 
 export {
+  type CardCompute,
+  type CardData,
+  type MetricCard,
+  type MetricPartition,
+  type MetricTrend,
+  type MetricValue,
+  metricCard,
+  partitionTotal,
+  trendDirection,
+  trendPercent,
+} from "@/admin/dashboard";
+export {
+  type AdminLens,
+  type AdminLensOptions,
+  adminLens,
+} from "@/admin/lenses";
+export {
+  type AdminAccessPolicy,
+  AdminPermission,
+} from "@/admin/permissions";
+export {
   type AdminAction,
   type AdminActionCategory,
   type AdminActionContext,
@@ -66,6 +87,9 @@ export {
 } from "@/admin/site";
 export { ADMIN_CSS } from "@/admin/styles";
 export {
+  type AdminAuditEntryView,
+  type AdminAuditView,
+  type AdminBusinessCardView,
   type AdminDashboardCard,
   type AdminDashboardMetrics,
   type AdminDetailView,

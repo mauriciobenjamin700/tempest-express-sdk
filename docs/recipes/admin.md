@@ -379,6 +379,144 @@ FK para tabela **não registrada** continua input de texto — um dropdown vazio
 seria pior que o campo cru. As opções são limitadas a 1000 linhas; acima disso
 a tabela de destino pede um campo de busca, não uma lista.
 
+## 9. Controle de acesso por papel
+
+Por padrão todo operador que entra (`isAdmin`) faz tudo que as flags do
+`AdminModel` permitem. Para restringir um principal a um subconjunto de models
+ou de ações, passe uma `accessPolicy`:
+
+```ts
+import { AdminPermission, makeAdminRouter } from "tempest-express-sdk";
+
+makeAdminRouter(site, {
+  engine,
+  authBackend,
+  secretKey: settings.JWT_SECRET,
+  accessPolicy: (user, admin, action) => {
+    const principal = user as { role: string };
+    if (principal.role === "superadmin") return true;
+    if (principal.role === "support") return action === AdminPermission.VIEW;
+    return admin.slug() === "article";
+  },
+});
+```
+
+A política **compõe** com `canCreate` / `canEdit` / `canDelete`: as duas
+precisam permitir. E o painel não mostra porta que responde erro — model sem
+`VIEW` some da sidebar e do dashboard, ação sem permissão some do dropdown de
+massa, e os botões **+ New**, **Edit** e **Delete** só aparecem quando a
+política deixa.
+
+!!! info "404 e 403 querem dizer coisas diferentes"
+    Flag desligada responde **404** — aquela view não existe neste painel.
+    Política recusando responde **403** — a view existe e este operador não
+    pode usá-la. Misturar os dois esconderia configuração errada atrás de um
+    "sem permissão".
+
+## 10. Trilha de auditoria
+
+Modelo com as colunas `createdBy` / `updatedBy` (via `createdByColumn()` /
+`updatedByColumn()`) é carimbado automaticamente com o id do operador — na
+criação e na edição pelo painel. O detail ganha um painel **Audit** com
+timestamps e os atores já resolvidos para nome pelo auth backend.
+
+Para ver **o quê** mudou, e não só quem e quando, passe um `auditModel` — a
+mesma tabela `BaseAuditLogModel` que seus services já escrevem:
+
+```ts
+import { BaseAuditLogModel } from "tempest-express-sdk";
+
+class AuditLogModel extends BaseAuditLogModel {
+  static override tablename = "audit_log";
+}
+
+site.register(new AdminModel({ model: OrderModel, auditModel: AuditLogModel }));
+```
+
+O detail passa a mostrar uma timeline por registro (as 50 entradas mais
+recentes): ação, ator, quando, a tabela de diff campo a campo e o `context`
+que o escritor gravou. Cada entrada é um `<details>` recolhido, então
+histórico longo continua escaneável — e sem JavaScript.
+
+!!! warning "O painel lê a trilha, não escreve"
+    `auditModel` só alimenta a tela. Quem grava as linhas é o seu service, com
+    `snapshot` / `diffSnapshots`. Registrar o model sem gravar nada deixa a
+    timeline vazia — o painel não inventa histórico.
+
+## 11. Cards de métrica no dashboard
+
+Além do painel de CPU/memória, o dashboard aceita **cards de negócio**
+calculados do seu próprio banco no carregamento:
+
+```ts
+import { metricCard } from "tempest-express-sdk";
+
+const site = new AdminSite({
+  title: "Shop",
+  dashboardCards: [
+    metricCard(
+      "Pedidos hoje",
+      async (session) => ({
+        kind: "value",
+        value: await new BaseRepository(OrderModel, session).count({ ... }),
+        unit: "pedidos",
+      }),
+      "Desde a meia-noite",
+    ),
+    metricCard("Semana vs anterior", async (session) => ({
+      kind: "trend",
+      value: 18,
+      previous: 12,
+    })),
+    metricCard("Por status", async (session) => ({
+      kind: "partition",
+      segments: [
+        { label: "Pagos", value: 8 },
+        { label: "Pendentes", value: 6 },
+      ],
+    })),
+  ],
+});
+```
+
+Três formatos: `value` (número em destaque), `trend` (▲/▼ com a variação
+percentual contra o período anterior) e `partition` (barras por segmento).
+`trendPercent` devolve `null` quando o período anterior é zero — porcentagem
+contra zero é indefinida, não infinita.
+
+!!! check "Card quebrado não derruba o dashboard"
+    Card cujo `compute` levanta é registrado no log e renderiza como
+    "Could not compute this metric." — uma query ruim não custa ao operador
+    todos os outros números da página.
+
+## 12. Lenses (presets salvos de listagem)
+
+Uma lens junta filtros e ordenação sob um rótulo, e vira aba acima da tabela:
+
+```ts
+import { adminLens } from "tempest-express-sdk";
+
+site.register(
+  new AdminModel({
+    model: TicketModel,
+    lenses: [
+      adminLens({
+        name: "Triage aberta",
+        filters: { status: "open", priority: { gte: 3 } },
+        orderBy: "-createdAt",
+      }),
+      adminLens({ name: "Fechados", filters: { status: "closed" } }),
+    ],
+  }),
+);
+```
+
+Clicar numa aba aplica `?lens=<slug>`. Os filtros da lens são **ANDados** com o
+que o operador digitou, então busca e filtros continuam funcionando por cima
+dela; a ordenação da lens vale até o operador clicar num cabeçalho de coluna. A
+aba **All** volta para a listagem sem preset, e o `lens` viaja nos links de
+paginação, ordenação e export.
+
 ## Recapitulando
 
 1. `BaseUserModel` + uma linha `isAdmin` semeada dá o login.
@@ -388,3 +526,6 @@ a tabela de destino pede um campo de busca, não uma lista.
    duplicado para manter em sincronia.
 5. `actions: [...]` leva a operação do dia a dia para dentro do painel; export e
    FK-select saem de graça do que o model já declara.
+6. `accessPolicy` estreita quem faz o quê; `auditModel` responde quem mudou o
+   quê; `dashboardCards` e `lenses` levam para o painel os números e as
+   consultas que o time repete todo dia.

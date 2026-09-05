@@ -9,6 +9,53 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.26.0] — 2026-09-05
+
+### Adicionado
+
+- **admin**: **controle de acesso por papel**. `makeAdminRouter({ accessPolicy })`
+  recebe um predicado `(principal, admin, action)` consultado em toda ação de
+  model. Ele **compõe** com as flags `canCreate` / `canEdit` / `canDelete` — não
+  as substitui — e o painel esconde o que recusa: model sem `VIEW` some da
+  sidebar e do dashboard, ação recusada sai do dropdown de massa, e os botões
+  **+ New** / **Edit** / **Delete** só aparecem quando a política deixa. Flag
+  desligada responde `404` (a view não existe); política recusando responde
+  `403` (existe, e você não pode usá-la) — juntar os dois esconderia
+  configuração errada atrás de um "sem permissão".
+
+- **admin**: **trilha de auditoria**. Create e edit carimbam `createdBy` /
+  `updatedBy` com o operador quando o model declara essas colunas, e o detail
+  ganha um painel **Audit** com os timestamps e os atores já resolvidos para
+  nome pelo auth backend. Passando `AdminModel({ auditModel })`, o painel também
+  renderiza a timeline de mudanças do registro lida daquela tabela
+  `BaseAuditLogModel` — ação, ator, o diff campo a campo e o contexto gravado,
+  cada entrada num `<details>` recolhido para histórico longo continuar
+  escaneável sem JavaScript. O painel só lê a trilha; quem escreve continua
+  sendo o service.
+
+- **admin**: **cards de métrica no dashboard**. `new AdminSite({ dashboardCards })`
+  recebe entradas `metricCard(label, compute, helpText?)` calculadas do banco no
+  carregamento, em três formatos: `value`, `trend` (▲/▼ com a variação
+  percentual) e `partition` (uma barra por segmento). Card cujo `compute`
+  levanta é logado e renderiza como card de erro, em vez de derrubar o
+  dashboard. `trendPercent` devolve `null` contra base zero — porcentagem contra
+  zero é indefinida, não infinita.
+
+- **admin**: **lenses** — presets salvos de listagem. Entradas
+  `adminLens({ name, filters, orderBy })` passadas em `AdminModel({ lenses })`
+  viram abas acima da tabela e aplicam via `?lens=<slug>`. Os filtros da lens
+  são ANDados com o que o operador digitou, a ordenação dela vale até alguém
+  clicar num cabeçalho de coluna, e a lens ativa viaja nos links de paginação,
+  ordenação e export.
+
+### Alterado
+
+- **admin**: o detail move `createdAt` / `updatedAt` / `createdBy` / `updatedBy`
+  da lista de campos para o novo painel de auditoria, onde "quem e quando" lê
+  melhor ao lado do histórico do que espalhado entre os campos de domínio.
+  `AdminModel.detailFieldNames()` não os devolve mais; o novo
+  `auditFieldNames()` devolve.
+
 ## [0.25.0] — 2026-09-05
 
 ### Adicionado

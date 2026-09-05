@@ -4,6 +4,53 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.26.0] — 2026-09-05
+
+### Added
+
+- **admin**: **role-based access control**. `makeAdminRouter({ accessPolicy })`
+  takes a `(principal, admin, action)` predicate consulted for every model
+  action. It composes with — never replaces — the `canCreate` / `canEdit` /
+  `canDelete` flags, and the panel hides what it refuses: a model without `VIEW`
+  drops out of the sidebar and dashboard, a refused action leaves the bulk
+  dropdown, and the **+ New** / **Edit** / **Delete** buttons appear only when
+  the policy allows them. A disabled flag answers `404` (the view does not
+  exist) while a policy refusal answers `403` (it exists, you may not use it) —
+  collapsing the two would hide misconfiguration behind "no permission".
+
+- **admin**: **audit trail**. Create and edit stamp `createdBy` / `updatedBy`
+  with the acting operator when the model declares those columns, and the detail
+  view grows an **Audit** panel holding the timestamps and the actors resolved
+  to display names through the auth backend. Pass `AdminModel({ auditModel })`
+  and the panel also renders a per-record change timeline read from that
+  `BaseAuditLogModel` table — action, actor, the field-by-field diff and the
+  recorded context, each entry a collapsed `<details>` so a long history stays
+  scannable without JavaScript. The panel only reads the trail; the service
+  still writes it.
+
+- **admin**: **dashboard metric cards**. `new AdminSite({ dashboardCards })`
+  takes `metricCard(label, compute, helpText?)` entries computed from the DB on
+  load, in three shapes: `value`, `trend` (▲/▼ with the percentage change) and
+  `partition` (a bar per segment). A card whose `compute` throws is logged and
+  renders as an error card rather than taking the dashboard down. `trendPercent`
+  returns `null` against a zero baseline — a percentage against zero is
+  undefined, not infinite.
+
+- **admin**: **lenses** — saved list-view presets. `adminLens({ name, filters,
+  orderBy })` entries passed to `AdminModel({ lenses })` render as tabs above
+  the table and apply through `?lens=<slug>`. A lens's filters are ANDed with
+  whatever the operator typed, its ordering holds until a column header is
+  clicked, and the active lens travels through the pagination, sorting and
+  export links.
+
+### Changed
+
+- **admin**: the detail view moves `createdAt` / `updatedAt` / `createdBy` /
+  `updatedBy` out of the field list and into the new audit panel, where "who and
+  when" reads better next to the change history than scattered among the domain
+  fields. `AdminModel.detailFieldNames()` no longer returns them; the new
+  `auditFieldNames()` does.
+
 ## [0.25.0] — 2026-09-05
 
 ### Added
