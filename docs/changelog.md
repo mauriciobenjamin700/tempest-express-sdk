@@ -9,6 +9,46 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.25.0] — 2026-09-05
+
+### Adicionado
+
+- **admin**: **ações em massa** na list view. Cada linha ganha um checkbox mais
+  um "selecionar tudo", e a barra de ação aplica **Activate** / **Deactivate**
+  (condicionadas a `canEdit` e à coluna `isActive`) ou **Delete** (condicionada a
+  `canDelete`) às linhas marcadas, informando quantas mudaram. Toda submissão
+  carrega o token CSRF da sessão.
+
+- **admin**: **ações customizadas** com `adminAction({ label }, handler)`,
+  passadas em `AdminModel({ actions: [...] })`. Cada uma entra no dropdown com o
+  namespace `custom:<nome>`, então nunca colide com uma ação embutida. O handler
+  recebe os `ids` marcados, um repository na sessão do request, a sessão de
+  banco, o request, a sessão do admin e o operador que disparou, e devolve
+  `{ message, category }` para exibir um banner (ou `null` para nenhum). Handler
+  que levanta é registrado no log e volta como banner de erro, não como `500`.
+
+  Onde o SDK Python usa o decorator `@admin_action`, aqui `adminAction` devolve o
+  descritor: o handler continua uma função comum, chamável e testável
+  (`action.handler(ctx)`), sem sintaxe de decorator para ligar no build de quem
+  consome.
+
+- **admin**: **export CSV / JSON** em `GET {prefix}/m/{slug}/export.csv|json`,
+  respeitando busca, filtros, ordenação e as colunas do `listDisplay` do request
+  — list view e export agora resolvem a query por um caminho de código só, porque
+  export que discorda em silêncio da página de onde saiu é pior que export
+  nenhum. O CSV segue a RFC 4180; `Date` vira ISO, `bigint` vira string decimal,
+  binário vira base64. `makeAdminRouter({ exportMaxRows })` limita as linhas
+  (default `5000`), para um clique numa tabela grande não virar incidente.
+
+- **admin**: **select de chave estrangeira**. Coluna FK cujo model de destino
+  está registrado no mesmo site vira `<select>` das linhas relacionadas, no
+  formulário e no filtro da listagem, com label do primeiro `searchFields` do
+  admin referenciado (caindo para `name`/`title`/`email`/`label`/`reference` e,
+  por último, a identidade). FK para tabela não registrada continua input de
+  texto — dropdown vazio seria pior que o campo cru. Opções limitadas a 1000
+  linhas. Os helpers `foreignKeyFields`, `foreignKeyLabel` e `foreignKeyTable`
+  passam a ser exportados para quem monta as próprias telas.
+
 ## [0.24.0] — 2026-09-05
 
 ### Adicionado
