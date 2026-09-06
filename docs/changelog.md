@@ -9,6 +9,55 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.32.0] — 2026-09-06
+
+### Adicionado
+
+- **asyncapi**: `createAsyncApiRegistry()` documenta a superfície WebSocket como
+  um documento **AsyncAPI 3.0**, servido ao lado do `/openapi.json`.
+
+  O OpenAPI descreve uma requisição e a resposta dela. Socket não tem esse
+  formato — a conexão fica aberta, as mensagens vão nos dois sentidos e o
+  servidor fala sem ninguém pedir —, então rota de socket era documentada em
+  prosa, e prosa não gera cliente. O registry espelha o de OpenAPI: registre o
+  canal, as mensagens e as operações, e o
+  `createApp({ asyncapi: { registry, info } })` serve o resultado em
+  `/asyncapi.json`.
+
+  ```typescript
+  const asyncapi = createAsyncApiRegistry()
+    .registerChannel({ name: "socket", address: "/ws", handshakeHeaders })
+    .registerMessage({ name: "SubscribeFrame", schema: subscribeFrame })
+    .registerOperation({
+      name: "subscribe",
+      channel: "socket",
+      direction: "clientToServer",
+      messages: ["SubscribeFrame"],
+    });
+  ```
+
+  **A direção é declarada, nunca inferida.** O `action` do AsyncAPI é relativo a
+  quem publicou o documento, então um documento escrito pelo servidor grafa o
+  envio do cliente como `receive`. Um consumidor gerado inverte todos eles, e o
+  sinal errado produz um cliente que compila, passa no type-check e faz o
+  oposto. Por isso o registry aceita `clientToServer` / `serverToClient`, que
+  não têm como ser lidos de trás para frente, e emite o `action` sozinho. O
+  documento carrega também `x-tempest-perspective: "server"`, para nenhum leitor
+  precisar supor.
+
+  O payload de cada mensagem é gerado dos schemas zod do chamador, pelo mesmo
+  caminho que alimenta o OpenAPI — então a forma documentada e a forma que o
+  servidor aceita são um objeto só, não dois que podem divergir. Operação que
+  nomeia canal ou mensagem não registrada levanta na geração: um `$ref`
+  pendurado produz documento estruturalmente válido cujo cliente gerado fica sem
+  aquele frame, em silêncio.
+
+  Exports novos: `createAsyncApiRegistry`, `generateAsyncApiDocument`,
+  `mountAsyncApiJson`, `AsyncApiRegistry`, `ASYNCAPI_VERSION`,
+  `PERSPECTIVE_EXTENSION` e os tipos `AsyncApi*`. O `createApp` ganha a opção
+  `asyncapi` ao lado de `openapi`. Receita:
+  [AsyncAPI: documentando o WebSocket](recipes/asyncapi.md).
+
 ## [0.31.0] — 2026-09-05
 
 ### Corrigido

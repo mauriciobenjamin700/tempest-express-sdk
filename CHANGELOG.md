@@ -4,6 +4,54 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [SemVer](https://semver.org/).
 
+## [0.32.0] — 2026-09-06
+
+### Added
+
+- **asyncapi**: `createAsyncApiRegistry()` documents a WebSocket surface as an
+  **AsyncAPI 3.0** document, served next to `/openapi.json`.
+
+  OpenAPI describes one request and its response. A socket has no such shape —
+  the connection stays open, messages travel both ways, and the server speaks
+  unprompted — so socket routes were documented in prose, and prose generates
+  no client. The registry mirrors the OpenAPI one: register the channel, the
+  messages and the operations, and `createApp({ asyncapi: { registry, info } })`
+  serves the result at `/asyncapi.json`.
+
+  ```typescript
+  const asyncapi = createAsyncApiRegistry()
+    .registerChannel({ name: "socket", address: "/ws", handshakeHeaders })
+    .registerMessage({ name: "SubscribeFrame", schema: subscribeFrame })
+    .registerOperation({
+      name: "subscribe",
+      channel: "socket",
+      direction: "clientToServer",
+      messages: ["SubscribeFrame"],
+    });
+  ```
+
+  **Direction is stated, never inferred.** AsyncAPI's `action` is relative to
+  whoever published the document, so a server-authored document spells a
+  client's send as `receive`. A generated consumer inverts every one of them,
+  and the wrong sign yields a client that compiles, type-checks and does the
+  opposite. The registry therefore takes `clientToServer` / `serverToClient`,
+  which cannot be read backwards, and emits the `action` itself. The document
+  also carries `x-tempest-perspective: "server"` so a reader never has to
+  assume.
+
+  Message payloads are generated from the caller's zod schemas through the same
+  path that feeds OpenAPI, so the documented shape and the shape the server
+  accepts are one object rather than two that can drift. An operation naming an
+  unregistered channel or message throws at generation: a dangling `$ref`
+  produces a structurally valid document whose generated client is silently
+  missing that frame.
+
+  New exports: `createAsyncApiRegistry`, `generateAsyncApiDocument`,
+  `mountAsyncApiJson`, `AsyncApiRegistry`, `ASYNCAPI_VERSION`,
+  `PERSPECTIVE_EXTENSION`, and the `AsyncApi*` types. `createApp` gains an
+  `asyncapi` option beside `openapi`. Recipe:
+  [AsyncAPI: documenting the WebSocket](recipes/asyncapi.en.md).
+
 ## [0.31.0] — 2026-09-05
 
 ### Fixed

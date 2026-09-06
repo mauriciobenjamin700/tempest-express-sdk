@@ -32,6 +32,12 @@ import {
   type OpenAPIRegistry,
   generateOpenApiDocument,
 } from "@/api/openapi";
+import {
+  type AsyncApiRegistry,
+  type GenerateAsyncApiOptions,
+  generateAsyncApiDocument,
+  mountAsyncApiJson,
+} from "@/asyncapi";
 import { JSONLogger } from "@/core";
 import type { MessageCatalog } from "@/exceptions/i18n";
 import express, { type Express, type RequestHandler } from "express";
@@ -54,6 +60,20 @@ export interface CreateAppOpenApi extends GenerateOpenApiOptions {
   redoc?: RedocOptions;
 }
 
+/**
+ * AsyncAPI documentation configuration for {@link createApp}.
+ *
+ * Sits beside {@link CreateAppOpenApi} rather than inside it: a service that
+ * speaks HTTP and WebSocket publishes two documents, because no single format
+ * describes both.
+ */
+export interface CreateAppAsyncApi extends GenerateAsyncApiOptions {
+  /** Registry holding the registered channels, messages and operations. */
+  registry: AsyncApiRegistry;
+  /** Route serving the document JSON. Default `/asyncapi.json`. */
+  jsonPath?: string;
+}
+
 /** Options for {@link createApp}. */
 export interface CreateAppOptions {
   /** Allowed CORS origins. `"*"` or a list; omit/`false` to disable CORS. */
@@ -64,6 +84,8 @@ export interface CreateAppOptions {
   configure?: (app: Express) => void | Promise<void>;
   /** OpenAPI docs configuration; omit to skip Swagger/Redoc. */
   openapi?: CreateAppOpenApi;
+  /** AsyncAPI docs configuration; omit when the service serves no socket. */
+  asyncapi?: CreateAppAsyncApi;
   /** Message catalog for localized error responses. */
   catalog?: MessageCatalog;
   /** Error-handling options forwarded to {@link registerExceptionHandlers}. */
@@ -131,6 +153,15 @@ export async function createApp(options: CreateAppOptions = {}): Promise<Express
     if (redocPath !== false) {
       mountRedoc(app, redocPath ?? "/redoc", specPath, redoc ?? {});
     }
+  }
+
+  if (options.asyncapi) {
+    const { registry, jsonPath, ...genOptions } = options.asyncapi;
+    mountAsyncApiJson(
+      app,
+      jsonPath ?? "/asyncapi.json",
+      generateAsyncApiDocument(registry, genOptions),
+    );
   }
 
   registerExceptionHandlers(app, {
