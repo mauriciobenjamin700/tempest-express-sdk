@@ -9,6 +9,47 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
     (0.2.0–0.11.0) vive no [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md)
     do repositório.
 
+## [0.31.0] — 2026-09-05
+
+### Corrigido
+
+- **api**: `registry.register()` não depende mais da ordem de avaliação de
+  módulo. O `zod-to-openapi` adiciona `.openapi()` por patch de
+  `ZodType.prototype`, e o zod v4 copia os membros do protótipo para dentro da
+  instância na construção — então um schema construído *antes* do módulo do SDK
+  ser avaliado nunca recebia o patch, e registrá-lo estourava
+  `TypeError: zodSchema.openapi is not a function` de dentro de `node_modules`.
+  Como declarar schemas em `schemas/*.ts` e importar o SDK só na camada de docs
+  é a ordem natural, a ordem que quebrava era a comum — e a falha caía no
+  **boot**.
+
+  `createOpenApiRegistry()` agora devolve um registry que re-marca esse schema
+  com `.meta({ id })` — o que constrói uma instância nova, já patchada — antes de
+  repassar para a biblioteca. O mesmo call site funciona nas duas ordens, e o
+  `registerParameter` é normalizado do mesmo jeito. Valor que não é nem schema
+  estendido nem schema zod v4 passa a falhar com uma mensagem que nomeia a causa
+  e aponta para `npm ls zod`, em vez de um `TypeError` vindo de dependência.
+  Closes #19.
+
+### Adicionado
+
+- **api**: `extendZodWithOpenApi` passa a ser reexportado, para quem precisa de
+  `.openapi()` **nas próprias instâncias de schema** (parâmetro com `param`,
+  `extend` com `anyOf`) aplicar o patch no próprio entrypoint sem declarar
+  `@asteasolutions/zod-to-openapi` como dependência direta e ter que manter a
+  versão em sincronia com a do SDK na mão.
+
+### Alterado
+
+- **docs**: a receita de OpenAPI passa a ensinar `.meta({ id })` como o jeito
+  padrão de nomear um componente. É nativo do zod v4, imune à ordem de import, e
+  marca o próprio schema — então qualquer rota que o importe emite `$ref` sem
+  precisar carregar um valor de retorno. O `register()` fica com seção própria,
+  com o aviso de que o valor devolvido é a cópia marcada: rota que referencia a
+  variável original sai com corpo inline, que foi como um gateway terminou com 18
+  rotas e nenhum componente. O `z` reexportado passa a ser documentado como a
+  instância já estendida.
+
 ## [0.30.0] — 2026-09-05
 
 ### Adicionado

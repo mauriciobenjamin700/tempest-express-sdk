@@ -5,6 +5,14 @@
  * module re-exports a `z` already augmented with `.openapi()` (so every schema
  * can carry OpenAPI metadata) and a {@link toDict} helper matching
  * `BaseSchema.to_dict` (drop nullish, exclude keys, merge extras).
+ *
+ * **The `z` this module exports is the augmented instance.** `extendZodWithOpenApi`
+ * patches `ZodType.prototype`, and zod v4 copies prototype members into each
+ * instance at construction — so only schemas built *after* this module has been
+ * evaluated carry `.openapi()`. Importing `z` from here rather than from `zod`
+ * makes that ordering automatic. It is not a requirement:
+ * `createOpenApiRegistry()` re-tags an un-patched schema on registration, so a
+ * project importing `z` straight from `zod` works too.
  */
 
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";

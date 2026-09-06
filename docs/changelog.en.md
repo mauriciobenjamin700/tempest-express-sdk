@@ -9,6 +9,46 @@ to [SemVer](https://semver.org/).
     (0.2.0–0.11.0) lives in the repository's
     [`CHANGELOG.md`](https://github.com/mauriciobenjamin700/tempest-express-sdk/blob/main/CHANGELOG.md).
 
+## [0.31.0] — 2026-09-05
+
+### Fixed
+
+- **api**: `registry.register()` no longer depends on module evaluation order.
+  `zod-to-openapi` adds `.openapi()` by patching `ZodType.prototype`, and zod v4
+  copies prototype members into each instance at construction — so a schema
+  built *before* the SDK module was evaluated never received the patch, and
+  registering it threw `TypeError: zodSchema.openapi is not a function` from
+  inside `node_modules`. Since declaring schemas in `schemas/*.ts` and importing
+  the SDK only in the docs layer is the natural order, the failing order was the
+  common one, and the failure landed at **boot**.
+
+  `createOpenApiRegistry()` now returns a registry that re-tags such a schema
+  through `.meta({ id })` — which builds a fresh, patched instance — before
+  handing it to the library. The same call site works in either order, and
+  `registerParameter` is normalized the same way. A value that is neither an
+  extended schema nor a zod v4 schema now fails with a message naming the cause
+  and pointing at `npm ls zod`, instead of a `TypeError` from a dependency.
+  Closes #19.
+
+### Added
+
+- **api**: `extendZodWithOpenApi` is re-exported, so a project that needs
+  `.openapi()` **on its own schema instances** (a parameter with `param`, an
+  `extend` with `anyOf`) can apply the patch in its own entrypoint without
+  declaring `@asteasolutions/zod-to-openapi` as a direct dependency and keeping
+  its version in sync with the SDK's by hand.
+
+### Changed
+
+- **docs**: the OpenAPI recipe now teaches `.meta({ id })` as the default way to
+  name a component. It is native zod v4, immune to import order, and it marks the
+  schema itself — so any route importing it emits a `$ref` without threading a
+  return value around. `register()` keeps its own section, with the warning that
+  its return value is the tagged copy: a route referencing the original variable
+  ships an inline body, which is how a gateway ended up with 18 routes and no
+  components. The re-exported `z` is now documented as the already-extended
+  instance.
+
 ## [0.30.0] — 2026-09-05
 
 ### Added

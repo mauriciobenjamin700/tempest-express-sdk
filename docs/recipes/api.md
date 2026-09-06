@@ -121,19 +121,20 @@ import { createOpenApiRegistry, z } from "tempest-express-sdk";
 const registry = createOpenApiRegistry();
 ```
 
-### Passo 2 — registre schemas e paths
+### Passo 2 — nomeie os schemas com `.meta({ id })`
 
-`registry.register(nome, schema)` publica um schema como **componente**
-reutilizável; `registry.registerPath({...})` descreve uma rota.
+Um schema com `id` vira **componente** (`components.schemas`), e toda rota que
+o usa emite `$ref` em vez de repetir a estrutura inline:
 
 ```ts
-const Item = registry.register(
-  "Item",
-  z.object({
+import { z } from "tempest-express-sdk";
+
+export const Item = z
+  .object({
     id: z.uuid().openapi({ description: "ID do item." }),
     name: z.string().openapi({ description: "Nome do item." }),
-  }),
-);
+  })
+  .meta({ id: "Item" });
 
 registry.registerPath({
   method: "get",
@@ -145,6 +146,50 @@ registry.registerPath({
   },
 });
 ```
+
+Resultado: `components.schemas.Item` preenchido e o corpo da resposta como
+`{"$ref": "#/components/schemas/Item"}`.
+
+!!! tip "`.meta({ id })` é o caminho padrão por dois motivos"
+    **É imune à ordem de import** (veja o aviso abaixo) e **marca o próprio
+    schema** — qualquer rota que o importe emite `$ref` sem precisar receber
+    nenhum valor de volta. `.meta` é nativo do zod v4, não uma extensão.
+
+### `registry.register(nome, schema)`
+
+Continua funcionando e é o caminho quando o schema precisa ser publicado como
+componente **sem** aparecer em nenhuma rota:
+
+```ts
+const Item = registry.register("Item", z.object({ id: z.uuid() }));
+```
+
+!!! warning "Use o valor que `register` devolve"
+    `register` não altera o schema que você passou — ele **devolve** uma cópia
+    marcada. Uma rota que referencia a variável original sai com o corpo
+    **inline**, não com `$ref`. Foi assim que 18 rotas de um gateway saíram sem
+    componente, fazendo o gerador de client emitir tipo anônimo do outro lado.
+
+!!! danger "Ordem de avaliação de módulo, e por que ela não te quebra mais"
+    `.openapi()` é adicionado por **patch de protótipo**, e o zod v4 copia os
+    membros do protótipo para dentro da instância na construção. Um schema
+    construído **antes** do módulo do SDK ser avaliado — a ordem natural, com
+    schemas em `schemas/*.ts` e o SDK importado só na camada de docs — não
+    recebe o patch, e o `register` da biblioteca estourava com
+    `TypeError: zodSchema.openapi is not a function` vindo de dentro de
+    `node_modules`, **no boot**.
+
+    Desde a 0.31.0 o registry do SDK normaliza o schema antes de repassar, então
+    o mesmo call site funciona nas duas ordens. Três coisas continuam valendo:
+
+    - `import { z } from "tempest-express-sdk"` nos módulos de schema garante a
+      instância já estendida — é a saída mais barata, e por isso a receita usa
+      esse import;
+    - quem precisa de `.openapi()` **no próprio schema** (parâmetro com `param`,
+      `extend` com `anyOf`) precisa da instância estendida, então importe o `z`
+      do SDK ou chame `extendZodWithOpenApi(z)` — agora reexportado — no
+      entrypoint da aplicação;
+    - `.meta({ id })` não depende de nada disso.
 
 ### Passo 3 — passe o registry para o `createApp`
 

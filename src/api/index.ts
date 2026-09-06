@@ -16,6 +16,7 @@ export {
   type OpenApiInfo,
   OpenAPIRegistry,
   createOpenApiRegistry,
+  extendZodWithOpenApi,
   generateOpenApiDocument,
 } from "@/api/openapi";
 export {
