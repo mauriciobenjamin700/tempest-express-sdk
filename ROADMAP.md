@@ -72,6 +72,9 @@
 - **0.30.0** — task primitives (`TaskManager.inventory`, `BaseJobModel` +
   `JobStore`) and the admin tasks page. **Parity with the `tempest-fastapi-sdk`
   admin panel is complete.**
+- **0.31.0** — the OpenAPI registry stopped depending on module evaluation
+  order (#19); `extendZodWithOpenApi` re-exported and `.meta({ id })` taught as
+  the default way to name a component.
 
 ## Goal: full parity with `tempest-fastapi-sdk`
 
