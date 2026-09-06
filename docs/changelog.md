@@ -52,6 +52,13 @@ Todas as mudanças relevantes deste projeto são documentadas aqui. O formato se
   pendurado produz documento estruturalmente válido cujo cliente gerado fica sem
   aquele frame, em silêncio.
 
+  Os headers do handshake são **embutidos** no binding `ws` em vez de
+  referenciados. A especificação tipa `bindings.ws.headers` como
+  `oneOf: [Schema, Reference]`, e um `{"$ref": ...}` puro satisfaz os dois
+  ramos — então o `oneOf` vê duas correspondências e o documento falha no
+  próprio JSON Schema do AsyncAPI. Medido das duas formas contra o
+  meta-schema oficial: embutido valida com zero erros.
+
   Exports novos: `createAsyncApiRegistry`, `generateAsyncApiDocument`,
   `mountAsyncApiJson`, `AsyncApiRegistry`, `ASYNCAPI_VERSION`,
   `PERSPECTIVE_EXTENSION` e os tipos `AsyncApi*`. O `createApp` ganha a opção

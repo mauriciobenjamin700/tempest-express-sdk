@@ -211,7 +211,7 @@ export class AsyncApiRegistry {
 
     const schemas = this.renderPayloads();
     const messages = this.renderMessages();
-    const channels = this.renderChannels();
+    const channels = this.renderChannels(schemas);
     const operations = this.renderOperations();
 
     return {
@@ -307,14 +307,23 @@ export class AsyncApiRegistry {
   /**
    * Render `channels`, each listing every message it can carry.
    *
+   * @param schemas - The rendered component schemas, to inline the
+   *   handshake ones into the binding.
    * @returns Channel objects keyed by name.
+   *
+   * The handshake schemas are **inlined** rather than `$ref`-ed. The
+   * specification types the binding's `headers` and `query` as
+   * `oneOf: [Schema, Reference]`, and a bare `{"$ref": ...}` object
+   * satisfies both branches — so `oneOf` sees two matches and the document
+   * fails validation against AsyncAPI's own JSON Schema. Measured: the same
+   * binding with the schema inlined validates clean.
    *
    * A channel lists every registered message rather than only those its own
    * operations use: the specification requires an operation's `messages` to
    * be a subset of its channel's, and with one connection per document the
    * distinction buys nothing.
    */
-  private renderChannels(): Record<string, unknown> {
+  private renderChannels(schemas: Record<string, unknown>): Record<string, unknown> {
     const everyMessage: Record<string, unknown> = {};
     for (const name of this.messages.keys()) {
       everyMessage[name] = { $ref: `#/components/messages/${name}` };
@@ -327,10 +336,10 @@ export class AsyncApiRegistry {
         method: "GET",
       };
       if (channel.handshakeHeaders !== undefined) {
-        bindings.headers = { $ref: `#/components/schemas/${name}Headers` };
+        bindings.headers = schemas[`${name}Headers`];
       }
       if (channel.handshakeQuery !== undefined) {
-        bindings.query = { $ref: `#/components/schemas/${name}Query` };
+        bindings.query = schemas[`${name}Query`];
       }
       rendered[name] = {
         address: channel.address,

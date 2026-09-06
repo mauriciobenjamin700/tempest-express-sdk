@@ -46,6 +46,13 @@ to [SemVer](https://semver.org/).
   produces a structurally valid document whose generated client is silently
   missing that frame.
 
+  The handshake headers are **inlined** into the `ws` binding rather than
+  `$ref`-ed. The specification types `bindings.ws.headers` as
+  `oneOf: [Schema, Reference]`, and a bare `{"$ref": ...}` satisfies both
+  branches — so `oneOf` sees two matches and the document fails AsyncAPI's own
+  JSON Schema. Measured both ways against the official meta-schema: inlined
+  validates with zero errors.
+
   New exports: `createAsyncApiRegistry`, `generateAsyncApiDocument`,
   `mountAsyncApiJson`, `AsyncApiRegistry`, `ASYNCAPI_VERSION`,
   `PERSPECTIVE_EXTENSION`, and the `AsyncApi*` types. `createApp` gains an

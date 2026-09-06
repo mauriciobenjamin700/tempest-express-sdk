@@ -94,7 +94,11 @@ Batendo em `http://127.0.0.1:3000/asyncapi.json`:
         "ws": {
           "bindingVersion": "0.1.0",
           "method": "GET",
-          "headers": { "$ref": "#/components/schemas/socketHeaders" }
+          "headers": {
+            "type": "object",
+            "properties": { "x-api-key": { "type": "string" } },
+            "required": ["x-api-key"]
+          }
         }
       }
     }
@@ -126,6 +130,13 @@ documento.
 
 O `handshakeHeaders` vira o binding `ws` do canal, que é onde a especificação
 guarda o que o upgrade HTTP exige. É ali que a chave de API fica documentada.
+
+!!! note "O schema do handshake é embutido, não referenciado"
+    A especificação tipa `bindings.ws.headers` como
+    `oneOf: [Schema, Reference]`, e um `{"$ref": ...}` puro satisfaz **os
+    dois** ramos — então o `oneOf` vê duas correspondências e o documento
+    falha no próprio JSON Schema do AsyncAPI. Medido das duas formas contra o
+    meta-schema oficial.
 
 ### `direction` é do ponto de vista do cliente
 

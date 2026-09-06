@@ -169,14 +169,16 @@ describe("The WebSocket handshake is documented", () => {
     expect(at(document, "channels.socket.bindings.ws.method")).toBe("GET");
   });
 
-  it("points the binding headers at the registered schema", () => {
+  it("inlines the handshake headers into the binding", () => {
+    // Not a `$ref`: the specification types the binding's `headers` as
+    // `oneOf: [Schema, Reference]`, and `{"$ref": ...}` satisfies both, so
+    // `oneOf` sees two matches and the document fails validation against
+    // AsyncAPI's own JSON Schema.
     const document = buildDocument();
-    expect(at(document, "channels.socket.bindings.ws.headers")).toEqual({
-      $ref: "#/components/schemas/socketHeaders",
-    });
     expect(
-      at(document, "components.schemas.socketHeaders.properties.x-api-key.type"),
+      at(document, "channels.socket.bindings.ws.headers.properties.x-api-key.type"),
     ).toBe("string");
+    expect(at(document, "channels.socket.bindings.ws.headers.$ref")).toBeUndefined();
   });
 
   it("omits the query binding when the channel declares none", () => {
